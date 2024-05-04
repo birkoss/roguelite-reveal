@@ -33,27 +33,21 @@ export class DungeonScene extends Phaser.Scene {
         this.#map.container.setPosition(this.scale.width - this.#map.container.getBounds().width, 0);
 
         // Enable Tile selection
-        // this.#mapContainer.setInteractive(
-        //     new Phaser.Geom.Rectangle(0, 0, this.#mapContainer.getBounds().width, this.#mapContainer.getBounds().height),
-        //     Phaser.Geom.Rectangle.Contains
-        // );
-        // this.#mapContainer.on('pointerdown', (target) => {
-        //     let x = Math.floor((target.worldX - this.#mapContainer.x) / TILE_SIZE);
-        //     let y = Math.floor((target.worldY - this.#mapContainer.y) / TILE_SIZE);
+        this.#map.container.setInteractive(
+            new Phaser.Geom.Rectangle(
+                0, 0, this.#map.container.getBounds().width, this.#map.container.getBounds().height
+            ),
+            Phaser.Geom.Rectangle.Contains
+        );
+        this.#map.container.on('pointerdown', (target) => {
+            let x = Math.floor((target.worldX - this.#map.container.x) / TILE_SIZE);
+            let y = Math.floor((target.worldY - this.#map.container.y) / TILE_SIZE);
 
-        //     this.#selectTile(x, y);
-        // });
-
-        // Reveal all borders
-        // this.#map.tiles.forEach((singleTile) => {
-        //     if (singleTile.x == 0 || singleTile.y == 0 || singleTile.x == this.#map.width -1 || singleTile.y == this.#map.height - 1) {
-        //         singleTile.reveal({
-        //             skipAnimation: true,
-        //         });
-        //     }
-        // });
+            this.#selectTile(x, y);
+        });
 
         // Pick a random position for the starting player
+        // TODO: Pick an EMPTY tile
         let tiles = this.#map.tiles.filter(singleTile => !singleTile.isRevealed);
         Phaser.Utils.Array.Shuffle(tiles);
 

@@ -226,9 +226,9 @@ export class Map {
      * @param {number} y 
      */
     revealTile(x, y) {
+        console.log(`TILE CLICKED ON ${x}x${y}`);
         // TODO: Remove
         return;
-        console.log(`TILE CLICKED ON ${x}x${y}`);
         let tile = this.tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
         if (tile.fogOfWar !== TILE_FOG_OF_WAR.PARTIAL) {
             return;
