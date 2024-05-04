@@ -9,8 +9,6 @@ import { TILE_SIZE } from "../config.js";
 export class DungeonScene extends Phaser.Scene {
     /** @type {Map} */
     #map;
-    /** @type {Phaser.GameObjects.Container} */
-    #mapContainer;
 
     /** @type {DungeonTheme} */
     #dungeonTheme;
@@ -28,48 +26,23 @@ export class DungeonScene extends Phaser.Scene {
     }
 
     #createMap() {
-        this.#mapContainer = this.add.container(0, 0);
+        this.#map = new Map(this, 10, 8);
 
-        this.#map = new Map(10, 8);
+        this.#map.create(this.#dungeonTheme);
 
-        this.#map.tiles.forEach((singleTile) => {
-            let assetKey = this.#dungeonTheme.floor.assetKey;
-            let assetFrame = this.#dungeonTheme.floor.assetFrame;
-
-            if (singleTile.type == TILE_TYPE.WALL) {
-                assetKey = this.#dungeonTheme.walls.assetKey;
-
-                assetFrame = 0;
-
-                // Get the first frame, should always be the default wall
-                if (this.#dungeonTheme.walls.assetFrames.length > 0) {
-                    assetFrame = this.#dungeonTheme.walls.assetFrames[0];
-                }
-
-                let dungeonWallLayout = this.#map.getTileLayout(singleTile.x, singleTile.y, TILE_TYPE.WALL);
-
-                if (dungeonWallLayout < this.#dungeonTheme.walls.assetFrames.length) {
-                    assetFrame = this.#dungeonTheme.walls.assetFrames[dungeonWallLayout];
-                }
-            }
-
-            let tileGameObjects = singleTile.create(this, assetKey, assetFrame);
-            this.#mapContainer.add(tileGameObjects);
-        });
-
-        this.#mapContainer.setPosition(this.scale.width - this.#mapContainer.getBounds().width, 0);
+        this.#map.container.setPosition(this.scale.width - this.#map.container.getBounds().width, 0);
 
         // Enable Tile selection
-        this.#mapContainer.setInteractive(
-            new Phaser.Geom.Rectangle(0, 0, this.#mapContainer.getBounds().width, this.#mapContainer.getBounds().height),
-            Phaser.Geom.Rectangle.Contains
-        );
-        this.#mapContainer.on('pointerdown', (target) => {
-            let x = Math.floor((target.worldX - this.#mapContainer.x) / TILE_SIZE);
-            let y = Math.floor((target.worldY - this.#mapContainer.y) / TILE_SIZE);
+        // this.#mapContainer.setInteractive(
+        //     new Phaser.Geom.Rectangle(0, 0, this.#mapContainer.getBounds().width, this.#mapContainer.getBounds().height),
+        //     Phaser.Geom.Rectangle.Contains
+        // );
+        // this.#mapContainer.on('pointerdown', (target) => {
+        //     let x = Math.floor((target.worldX - this.#mapContainer.x) / TILE_SIZE);
+        //     let y = Math.floor((target.worldY - this.#mapContainer.y) / TILE_SIZE);
 
-            this.#selectTile(x, y);
-        });
+        //     this.#selectTile(x, y);
+        // });
 
         // Reveal all borders
         this.#map.tiles.forEach((singleTile) => {

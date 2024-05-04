@@ -5,6 +5,8 @@ import { TILE_FOG_OF_WAR, TILE_TYPE, Tile } from "./tiles/tile.js";
 import { Wall } from "./tiles/wall.js";
 
 export class Map {
+    /** @type {Phaser.Scene} */
+    #scene;
     /** @type {number} */
     #width;
     /** @type {number} */
@@ -13,13 +15,34 @@ export class Map {
     /** @type {Tile[]} */
     #tiles;
 
+    /** @type {Phaser.GameObjects.Container} */
+    #container;
+    /** @type {Phaser.GameObjects.Container} */
+    #tilesContainer;
+    /** @type {Phaser.GameObjects.Container} */
+    #entitiesContainer;
+    /** @type {Phaser.GameObjects.Container} */
+    #overlayContainer;
+
     /**
+     * @param {Phaser.Scene} scene
      * @param {number} width 
      * @param {number} height 
      */
-    constructor(width, height) {
+    constructor(scene, width, height) {
+        this.#scene = scene;
         this.#width = width;
         this.#height = height;
+
+        this.#tilesContainer = scene.add.container(0, 0);
+        this.#entitiesContainer = scene.add.container(0, 0);
+        this.#overlayContainer = scene.add.container(0, 0);
+
+        this.#container = scene.add.container(0, 0, [
+            this.#tilesContainer,
+            this.#entitiesContainer, 
+            this.#overlayContainer,
+        ]);
 
         this.#generate();
     }
@@ -32,10 +55,43 @@ export class Map {
     get height() {
         return this.#height;
     }
-
     /** @type {Tile[]} */
     get tiles() {
         return [...this.#tiles];
+    }
+    /** @type {Phaser.GameObjects.Container} */
+    get container() {
+        return this.#container;
+    }
+
+    /**
+     * @param {DungeonTheme} theme 
+     */
+    create(theme) {
+        this.tiles.forEach((singleTile) => {
+            let assetKey = theme.floor.assetKey;
+            let assetFrame = theme.floor.assetFrame;
+
+            if (singleTile.type == TILE_TYPE.WALL) {
+                assetKey = theme.walls.assetKey;
+
+                assetFrame = 0;
+
+                // Get the first frame, should always be the default wall
+                if (theme.walls.assetFrames.length > 0) {
+                    assetFrame = theme.walls.assetFrames[0];
+                }
+
+                let dungeonWallLayout = this.getTileLayout(singleTile.x, singleTile.y, TILE_TYPE.WALL);
+
+                if (dungeonWallLayout < theme.walls.assetFrames.length) {
+                    assetFrame = theme.walls.assetFrames[dungeonWallLayout];
+                }
+            }
+
+            let tileGameObjects = singleTile.create(this.#scene, assetKey, assetFrame);
+            this.#tilesContainer.add(tileGameObjects);
+        });
     }
 
     /**
@@ -170,7 +226,7 @@ export class Map {
         Phaser.Utils.Array.Shuffle(emptyTiles);
 
         let tile = emptyTiles.shift();
-        
+
 
     }
 }
