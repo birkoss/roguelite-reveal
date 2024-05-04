@@ -1,7 +1,7 @@
 import Phaser from "../lib/phaser.js";
 
 import { SCENE_KEYS } from "../keys/scene.js";
-import { DUNGEON_ASSET_KEYS } from "../keys/asset.js";
+import { DATA_ASSET_KEYS, DUNGEON_ASSET_KEYS } from "../keys/asset.js";
 
 export class PreloadScene extends Phaser.Scene {
     constructor() {
@@ -19,6 +19,10 @@ export class PreloadScene extends Phaser.Scene {
             frameWidth: 24,
             frameHeight: 24,
         });
+        this.load.json(
+            DATA_ASSET_KEYS.DUNGEON_THEMES,
+            'assets/data/dungeon-themes.json'
+        );
     }
 
     create() {

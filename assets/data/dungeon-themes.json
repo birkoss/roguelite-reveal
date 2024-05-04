@@ -1,0 +1,31 @@
+[
+    {
+        "id" : "main",
+        "name": "Main Theme",
+        "floor": {
+            "assetKey": "WORLD",
+            "assetFrame": 3
+        },
+        "walls": {
+            "assetKey": "WORLD",
+            "assetFrames": [
+                0,
+                12,
+                15,
+                19,
+                10,
+                11,
+                18,
+                24,
+                13,
+                17,
+                14,
+                22,
+                16,
+                21,
+                23,
+                20
+            ]
+        }
+    }
+]

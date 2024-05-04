@@ -37,6 +37,37 @@ export class Map {
         return (x >= 0 && x < this.#width && y >= 0 && y < this.#height);
     }
 
+    /**
+     * @param {number} x 
+     * @param {number} y 
+     * @param {import("./tiles/tile.js").TileType} tileType 
+     * @returns {number}
+     */
+    getTileLayout(x, y, tileType) {
+        // Get the layout depending on its neighboors from the tileType
+        // - Depending on the adjacent tile from those values (0 to 15) :
+        //  - (left = +1, top = +2, right = +4, bottom = +8)
+        let layout = 0;
+
+        let neighboors = this.#getNeighboors(x, y);
+        neighboors.forEach((singleNeighboor) => {
+            // Only check adjacent wall
+            if (singleNeighboor.type !== tileType) {
+                return;
+            }
+
+            let diffX = x - singleNeighboor.x;
+            let diffY = y - singleNeighboor.y;
+            if (diffX !== 0) {
+                layout += (diffX < 0 ? 4 : 1);
+            } else {
+                layout += (diffY < 0 ? 8 : 2);
+            }
+        });
+
+        return layout;
+    }
+
     #generate() {
         this.#tiles = [];
 
@@ -61,7 +92,7 @@ export class Map {
      * @param {number} y 
      * @returns {Tile[]}
      */
-    getNeighboors(x, y) {
+    #getNeighboors(x, y) {
         let neighboors = [];
 
         for (let y2=-1; y2<= 1; y2++) {
