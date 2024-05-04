@@ -108,6 +108,10 @@ export class Map {
         return neighboors;
     }
 
+    /**
+     * @param {number} x 
+     * @param {number} y 
+     */
     revealTile(x, y) {
         console.log(`TILE CLICKED ON ${x}x${y}`);
         let tile = this.tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
