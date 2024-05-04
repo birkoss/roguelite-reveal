@@ -1,3 +1,4 @@
+import { TILE_SIZE } from "../config.js";
 import Phaser from "../lib/phaser.js";
 import { Floor } from "./tiles/floor.js";
 
@@ -68,6 +69,7 @@ export class Map {
      * @param {DungeonTheme} theme 
      */
     create(theme) {
+        // Create tiles
         this.tiles.forEach((singleTile) => {
             let assetKey = theme.floor.assetKey;
             let assetFrame = theme.floor.assetFrame;
@@ -89,9 +91,42 @@ export class Map {
                 }
             }
 
-            let tileGameObjects = singleTile.create(this.#scene, assetKey, assetFrame);
-            this.#tilesContainer.add(tileGameObjects);
+            let tileGameObject = singleTile.create(this.#scene, assetKey, assetFrame);
+            this.#tilesContainer.add(tileGameObject);
         });
+
+        // Create Overlays
+        this.tiles.forEach((singleTile) => {
+            if (this.isBorder(singleTile.x, singleTile.y)) {
+                return;
+            }
+
+            let overlay = this.#scene.add.image(
+                singleTile.gameObject.x,
+                singleTile.gameObject.y,
+                theme.floor.assetKey,
+                2
+            );
+            overlay.setOrigin(0);
+            overlay.setAlpha(0.3);
+            this.#overlayContainer.add(overlay);
+        });
+
+
+        // Place exit
+        let emptyTiles = this.getEmptyTiles();
+        Phaser.Utils.Array.Shuffle(emptyTiles);
+
+        let tile = emptyTiles.shift();
+        let exitGameObject = this.#scene.add.image(
+            tile.gameObject.x,
+            tile.gameObject.y,
+            theme.exit.assetKey,
+            theme.exit.assetFrame,
+        );
+        exitGameObject.setOrigin(0);
+        exitGameObject.setAlpha(1);
+        this.#entitiesContainer.add(exitGameObject);
     }
 
     /**
@@ -101,6 +136,15 @@ export class Map {
      */
     isInBound(x, y) {
         return (x >= 0 && x < this.#width && y >= 0 && y < this.#height);
+    }
+
+    /**
+     * @param {number} x 
+     * @param {number} y 
+     * @returns {boolean}
+     */
+    isBorder(x, y) {
+        return (x == 0 || y === 0 || x == this.#width - 1 || y === this.#height - 1);
     }
 
     /**
@@ -182,6 +226,8 @@ export class Map {
      * @param {number} y 
      */
     revealTile(x, y) {
+        // TODO: Remove
+        return;
         console.log(`TILE CLICKED ON ${x}x${y}`);
         let tile = this.tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
         if (tile.fogOfWar !== TILE_FOG_OF_WAR.PARTIAL) {
@@ -221,11 +267,6 @@ export class Map {
 
         // Generate chest
 
-        // Place exit
-        let emptyTiles = this.getEmptyTiles();
-        Phaser.Utils.Array.Shuffle(emptyTiles);
-
-        let tile = emptyTiles.shift();
 
 
     }

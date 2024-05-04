@@ -78,23 +78,28 @@ export class Tile {
     get fogOfWar() {
         return this._fogOfWar;
     }
+    /** @type {Phaser.GameObjects.Image} */
+    get gameObject() {
+        return this._gameObject;
+    }
 
     /**
      * @param {Phaser.Scene} scene 
      * @param {string} assetKey
      * @param {number} [assetFrame=0]
-     * @returns {Phaser.GameObjects.Image[]}
+     * @returns {Phaser.GameObjects.Image}
      */
     create(scene, assetKey, assetFrame) {
         this._assetFrame = assetFrame;
 
         this._gameObject = scene.add.image(this.x * TILE_SIZE, this.y * TILE_SIZE, assetKey, assetFrame);
         this._gameObject.setOrigin(0);
-        this._gameObject.setTint(0x000000);
 
-        this._overlayGameObject = scene.add.image(this._gameObject.x, this._gameObject.y, assetKey, 2);
-        this._overlayGameObject.setOrigin(0);
-        this._overlayGameObject.setAlpha(0.4);
+        // this._gameObject.setTint(0x000000);
+
+        // this._overlayGameObject = scene.add.image(this._gameObject.x, this._gameObject.y, assetKey, 2);
+        // this._overlayGameObject.setOrigin(0);
+        // this._overlayGameObject.setAlpha(0.4);
 
         // TODO: Replace this shadow depending on the layout
         // if (this.x === 1 && this.y === 1) {
@@ -102,7 +107,7 @@ export class Tile {
         //     shadow.setOrigin(0);
         // }
 
-        return [this._gameObject, this._overlayGameObject];
+        return this._gameObject;
     }
 
     /**

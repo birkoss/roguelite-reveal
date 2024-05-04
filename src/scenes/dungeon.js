@@ -45,22 +45,22 @@ export class DungeonScene extends Phaser.Scene {
         // });
 
         // Reveal all borders
-        this.#map.tiles.forEach((singleTile) => {
-            if (singleTile.x == 0 || singleTile.y == 0 || singleTile.x == this.#map.width -1 || singleTile.y == this.#map.height - 1) {
-                singleTile.reveal({
-                    skipAnimation: true,
-                });
-            }
-        });
+        // this.#map.tiles.forEach((singleTile) => {
+        //     if (singleTile.x == 0 || singleTile.y == 0 || singleTile.x == this.#map.width -1 || singleTile.y == this.#map.height - 1) {
+        //         singleTile.reveal({
+        //             skipAnimation: true,
+        //         });
+        //     }
+        // });
 
         // Pick a random position for the starting player
         let tiles = this.#map.tiles.filter(singleTile => !singleTile.isRevealed);
         Phaser.Utils.Array.Shuffle(tiles);
 
         let startingPosition = tiles.shift();
-        startingPosition.preview(() => {
-            this.#selectTile(startingPosition.x, startingPosition.y);
-        });
+        // startingPosition.preview(() => {
+        //     this.#selectTile(startingPosition.x, startingPosition.y);
+        // });
     }
 
     /**
