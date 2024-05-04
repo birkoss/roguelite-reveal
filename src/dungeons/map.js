@@ -109,6 +109,19 @@ export class Map {
     }
 
     /**
+     * @returns {Tile[]}
+     */
+    getEmptyTiles() {
+        return this.#tiles.filter((singleTile) => {
+            // Walls are not empty
+            if (singleTile.type === TILE_TYPE.WALL) {
+                return;
+            }
+            return singleTile;
+        });
+    }
+
+    /**
      * @param {number} x 
      * @param {number} y 
      */
@@ -147,5 +160,17 @@ export class Map {
                 this.#tiles.push(tile);
             }
         }
+
+        // Generate ennemies
+
+        // Generate chest
+
+        // Place exit
+        let emptyTiles = this.getEmptyTiles();
+        Phaser.Utils.Array.Shuffle(emptyTiles);
+
+        let tile = emptyTiles.shift();
+        
+
     }
 }

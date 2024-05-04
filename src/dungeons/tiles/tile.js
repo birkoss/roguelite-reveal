@@ -1,5 +1,7 @@
-import { TILE_SIZE } from "../../config.js";
 import Phaser from "../../lib/phaser.js";
+
+import { TILE_SIZE } from "../../config.js";
+import { Entity } from "../entities/entity.js";
 
 /** @typedef {keyof typeof TILE_TYPE} TileType */
 /** @enum {TileType} */
@@ -38,6 +40,9 @@ export class Tile {
 
     /** @type {TileFogOfWar} */
     _fogOfWar;
+
+    /** @type {Entity | undefined} */
+    _entity;
 
     /**
      * @param {number} x 

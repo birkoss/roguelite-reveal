@@ -6,6 +6,10 @@
             "assetKey": "WORLD",
             "assetFrame": 3
         },
+        "exit": {
+            "assetKey": "WORLD",
+            "assetFrame": 7
+        },
         "walls": {
             "assetKey": "WORLD",
             "assetFrames": [

@@ -3,19 +3,20 @@
  * @type {Object}
  * @property {string} id
  * @property {string} name
- * @property {DungeonFloorData} floor
- * @property {DungeonWallData} walls
+ * @property {DungeonSingleFrame} floor
+ * @property {DungeonSingleFrame} exit
+ * @property {DungeonMultipleFrames} walls
  */
 
 /** 
- * @typedef DungeonFloorData
+ * @typedef DungeonSingleFrame
  * @type {Object}
  * @property {string} assetKey
  * @property {number} assetFrame
  */
 
 /** 
- * @typedef DungeonWallData
+ * @typedef DungeonMultipleFrames
  * @type {Object}
  * @property {string} assetKey
  * @property {number[]} assetFrames
