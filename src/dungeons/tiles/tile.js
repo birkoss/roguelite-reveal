@@ -51,5 +51,10 @@ export class Tile {
     create(scene, assetKey, assetFrame) {
         this._gameObject = scene.add.sprite(this.x * 48, this.y * 48, assetKey, assetFrame);
         this._gameObject.setOrigin(0);
+
+        if (this.x === 1 && this.y === 1) {
+            let shadow = scene.add.sprite(this.x * 48, this.y * 48, assetKey, 2009);
+            shadow.setOrigin(0);
+        }
     }
 }
