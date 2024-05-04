@@ -1,7 +1,7 @@
 import Phaser from "../lib/phaser.js";
 import { Floor } from "./tiles/floor.js";
 
-import { TILE_TYPE, Tile } from "./tiles/tile.js";
+import { TILE_FOG_OF_WAR, TILE_TYPE, Tile } from "./tiles/tile.js";
 import { Wall } from "./tiles/wall.js";
 
 export class Map {
@@ -24,6 +24,16 @@ export class Map {
         this.#generate();
     }
 
+    /** @type {number} */
+    get width() {
+        return this.#width;
+    }
+    /** @type {number} */
+    get height() {
+        return this.#height;
+    }
+
+    /** @type {Tile[]} */
     get tiles() {
         return [...this.#tiles];
     }
@@ -49,7 +59,7 @@ export class Map {
         //  - (left = +1, top = +2, right = +4, bottom = +8)
         let layout = 0;
 
-        let neighboors = this.#getNeighboors(x, y);
+        let neighboors = this.getNeighboors(x, y);
         neighboors.forEach((singleNeighboor) => {
             // Only check adjacent wall
             if (singleNeighboor.type !== tileType) {
@@ -68,31 +78,12 @@ export class Map {
         return layout;
     }
 
-    #generate() {
-        this.#tiles = [];
-
-        for (let y=0; y<this.#height; y++) {
-            for (let x=0; x<this.#width; x++) {
-                let isWall = (x === 0 || y === 0 || y === this.#height-1 || x === this.#width-1);
-
-                let tile;
-                if (isWall) {
-                    tile = new Wall(x, y);
-                } else {
-                    tile = new Floor(x, y);
-                }
-
-                this.#tiles.push(tile);
-            }
-        }
-    }
-
     /**
      * @param {number} x 
      * @param {number} y 
      * @returns {Tile[]}
      */
-    #getNeighboors(x, y) {
+    getNeighboors(x, y) {
         let neighboors = [];
 
         for (let y2=-1; y2<= 1; y2++) {
@@ -115,5 +106,42 @@ export class Map {
             }
         }
         return neighboors;
+    }
+
+    revealTile(x, y) {
+        console.log(`TILE CLICKED ON ${x}x${y}`);
+        let tile = this.tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
+        if (tile.fogOfWar !== TILE_FOG_OF_WAR.PARTIAL) {
+            return;
+        }
+
+        tile.reveal({
+            callback: () => {
+                // Preview adjacent tiles
+                let neighboors = this.getNeighboors(tile.x, tile.y);
+                neighboors.forEach((singleNeighboor) => {
+                    singleNeighboor.preview();
+                });
+            }
+        });
+    }
+
+    #generate() {
+        this.#tiles = [];
+
+        for (let y=0; y<this.#height; y++) {
+            for (let x=0; x<this.#width; x++) {
+                let isWall = (x === 0 || y === 0 || y === this.#height-1 || x === this.#width-1);
+
+                let tile;
+                if (isWall) {
+                    tile = new Wall(x, y);
+                } else {
+                    tile = new Floor(x, y);
+                }
+
+                this.#tiles.push(tile);
+            }
+        }
     }
 }

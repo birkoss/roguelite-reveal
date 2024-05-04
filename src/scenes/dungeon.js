@@ -2,7 +2,7 @@ import Phaser from "../lib/phaser.js";
 
 import { SCENE_KEYS } from "../keys/scene.js";
 import { Map } from "../dungeons/map.js";
-import { TILE_TYPE } from "../dungeons/tiles/tile.js";
+import { TILE_FOG_OF_WAR, TILE_TYPE } from "../dungeons/tiles/tile.js";
 import { DataUtils } from "../utils/data.js";
 import { TILE_SIZE } from "../config.js";
 
@@ -33,33 +33,33 @@ export class DungeonScene extends Phaser.Scene {
         this.#map = new Map(10, 8);
 
         this.#map.tiles.forEach((singleTile) => {
-            if (singleTile.type == TILE_TYPE.FLOOR) {
-                let gameObject = singleTile.create(this, this.#dungeonTheme.floor.assetKey, this.#dungeonTheme.floor.assetFrame);
-                this.#mapContainer.add(gameObject);
-                return;
-            }
+            let assetKey = this.#dungeonTheme.floor.assetKey;
+            let assetFrame = this.#dungeonTheme.floor.assetFrame;
 
             if (singleTile.type == TILE_TYPE.WALL) {
-                let dungeonWallAssetFrame = 0;
+                assetKey = this.#dungeonTheme.walls.assetKey;
+
+                assetFrame = 0;
 
                 // Get the first frame, should always be the default wall
                 if (this.#dungeonTheme.walls.assetFrames.length > 0) {
-                    dungeonWallAssetFrame = this.#dungeonTheme.walls.assetFrames[0];
+                    assetFrame = this.#dungeonTheme.walls.assetFrames[0];
                 }
 
                 let dungeonWallLayout = this.#map.getTileLayout(singleTile.x, singleTile.y, TILE_TYPE.WALL);
 
                 if (dungeonWallLayout < this.#dungeonTheme.walls.assetFrames.length) {
-                    dungeonWallAssetFrame = this.#dungeonTheme.walls.assetFrames[dungeonWallLayout];
+                    assetFrame = this.#dungeonTheme.walls.assetFrames[dungeonWallLayout];
                 }
-                
-                let gameObject = singleTile.create(this, this.#dungeonTheme.walls.assetKey, dungeonWallAssetFrame);
-                this.#mapContainer.add(gameObject);
             }
+
+            let tileGameObjects = singleTile.create(this, assetKey, assetFrame);
+            this.#mapContainer.add(tileGameObjects);
         });
 
         this.#mapContainer.setPosition(this.scale.width - this.#mapContainer.getBounds().width, 0);
 
+        // Enable Tile selection
         this.#mapContainer.setInteractive(
             new Phaser.Geom.Rectangle(0, 0, this.#mapContainer.getBounds().width, this.#mapContainer.getBounds().height),
             Phaser.Geom.Rectangle.Contains
@@ -70,6 +70,24 @@ export class DungeonScene extends Phaser.Scene {
 
             this.#selectTile(x, y);
         });
+
+        // Reveal all borders
+        this.#map.tiles.forEach((singleTile) => {
+            if (singleTile.x == 0 || singleTile.y == 0 || singleTile.x == this.#map.width -1 || singleTile.y == this.#map.height - 1) {
+                singleTile.reveal({
+                    skipAnimation: true,
+                });
+            }
+        });
+
+        // Pick a random position for the starting player
+        let tiles = this.#map.tiles.filter(singleTile => !singleTile.isRevealed);
+        Phaser.Utils.Array.Shuffle(tiles);
+
+        let startingPosition = tiles.shift();
+        startingPosition.preview(() => {
+            this.#selectTile(startingPosition.x, startingPosition.y);
+        });
     }
 
     /**
@@ -77,6 +95,6 @@ export class DungeonScene extends Phaser.Scene {
      * @param {number} y 
      */
     #selectTile(x, y) {
-        console.log(`TILE CLICKED ON ${x}x${y}`);
+        this.#map.revealTile(x, y);
     }
 }
