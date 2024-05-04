@@ -46,7 +46,6 @@ export class Map {
 
                 let tile;
                 if (isWall) {
-                    // TODO: Detect neighboors
                     tile = new Wall(x, y);
                 } else {
                     tile = new Floor(x, y);
