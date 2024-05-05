@@ -1,0 +1,13 @@
+[
+    {
+        "id": "skeleton",
+        "name": "Skeleton",
+        "hp": 3,
+        "attack": 1,
+        "assetKey": "UNITS",
+        "assetFrames": [
+            290,
+            308
+        ]
+    }
+]

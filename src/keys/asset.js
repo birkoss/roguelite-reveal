@@ -1,5 +1,6 @@
 export const DATA_ASSET_KEYS = Object.freeze({
     DUNGEON_THEMES: 'DUNGEON_THEMES',
+    ENEMIES: 'ENEMIES',
 });
 
 export const DUNGEON_ASSET_KEYS = Object.freeze({

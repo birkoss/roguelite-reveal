@@ -2,6 +2,7 @@ import Phaser from "../lib/phaser.js";
 
 import { SCENE_KEYS } from "../keys/scene.js";
 import { DATA_ASSET_KEYS, DUNGEON_ASSET_KEYS } from "../keys/asset.js";
+import { TILE_SIZE } from "../config.js";
 
 export class PreloadScene extends Phaser.Scene {
     constructor() {
@@ -12,16 +13,20 @@ export class PreloadScene extends Phaser.Scene {
 
     preload() {
         this.load.spritesheet(DUNGEON_ASSET_KEYS.WORLD, 'assets/tilesets/world.png', {
-            frameWidth: 48,
-            frameHeight: 48,
+            frameWidth: TILE_SIZE,
+            frameHeight: TILE_SIZE,
         });
         this.load.spritesheet(DUNGEON_ASSET_KEYS.UNITS, 'assets/tilesets/units.png', {
-            frameWidth: 24,
-            frameHeight: 24,
+            frameWidth: TILE_SIZE,
+            frameHeight: TILE_SIZE,
         });
         this.load.json(
             DATA_ASSET_KEYS.DUNGEON_THEMES,
             'assets/data/dungeon-themes.json'
+        );
+        this.load.json(
+            DATA_ASSET_KEYS.ENEMIES,
+            'assets/data/enemies.json'
         );
     }
 

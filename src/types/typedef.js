@@ -21,3 +21,14 @@
  * @property {string} assetKey
  * @property {number[]} assetFrames
  */
+
+/** 
+ * @typedef EnemyDetails
+ * @type {Object}
+ * @property {string} id
+ * @property {string} name
+ * @property {number} hp
+ * @property {number} attack
+ * @property {string} assetKey
+ * @property {number[]} assetFrames
+ */
