@@ -425,7 +425,7 @@ export class Map {
                         overlay.gameObject.x + overlay.gameObject.displayWidth / 2,
                         overlay.gameObject.y + overlay.gameObject.displayHeight / 2,
                         DUNGEON_ASSET_KEYS.TILE_STATUS,
-                        16,
+                        0,
                     );
                     
                     this.#status.push(effect);
@@ -491,11 +491,14 @@ export class Map {
 
         let tile = emptyTiles[1];
 
+        // TODO: Allow to lock the EXIT. Must give a key somewhere (drop or chest)
+        // TODO: Allow to seal the EXIT. Must defeat a specific enemy to lift it.
         let exit = new Entity(tile.x, tile.y, ENTITY_TYPE.EXIT);
         this.#entities.push(exit);
 
         // Generate ennemies
 
+        // TODO: Never spawn enemy adjacent to the EXIT
         this.#enemies = [];
 
         tile = emptyTiles[8];
