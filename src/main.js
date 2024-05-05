@@ -1,7 +1,6 @@
 import Phaser from './lib/phaser.js';
 
 import { SCENE_KEYS } from './keys/scene.js';
-
 import { PreloadScene } from './scenes/preload.js';
 import { DungeonScene } from './scenes/dungeon.js';
 

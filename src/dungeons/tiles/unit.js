@@ -2,10 +2,8 @@ import Phaser from "../../lib/phaser.js";
 
 import { TILE_SIZE } from "../../config.js";
 import { DUNGEON_ASSET_KEYS } from "../../keys/asset.js";
-
 import { ENTITY_TYPE, Entity } from "./entity.js";
 
-// TODO: Refactor to Unit class instead
 export class Unit extends Entity {
     /** @type {UnitDetails} */
     #unitDetails; 

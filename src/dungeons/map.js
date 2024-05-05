@@ -498,7 +498,7 @@ export class Map {
 
         // Generate ennemies
 
-        // TODO: Never spawn enemy adjacent to the EXIT
+        // TODO: Never spawn enemy adjacent to the EXIT (use getNeighboors to remove tiles)
         this.#enemies = [];
 
         tile = emptyTiles[8];

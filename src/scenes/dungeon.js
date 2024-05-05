@@ -5,10 +5,8 @@ import { Map } from "../dungeons/map.js";
 import { DataUtils } from "../utils/data.js";
 import { TILE_SIZE } from "../config.js";
 import { StateMachine } from "../state-machine.js";
-import { DUNGEON_ASSET_KEYS, UI_ASSET_KEYS } from "../keys/asset.js";
+import { DUNGEON_ASSET_KEYS } from "../keys/asset.js";
 import { ENTITY_TYPE } from "../dungeons/tiles/entity.js";
-import { Unit } from "../dungeons/tiles/unit.js";
-import { HorizontalBar } from "../ui/horizontal-bar.js";
 import { Panel } from "../ui/panel.js";
 
 const MAIN_STATES = Object.freeze({
