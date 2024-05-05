@@ -229,22 +229,32 @@ export class Map {
 
     /**
      * @param {number} x 
-     * @param {number} y 
+     * @param {number} y
+     * @param {() => void} [callback]
      */
-    selectTile(x, y) {
+    selectTile(x, y, callback) {
         // Pick the current valid tile, should always be one
         let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
         if (!tile) {
+            if (callback) {
+                callback();
+            }
             return;
         }
 
         let overlay = this.#overlays.find(singleOverlay => singleOverlay.x === x && singleOverlay.y === y);
         if (!overlay) {
+            if (callback) {
+                callback();
+            }
             return;
         }
         
         // Can't do NOTHING on FULLY hidden tile
         if (overlay.overlayType === OVERLAY_TYPE.FULL) {
+            if (callback) {
+                callback();
+            }
             return;
         }
 
@@ -264,6 +274,10 @@ export class Map {
                             }
                         });
                     });
+
+                    if (callback) {
+                        callback();
+                    }
                 }
             });
             return;
@@ -273,6 +287,9 @@ export class Map {
 
         // Can't do NOTHING on REVEALED tile without ENTITY
         if (!entity) {
+            if (callback) {
+                callback();
+            }
             return;
         }
 

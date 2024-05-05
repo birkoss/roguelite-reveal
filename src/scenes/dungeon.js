@@ -4,6 +4,15 @@ import { SCENE_KEYS } from "../keys/scene.js";
 import { Map } from "../dungeons/map.js";
 import { DataUtils } from "../utils/data.js";
 import { TILE_SIZE } from "../config.js";
+import { StateMachine } from "../state-machine.js";
+
+const MAIN_STATES = Object.freeze({
+    CREATE_DUNGEON: 'CREATE_DUNGEON',
+    TURN_START: 'TURN_START',
+    WAITING_FOR_PLAYER_ACTION: 'WAITING_FOR_PLAYER_ACTION',
+    WAITING_FOR_ACTION_FEEDBACK: 'WAITING_FOR_ACTION_FEEDBACK',
+    TURN_END: 'TURN_END',
+});
 
 export class DungeonScene extends Phaser.Scene {
     /** @type {Map} */
@@ -12,6 +21,9 @@ export class DungeonScene extends Phaser.Scene {
     /** @type {DungeonTheme} */
     #dungeonTheme;
 
+    /** @type {StateMachine} */
+    #stateMachine;
+
     constructor() {
         super({
             key: SCENE_KEYS.DUNGEON_SCENE,
@@ -19,9 +31,13 @@ export class DungeonScene extends Phaser.Scene {
     }
 
     create() {
-        this.#dungeonTheme = DataUtils.getDungeonTheme(this, "main");
+        this.#createStateMachine();
 
-       this.#createMap();
+        this.#stateMachine.setState(MAIN_STATES.CREATE_DUNGEON);
+    }
+
+    update() {
+        this.#stateMachine.update();
     }
 
     #createMap() {
@@ -52,7 +68,56 @@ export class DungeonScene extends Phaser.Scene {
 
         let startingPosition = tiles.shift();
         this.#map.previewTile(startingPosition.x, startingPosition.y, () => {
-            this.#selectTile(startingPosition.x, startingPosition.y);
+            this.#map.selectTile(startingPosition.x, startingPosition.y);
+        });
+    }
+
+    #createStateMachine() {
+        this.#stateMachine = new StateMachine('MAIN', this);
+
+        this.#stateMachine.addState({
+            name: MAIN_STATES.CREATE_DUNGEON,
+            onEnter: () => {
+                this.#dungeonTheme = DataUtils.getDungeonTheme(this, "main");
+
+                this.#createMap();
+
+                this.time.delayedCall(500, () => {
+                    this.#stateMachine.setState(MAIN_STATES.TURN_START);
+                });
+            },
+        });
+
+        this.#stateMachine.addState({
+            name: MAIN_STATES.TURN_START,
+            onEnter: () => {
+                this.time.delayedCall(500, () => {
+                    this.#stateMachine.setState(MAIN_STATES.WAITING_FOR_PLAYER_ACTION);
+                });
+            },
+        });
+
+        this.#stateMachine.addState({
+            name: MAIN_STATES.WAITING_FOR_PLAYER_ACTION,
+            onEnter: () => {
+                // 
+            },
+        });
+
+        this.#stateMachine.addState({
+            name: MAIN_STATES.WAITING_FOR_ACTION_FEEDBACK,
+            onEnter: () => {
+                // 
+            },
+        });
+
+        this.#stateMachine.addState({
+            name: MAIN_STATES.TURN_END,
+            onEnter: () => {
+                this.time.delayedCall(500, () => {
+                    this.#stateMachine.setState(MAIN_STATES.TURN_START);
+                });
+            },
         });
     }
 
@@ -61,6 +126,11 @@ export class DungeonScene extends Phaser.Scene {
      * @param {number} y 
      */
     #selectTile(x, y) {
-        this.#map.selectTile(x, y);
+        if (this.#stateMachine.currentStateName === MAIN_STATES.WAITING_FOR_PLAYER_ACTION) {
+            this.#stateMachine.setState(MAIN_STATES.WAITING_FOR_ACTION_FEEDBACK);
+            this.#map.selectTile(x, y, () => {
+                this.#stateMachine.setState(MAIN_STATES.TURN_END);
+            });
+        }
     }
 }
