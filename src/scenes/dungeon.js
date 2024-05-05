@@ -158,6 +158,7 @@ export class DungeonScene extends Phaser.Scene {
 
                 // Wait a bit and damage the player
                 this.time.delayedCall(500, () => {
+                    // TODO: Add a PASSIVE that allow the player to survive a deadly attack ONCE per X (level, move, etc.)
                     this.#panel.damagePlayer(totalDamage);
                     this.cameras.main.shake(200);
                     this.cameras.main.flash(200, 255, 0, 0);
