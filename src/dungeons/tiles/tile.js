@@ -8,6 +8,7 @@ export const TILE_TYPE = Object.freeze({
     WALL: 'WALL',
     FLOOR: 'FLOOR',
     OVERLAY: 'OVERLAY',
+    ENTITY: 'ENTITY',
 });
 
 export class Tile {

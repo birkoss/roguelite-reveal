@@ -60,6 +60,6 @@ export class DungeonScene extends Phaser.Scene {
      * @param {number} y 
      */
     #selectTile(x, y) {
-        this.#map.revealTile(x, y);
+        this.#map.selectTile(x, y);
     }
 }

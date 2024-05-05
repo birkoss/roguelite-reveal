@@ -1,4 +1,5 @@
 import Phaser from "../lib/phaser.js";
+import { ENTITY_TYPE, Entity } from "./tiles/entity.js";
 
 import { Floor } from "./tiles/floor.js";
 import { OVERLAY_TYPE, Overlay } from "./tiles/overlay.js";
@@ -17,6 +18,8 @@ export class Map {
     #tiles;
     /** @type {Overlay[]} */
     #overlays;
+    /** @type {Entity[]} */
+    #entities;
 
     /** @type {Phaser.GameObjects.Container} */
     #container;
@@ -98,7 +101,6 @@ export class Map {
         });
 
         // Create Overlays
-        this.#overlays = [];
         this.tiles.forEach((singleTile) => {
             if (this.isBorder(singleTile.x, singleTile.y)) {
                 return;
@@ -113,19 +115,12 @@ export class Map {
         });
 
         // Place exit
-        let emptyTiles = this.getEmptyTiles();
-        Phaser.Utils.Array.Shuffle(emptyTiles);
-
-        let tile = emptyTiles.shift();
-        let exitGameObject = this.#scene.add.image(
-            tile.gameObject.x,
-            tile.gameObject.y,
-            theme.exit.assetKey,
-            theme.exit.assetFrame,
-        );
-        exitGameObject.setOrigin(0);
-        exitGameObject.setAlpha(1);
-        this.#entitiesContainer.add(exitGameObject);
+        this.#entities.forEach((singleTile) => {
+            console.log(singleTile.x, singleTile.y);
+            let gameObject = singleTile.create(this.#scene, theme.exit.assetKey, theme.exit.assetFrame);
+            this.#entitiesContainer.add(gameObject);
+        });
+        
     }
 
     /**
@@ -224,9 +219,10 @@ export class Map {
      * @param {number} x 
      * @param {number} y 
      */
-    revealTile(x, y) {
-        console.log(`map.revealTile: ${x}x${y}`);
+    selectTile(x, y) {
+        console.log(`map.selectTile: ${x}x${y}`);
 
+        // Pick the current valid tile, should always be one
         let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
         if (!tile) {
             return;
@@ -277,6 +273,7 @@ export class Map {
 
     #generate() {
         this.#tiles = [];
+        this.#overlays = [];
 
         for (let y=0; y<this.#height; y++) {
             for (let x=0; x<this.#width; x++) {
@@ -292,6 +289,17 @@ export class Map {
                 this.#tiles.push(tile);
             }
         }
+
+        this.#entities = [];
+
+        // Generate exit
+        let emptyTiles = this.getEmptyTiles();
+        Phaser.Utils.Array.Shuffle(emptyTiles);
+
+        let tile = emptyTiles.shift();
+
+        let exit = new Entity(tile.x, tile.y, ENTITY_TYPE.EXIT);
+        this.#entities.push(exit);
 
         // Generate ennemies
 
