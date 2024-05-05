@@ -22,6 +22,8 @@ export class Map {
     #overlays;
     /** @type {Entity[]} */
     #entities;
+    /** @type {Enemy[]} */
+    #enemies;
 
     /** @type {Phaser.GameObjects.Container} */
     #container;
@@ -70,6 +72,10 @@ export class Map {
     /** @type {Phaser.GameObjects.Container} */
     get container() {
         return this.#container;
+    }
+    /** @type {Enemy[]} */
+    get enemies() {
+        return this.#enemies;
     }
 
     /**
@@ -132,7 +138,15 @@ export class Map {
                 return;
             }
         });
-        
+
+        // Place enemies
+        this.#enemies.forEach((singleTile) => {
+            console.log(`enemy @ ${singleTile.x}x${singleTile.y}`);
+
+            let gameObject = singleTile.create(this.#scene);
+            this.#entitiesContainer.add(gameObject);
+            return;
+        });   
     }
 
     /**
@@ -224,6 +238,15 @@ export class Map {
                 return;
             }
             return singleTile;
+        });
+    }
+
+    /**
+     * @returns {Tile[]}
+     */
+    getRevealedTiles() {
+        return this.#tiles.filter((singleTile) => {
+            return this.#overlays.find(singleOverlay => singleOverlay.x === singleTile.x && singleOverlay.y === singleTile.y && singleOverlay.overlayType === OVERLAY_TYPE.NONE);
         });
     }
 
@@ -351,11 +374,14 @@ export class Map {
         this.#entities.push(exit);
 
         // Generate ennemies
+
+        this.#enemies = [];
+
         tile = emptyTiles[8];
 
         let enemyDetails = DataUtils.getEnemyDetails(this.#scene, 'skeleton');
         let enemy = new Enemy(tile.x, tile.y, enemyDetails);
-        this.#entities.push(enemy);
+        this.#enemies.push(enemy);
 
         // Generate chest
     }
