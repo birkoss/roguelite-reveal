@@ -59,7 +59,7 @@ export class Panel {
 
         this.#player = new Unit(0, 0, dataDetails);
         this.#player.create(this.#scene);
-        this.#player.animatedGameObject.setOrigin(0).setPosition(22, 54);
+        this.#player.animatedGameObject.setOrigin(0).setPosition(22, 54).setFlipX(true);
         this.#player.animate();
         this.#container.add(this.#player.animatedGameObject);
 
