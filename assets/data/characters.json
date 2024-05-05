@@ -1,0 +1,14 @@
+[
+    {
+        "id": "knight",
+        "name": "knight",
+        "hp": 3,
+        "attack": 1,
+        "assetKey": "UNITS",
+        "assetFrames": [
+            0,
+            18
+        ],
+        "tileLockDistance": 1
+    }
+]
