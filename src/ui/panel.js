@@ -76,14 +76,14 @@ export class Panel {
         this.#container.add(text);
         this.#mpBar = new HorizontalBar(this.#scene, 130, text.y + 8, 220, 6);
         this.#mpBar.setText('0/3');
-        this.#mpBar.setWidthAnimated(0);
+        this.#mpBar.setWidthAnimated(0, { duration: 1 });
         this.#container.add(this.#mpBar.container);
 
         text = this.#scene.add.text(120, 94, "XP").setOrigin(1, 0);
         this.#container.add(text);
         this.#xpBar = new HorizontalBar(this.#scene, 130, text.y + 8, 220, 9);
-        this.#xpBar.setText("0 / 100");
-        this.#xpBar.setWidthAnimated(0);
+        this.#xpBar.setText("0/100");
+        this.#xpBar.setWidthAnimated(0, { duration: 1 });
         this.#container.add(this.#xpBar.container);
 
         text = this.#scene.add.text(120, 148, "Skills").setOrigin(1, 0);
