@@ -1,3 +1,4 @@
+import { DUNGEON_ASSET_KEYS } from "../keys/asset.js";
 import Phaser from "../lib/phaser.js";
 import { DataUtils } from "../utils/data.js";
 import { Enemy } from "./tiles/enemy.js";
@@ -345,16 +346,35 @@ export class Map {
 
         overlay.reveal({
             callback: () => {
-                // Animate enemy on this tile
-                let enemy = this.#enemies.find(singleEnemy => singleEnemy.x === overlay.x && singleEnemy.y === overlay.y);
-                if (enemy) {
-                    enemy.animate();
-                }
-
+                // Reveal adjacent tiles
                 let neighboors = this.getNeighboors(overlay.x, overlay.y);
                 neighboors.forEach((singleNeighboor) => {
                     this.previewTileAt(singleNeighboor.x, singleNeighboor.y);
                 });
+
+                // Animate enemy on this tile
+                let enemy = this.#enemies.find(singleEnemy => singleEnemy.x === overlay.x && singleEnemy.y === overlay.y);
+                if (enemy) {
+                    enemy.animate();
+                
+                    let effect = this.#scene.add.sprite(
+                        enemy.animatedGameObject.x + enemy.animatedGameObject.displayWidth / 2,
+                        enemy.animatedGameObject.y + enemy.animatedGameObject.displayHeight / 2 - enemy.animatedGameObject.displayHeight,
+                        DUNGEON_ASSET_KEYS.EFFECTS_LARGE
+                    );
+                    this.#container.add(effect);
+
+                    effect.on("animationcomplete", (tween, sprite, element) => {
+                        element.destroy();
+
+                        if (callback) {
+                            callback();
+                        }
+                    });
+                    effect.anims.play("appear", true);
+
+                    return;
+                }
 
                 if (callback) {
                     callback();

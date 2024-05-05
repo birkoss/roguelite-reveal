@@ -93,9 +93,7 @@ export class DungeonScene extends Phaser.Scene {
         this.#stateMachine.addState({
             name: MAIN_STATES.TURN_START,
             onEnter: () => {
-                this.time.delayedCall(500, () => {
-                    this.#stateMachine.setState(MAIN_STATES.WAITING_FOR_PLAYER_ACTION);
-                });
+                this.#stateMachine.setState(MAIN_STATES.WAITING_FOR_PLAYER_ACTION);
             },
         });
 
@@ -134,13 +132,12 @@ export class DungeonScene extends Phaser.Scene {
                     return;
                 }
 
-                console.log("REVEALED ENEMY:", aliveAndRevealedEnemies);
+                this.time.delayedCall(500, () => {
+                    console.log("REVEALED ENEMY:", aliveAndRevealedEnemies);
 
-                this.cameras.main.shake(200);
-                this.cameras.main.flash(200, 255, 0, 0);
+                    this.cameras.main.shake(200);
+                    this.cameras.main.flash(200, 255, 0, 0);
 
-                // let enemies = this.#map.enemies.filter()
-                this.time.delayedCall(1000, () => {
                     this.#stateMachine.setState(MAIN_STATES.TURN_START);
                 });
             },
@@ -152,14 +149,27 @@ export class DungeonScene extends Phaser.Scene {
             key: "attack",
             frames: [{
                 frame: 10,
-                key: DUNGEON_ASSET_KEYS.EFFECTS_LARGE
+                key: DUNGEON_ASSET_KEYS.EFFECTS_LARGE,
             },{
                 frame: 11,
-                key: DUNGEON_ASSET_KEYS.EFFECTS_LARGE
+                key: DUNGEON_ASSET_KEYS.EFFECTS_LARGE,
             }],
             frameRate: 20,
             yoyo: true,
             repeat: 1,
+        });
+        this.anims.create({
+            key: "appear",
+            frames: [{
+                frame: 76,
+                key: DUNGEON_ASSET_KEYS.EFFECTS_SMALL,
+            },{
+                frame: 77,
+                key: DUNGEON_ASSET_KEYS.EFFECTS_SMALL,
+            }],
+            frameRate: 10,
+            yoyo: true,
+            repeat: 3,
         });
     }
 

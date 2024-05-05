@@ -69,6 +69,8 @@ export class Enemy extends Entity {
 
         if (!this.isAlive) {
             this.#animatedGameObject.anims.stop();
+            // TODO: Depending on Unit Data
+            // TODO: Randomize the death frame
             this.#animatedGameObject.setTexture(DUNGEON_ASSET_KEYS.WORLD);
             this.#animatedGameObject.setFrame(89);
         }
