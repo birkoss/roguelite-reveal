@@ -96,7 +96,7 @@ export class Overlay extends Tile {
             targets: this._gameObject,
             alpha: 1,
             ease: Phaser.Math.Easing.Sine.Out,
-            duration: 150,
+            duration: 100,
             onComplete: () => {
                 if (callback) {
                     callback();
