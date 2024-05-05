@@ -52,9 +52,9 @@ export class DungeonScene extends Phaser.Scene {
         Phaser.Utils.Array.Shuffle(tiles);
 
         let startingPosition = tiles.shift();
-        // startingPosition.preview(() => {
-        //     this.#selectTile(startingPosition.x, startingPosition.y);
-        // });
+        startingPosition.preview(() => {
+            this.#selectTile(startingPosition.x, startingPosition.y);
+        });
     }
 
     /**

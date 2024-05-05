@@ -1,13 +1,13 @@
 import Phaser from "../../lib/phaser.js";
 
 import { TILE_SIZE } from "../../config.js";
-import { Entity } from "../entities/entity.js";
 
 /** @typedef {keyof typeof TILE_TYPE} TileType */
 /** @enum {TileType} */
 export const TILE_TYPE = Object.freeze({
     WALL: 'WALL',
     FLOOR: 'FLOOR',
+    OVERLAY: 'OVERLAY',
 });
 
 
@@ -32,17 +32,9 @@ export class Tile {
 
     /** @protected @type {Phaser.GameObjects.Image} */
     _gameObject;
-    /** @protected @type {Phaser.GameObjects.Image | undefined} */
-    _overlayGameObject;
-
-    /** @type {number} */
-    _assetFrame;
 
     /** @type {TileFogOfWar} */
     _fogOfWar;
-
-    /** @type {Entity | undefined} */
-    _entity;
 
     /**
      * @param {number} x 
@@ -95,12 +87,6 @@ export class Tile {
         this._gameObject = scene.add.image(this.x * TILE_SIZE, this.y * TILE_SIZE, assetKey, assetFrame);
         this._gameObject.setOrigin(0);
 
-        // this._gameObject.setTint(0x000000);
-
-        // this._overlayGameObject = scene.add.image(this._gameObject.x, this._gameObject.y, assetKey, 2);
-        // this._overlayGameObject.setOrigin(0);
-        // this._overlayGameObject.setAlpha(0.4);
-
         // TODO: Replace this shadow depending on the layout
         // if (this.x === 1 && this.y === 1) {
         //     let shadow = scene.add.sprite(this.x * 48, this.y * 48, assetKey, 2009);
@@ -118,12 +104,8 @@ export class Tile {
     reveal(options) {
         const skipAnimation = options?.skipAnimation || false;
 
-        this._gameObject.setTint(0xffffff);
-
         if (skipAnimation) {
-            this._overlayGameObject.setAlpha(0);
-            this._isRevealed = true;
-            this._fogOfWar = TILE_FOG_OF_WAR.NONE;
+            this._gameObject.setAlpha(0);
 
             if (options?.callback) {
                 options.callback();
@@ -131,13 +113,10 @@ export class Tile {
         }
 
         this._gameObject.scene.add.tween({
-            targets: this._overlayGameObject,
+            targets: this._gameObject,
             alpha: 0,
             duration: 200,
             onComplete: () => {
-                this._isRevealed = true;
-                this._fogOfWar = TILE_FOG_OF_WAR.NONE;
-
                 if (options?.callback) {
                     options.callback();
                 }
@@ -149,17 +128,12 @@ export class Tile {
      * @param {() => void} [callback]
      */
     preview(callback) {
-        if (this._fogOfWar === TILE_FOG_OF_WAR.NONE) {
-            return;
-        }
-
         this._gameObject.scene.add.tween({
-            targets: this._overlayGameObject,
+            targets: this._gameObject,
             alpha: 1,
             ease: Phaser.Math.Easing.Sine.Out,
             duration: 400,
             onComplete: () => {
-                this._fogOfWar = TILE_FOG_OF_WAR.PARTIAL;
                 if (callback) {
                     callback();
                 }

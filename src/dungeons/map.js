@@ -15,6 +15,8 @@ export class Map {
 
     /** @type {Tile[]} */
     #tiles;
+    /** @type {Tile[]} */
+    #overlays;
 
     /** @type {Phaser.GameObjects.Container} */
     #container;
@@ -96,22 +98,19 @@ export class Map {
         });
 
         // Create Overlays
+        this.#overlays = [];
         this.tiles.forEach((singleTile) => {
             if (this.isBorder(singleTile.x, singleTile.y)) {
                 return;
             }
+            
+            let overlay = new Tile(singleTile.x, singleTile.y, TILE_TYPE.OVERLAY);
+            this.#overlays.push(overlay);
 
-            let overlay = this.#scene.add.image(
-                singleTile.gameObject.x,
-                singleTile.gameObject.y,
-                theme.floor.assetKey,
-                2
-            );
-            overlay.setOrigin(0);
-            overlay.setAlpha(0.3);
-            this.#overlayContainer.add(overlay);
+            let overlayGameObject = overlay.create(this.#scene, theme.floor.assetKey, 2);
+            overlayGameObject.setAlpha(0.3);
+            this.#overlayContainer.add(overlayGameObject);
         });
-
 
         // Place exit
         let emptyTiles = this.getEmptyTiles();
@@ -227,21 +226,31 @@ export class Map {
      */
     revealTile(x, y) {
         console.log(`TILE CLICKED ON ${x}x${y}`);
-        // TODO: Remove
-        return;
-        let tile = this.tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
-        if (tile.fogOfWar !== TILE_FOG_OF_WAR.PARTIAL) {
-            return;
-        }
 
-        tile.reveal({
-            callback: () => {
-                // Preview adjacent tiles
-                let neighboors = this.getNeighboors(tile.x, tile.y);
-                neighboors.forEach((singleNeighboor) => {
-                    singleNeighboor.preview();
-                });
+        this.#overlays.forEach((singleTile) => {
+            if (singleTile.x !== x || singleTile.y !== y) {
+                return;
             }
+   
+            singleTile.reveal({
+                callback: () => {
+                    // Preview adjacent tiles
+                    let neighboors = this.getNeighboors(singleTile.x, singleTile.y);
+                    neighboors.forEach((singleNeighboor) => {
+                        this.#overlays.forEach((singleOverlay) => {
+                            if (singleOverlay.x !== singleNeighboor.x || singleOverlay.y !== singleNeighboor.y) {
+                                return;
+                            }
+                            singleOverlay.preview();
+                        });
+                    });
+                }
+            });
+
+            singleTile.gameObject.destroy();
+
+            this.#overlays.indexOf(singleTile);
+            this.#overlays.splice(this.#overlays.indexOf(singleTile), 1);
         });
     }
 
