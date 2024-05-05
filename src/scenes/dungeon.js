@@ -67,7 +67,7 @@ export class DungeonScene extends Phaser.Scene {
         //Phaser.Utils.Array.Shuffle(tiles);
 
         let startingPosition = tiles.shift();
-        this.#map.previewTile(startingPosition.x, startingPosition.y, () => {
+        this.#map.previewTileAt(startingPosition.x, startingPosition.y, () => {
             this.#map.selectTile(startingPosition.x, startingPosition.y);
         });
     }
@@ -142,10 +142,22 @@ export class DungeonScene extends Phaser.Scene {
      */
     #selectTile(x, y) {
         if (this.#stateMachine.currentStateName === MAIN_STATES.WAITING_FOR_PLAYER_ACTION) {
-            this.#stateMachine.setState(MAIN_STATES.WAITING_FOR_ACTION_FEEDBACK);
-            this.#map.selectTile(x, y, () => {
-                this.#stateMachine.setState(MAIN_STATES.TURN_END);
-            });
+            if (this.#map.canAttackAt(x, y)) {
+                this.#stateMachine.setState(MAIN_STATES.WAITING_FOR_ACTION_FEEDBACK);
+
+                // TODO: Attack
+
+                return;
+            }
+            if (this.#map.canRevealAt(x, y)) {
+                this.#stateMachine.setState(MAIN_STATES.WAITING_FOR_ACTION_FEEDBACK);
+
+                this.#map.revealTileAt(x, y, () => {
+                    this.#stateMachine.setState(MAIN_STATES.TURN_END);
+                });
+
+                return;
+            }
         }
     }
 }

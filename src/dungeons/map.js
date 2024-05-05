@@ -77,6 +77,10 @@ export class Map {
     get enemies() {
         return this.#enemies;
     }
+    /** @type {Overlay[]} */
+    get overlays() {
+        return this.#overlays;
+    }
 
     /**
      * @param {DungeonTheme} theme 
@@ -166,6 +170,47 @@ export class Map {
     isBorder(x, y) {
         return (x == 0 || y === 0 || x == this.#width - 1 || y === this.#height - 1);
     }
+
+    /**
+     * @param {number} x 
+     * @param {number} y 
+     * @returns {boolean}
+     */
+    canAttackAt(x, y) {
+        return false;
+    }
+    /**
+     * @param {number} x 
+     * @param {number} y 
+     * @returns {boolean}
+     */
+    canPreviewAt(x, y) {
+        return false;
+    }
+    /**
+     * @param {number} x 
+     * @param {number} y 
+     * @returns {boolean}
+     */
+    canRevealAt(x, y) {
+        let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
+        if (!tile) {
+            return false;
+        }
+
+        let overlay = this.#overlays.find(singleOverlay => singleOverlay.x === x && singleOverlay.y === y);
+        if (!overlay) {
+            return false;
+        }
+
+        // Can only REVEAL PARTIALLY overlay
+        if (overlay.overlayType !== OVERLAY_TYPE.PARTIAL) {
+            return false;
+        }
+
+        return true;
+    }
+
 
     /**
      * @param {number} x 
@@ -325,7 +370,7 @@ export class Map {
      * @param {number} y 
      * @param {() => void} [callback]
      */
-    previewTile(x, y, callback) {
+    previewTileAt(x, y, callback) {
         console.log(`map.previewTile: ${x}x${y}`);
 
         let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
@@ -338,7 +383,35 @@ export class Map {
             return;
         }
 
+        // Can only preview FULL overlay
+        if (overlay.overlayType !== OVERLAY_TYPE.FULL) {
+            return;
+        }
+
         overlay.preview(callback);
+    }
+
+    /**
+     * @param {number} x 
+     * @param {number} y 
+     * @param {() => void} [callback]
+     */
+    revealTileAt(x, y, callback) {
+        let overlay = this.#overlays.find(singleOverlay => singleOverlay.x === x && singleOverlay.y === y);
+
+        overlay.reveal({
+            callback: () => {
+                // TODO: When an Enemy is revealed, animate it!
+                let neighboors = this.getNeighboors(overlay.x, overlay.y);
+                neighboors.forEach((singleNeighboor) => {
+                    this.previewTileAt(singleNeighboor.x, singleNeighboor.y);
+                });
+
+                if (callback) {
+                    callback();
+                }
+            }
+        });
     }
 
     #generate() {
