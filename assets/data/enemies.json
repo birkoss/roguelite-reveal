@@ -8,6 +8,7 @@
         "assetFrames": [
             290,
             308
-        ]
+        ],
+        "tileLockDistance": 1
     }
 ]

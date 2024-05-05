@@ -31,4 +31,5 @@
  * @property {number} attack
  * @property {string} assetKey
  * @property {number[]} assetFrames
+ * @property {number} tileLockDistance
  */

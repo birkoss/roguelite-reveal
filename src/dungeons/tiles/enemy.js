@@ -1,9 +1,11 @@
+import Phaser from "../../lib/phaser.js";
+
 import { TILE_SIZE } from "../../config.js";
 import { DUNGEON_ASSET_KEYS } from "../../keys/asset.js";
-import Phaser from "../../lib/phaser.js";
 
 import { ENTITY_TYPE, Entity } from "./entity.js";
 
+// TODO: Refactor to Unit class instead
 export class Enemy extends Entity {
     /** @type {EnemyDetails} */
     #enemyDetails;
@@ -53,6 +55,8 @@ export class Enemy extends Entity {
             frameRate: 2,
             repeat: -1,
           });
+
+          // TODO: Add shadow under the character
 
         return this.#animatedGameObject;
     }
