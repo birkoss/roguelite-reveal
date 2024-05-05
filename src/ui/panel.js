@@ -90,4 +90,13 @@ export class Panel {
         btn = this.#scene.add.sprite(320, 130, UI_ASSET_KEYS.BUTTON_SKILLS, 1).setOrigin(0);
         this.#container.add(btn);
     }
+
+    /**
+     * @param {number} damage 
+     */
+    damagePlayer(damage) {
+        this.#player.takeDamage(damage);
+        this.#hpBar.setText(`${this.#player.hp}/${this.#player.maxHp}`);
+        this.#hpBar.setWidthAnimated(this.#player.hp/this.#player.maxHp);
+    }
 }

@@ -15,6 +15,8 @@ export class Unit extends Entity {
     /** @type {number} */
     #hp;
     /** @type {number} */
+    #maxHp;
+    /** @type {number} */
     #attack;
 
     constructor(x, y, unitDetails) {
@@ -23,6 +25,7 @@ export class Unit extends Entity {
         this.#unitDetails = unitDetails;
         
         this.#hp = this.#unitDetails.hp;
+        this.#maxHp = this.#unitDetails.hp;
         this.#attack = this.#attack;
     }
 
@@ -37,6 +40,14 @@ export class Unit extends Entity {
     /** @type {boolean} */
     get isAlive() {
         return this.#hp > 0;
+    }
+    /** @type {number} */
+    get hp() {
+        return this.#hp;
+    }
+    /** @type {number} */
+    get maxHp() {
+        return this.#maxHp;
     }
 
     /**
