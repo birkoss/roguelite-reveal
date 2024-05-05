@@ -57,14 +57,14 @@ export class Panel {
         this.#textName = this.#scene.add.text(22, 20, dataDetails.name).setOrigin(0);
         this.#container.add(this.#textName);
 
-        this.#textLevel = this.#scene.add.text(366, 20, "LV 1").setOrigin(1, 0);
-        this.#container.add(this.#textLevel);
-
         this.#player = new Unit(0, 0, dataDetails);
         this.#player.create(this.#scene);
         this.#player.animatedGameObject.setOrigin(0).setPosition(22, 54);
         this.#player.animate();
         this.#container.add(this.#player.animatedGameObject);
+
+        this.#textLevel = this.#scene.add.text(366, 20, `LV ${this.#player.level}`).setOrigin(1, 0);
+        this.#container.add(this.#textLevel);
 
         let text = this.#scene.add.text(120, 46, "HP").setOrigin(1, 0);
         this.#container.add(text);
@@ -82,7 +82,7 @@ export class Panel {
         text = this.#scene.add.text(120, 94, "XP").setOrigin(1, 0);
         this.#container.add(text);
         this.#xpBar = new HorizontalBar(this.#scene, 130, text.y + 8, 220, 9);
-        this.#xpBar.setText(`${this.#player.xp}/${this.#player.maxHp}`);
+        this.#xpBar.setText(`${this.#player.xp}/${this.#player.xpToNext}`);
         this.#xpBar.setWidthAnimated(0, { duration: 1 });
         this.#container.add(this.#xpBar.container);
 
@@ -103,5 +103,24 @@ export class Panel {
         this.#player.takeDamage(damage);
         this.#hpBar.setText(`${this.#player.hp}/${this.#player.maxHp}`);
         this.#hpBar.setWidthAnimated(this.#player.hp/this.#player.maxHp);
+    }
+
+    /**
+     * @param {number} xp 
+     */
+    gainXp(xp) {
+        this.#player.gainXp(xp);
+        this.#xpBar.setText(`${this.#player.xp}/${this.#player.xpToNext}`);
+        this.#xpBar.setWidthAnimated(this.#player.xp/this.#player.xpToNext);
+
+        while (this.#player.xp >= this.#player.xpToNext) {
+            // TODO: Animation for levelling up
+            // - Callback to the scene if animation are long
+            this.player.levelUp();
+            this.#textLevel.setText(`LV ${this.#player.level}`);
+
+            this.#xpBar.setText(`${this.#player.xp}/${this.#player.xpToNext}`);
+            this.#xpBar.setWidthAnimated(this.#player.xp/this.#player.xpToNext);
+        }
     }
 }

@@ -107,7 +107,16 @@ export class Unit extends Entity {
         this.#animatedGameObject.anims.play('idle');
     }
 
+    /**
+     * @param {number} xp 
+     */
+    gainXp(xp) {
+        this.#xp += xp;
+    }
+
     levelUp() {
+        this.#xp = Math.max(0, this.#xp - this.#xpToNext);
+
         this.#level++;
 
         this.#attack = this.#getStats(this.#unitDetails.attack);
@@ -153,7 +162,6 @@ export class Unit extends Entity {
     
 
     #calculateXpToNext() {
-        // return (0.04 * this.#level^3) + (0.8 * this.#level^2) + (2 * this.#level);
-        return (2 * this.#level) + 1;
+        return Math.floor((0.04 * Math.pow(this.#level, 3)) + (0.8 * Math.pow(this.#level, 2)) + (2 * this.#level));
     }
 }

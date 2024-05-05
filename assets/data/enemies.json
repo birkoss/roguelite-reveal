@@ -2,9 +2,9 @@
     {
         "id": "skeleton",
         "name": "Skeleton",
-        "hp": 15,
+        "hp": 10,
         "attack": 10,
-        "defense": 7,
+        "defense": 3,
         "assetKey": "UNITS",
         "assetFrames": [
             290,

@@ -8,6 +8,7 @@ import { StateMachine } from "../state-machine.js";
 import { DUNGEON_ASSET_KEYS } from "../keys/asset.js";
 import { ENTITY_TYPE } from "../dungeons/tiles/entity.js";
 import { Panel } from "../ui/panel.js";
+import { Unit } from "../dungeons/tiles/unit.js";
 
 const MAIN_STATES = Object.freeze({
     CREATE_DUNGEON: 'CREATE_DUNGEON',
@@ -145,7 +146,8 @@ export class DungeonScene extends Phaser.Scene {
 
                 let totalDamage = 0;
                 aliveAndRevealedEnemies.forEach((singleEnemy) => {
-                    totalDamage += singleEnemy.attack;
+                    let dmg = this.#calculateDamage(singleEnemy, this.#panel.player);
+                    totalDamage += dmg;
                 });
 
                 // Weird, but no damage ?
@@ -223,7 +225,13 @@ export class DungeonScene extends Phaser.Scene {
                 effect.on("animationcomplete", (tween, sprite, element) => {
                     element.destroy();
 
-                    enemy.takeDamage(this.#panel.player.attack);
+                    let dmg = this.#calculateDamage(this.#panel.player, enemy);
+
+                    enemy.takeDamage(dmg);
+                    if (!enemy.isAlive) {
+                        let xp = enemy.xpToNext;
+                        this.#panel.gainXp(xp);
+                    }
 
                     this.#map.refreshTileStatus();
 
@@ -252,5 +260,25 @@ export class DungeonScene extends Phaser.Scene {
                 return;
             }
         }
+    }
+
+    /**
+     * 
+     * @param {Unit} attacker 
+     * @param {Unit} defender 
+     * @returns {number}
+     */
+    #calculateDamage(attacker, defender) {
+        console.log(`${attacker.attack} -> ${defender.defense}`);
+
+        // let atk_mod = 0.9;  // (0.9 -> 1.1)
+        // let def_mod = 0.45; // (0.45 -> 0.6)
+        // let dmg = Math.ceil(((attacker.attack / 3) * (atk_mod)) - ((defender.defense/3) * def_mod));
+
+        let dmg = Math.ceil((attacker.attack * 0.5) - (defender.defense * 0.25));
+
+        console.log("===", dmg);
+
+        return dmg;
     }
 }
