@@ -1,4 +1,6 @@
 import Phaser from "../lib/phaser.js";
+import { DataUtils } from "../utils/data.js";
+import { Enemy } from "./tiles/enemy.js";
 import { ENTITY_TYPE, Entity } from "./tiles/entity.js";
 
 import { Floor } from "./tiles/floor.js";
@@ -114,11 +116,21 @@ export class Map {
             this.#overlayContainer.add(overlayGameObject);
         });
 
-        // Place exit
+        // Place entities
         this.#entities.forEach((singleTile) => {
             console.log(`${singleTile.x}x${singleTile.y}`);
-            let gameObject = singleTile.create(this.#scene, theme.exit.assetKey, theme.exit.assetFrame);
-            this.#entitiesContainer.add(gameObject);
+
+            if (singleTile.entityType === ENTITY_TYPE.EXIT) {
+                let gameObject = singleTile.create(this.#scene, theme.exit.assetKey, theme.exit.assetFrame);
+                this.#entitiesContainer.add(gameObject);
+                return;
+            }
+
+            if (singleTile.entityType === ENTITY_TYPE.ENEMY) {
+                let gameObject = singleTile.create(this.#scene);
+                this.#entitiesContainer.add(gameObject);
+                return;
+            }
         });
         
     }
@@ -315,12 +327,17 @@ export class Map {
         //Phaser.Utils.Array.Shuffle(emptyTiles);
         //let tile = emptyTiles.shift();
 
-        let tile = emptyTiles[2];
+        let tile = emptyTiles[1];
 
         let exit = new Entity(tile.x, tile.y, ENTITY_TYPE.EXIT);
         this.#entities.push(exit);
 
         // Generate ennemies
+        tile = emptyTiles[8];
+
+        let enemyDetails = DataUtils.getEnemyDetails(this.#scene, 'skeleton');
+        let enemy = new Enemy(tile.x, tile.y, enemyDetails);
+        this.#entities.push(enemy);
 
         // Generate chest
     }

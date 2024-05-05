@@ -18,8 +18,6 @@ export class Tile {
     _y;
     /** @protected @type {TileType} */
     _type;
-    /** @protected @type {boolean} */
-    _isRevealed;
 
     /** @protected @type {Phaser.GameObjects.Image} */
     _gameObject;
@@ -33,8 +31,6 @@ export class Tile {
         this._x = x;
         this._y = y;
         this._type = type;
-
-        this._isRevealed = false;
     }
 
     /** @type {number} */
@@ -49,10 +45,6 @@ export class Tile {
     get type() {
         return this._type;
     }
-    /** @type {boolean} */
-    get isRevealed() {
-        return this._isRevealed;
-    }
     /** @type {Phaser.GameObjects.Image} */
     get gameObject() {
         return this._gameObject;
@@ -60,13 +52,11 @@ export class Tile {
 
     /**
      * @param {Phaser.Scene} scene 
-     * @param {string} assetKey
+     * @param {string} [assetKey='']
      * @param {number} [assetFrame=0]
      * @returns {Phaser.GameObjects.Image}
      */
     create(scene, assetKey, assetFrame) {
-        this._assetFrame = assetFrame;
-
         this._gameObject = scene.add.image(this.x * TILE_SIZE, this.y * TILE_SIZE, assetKey, assetFrame);
         this._gameObject.setOrigin(0);
 

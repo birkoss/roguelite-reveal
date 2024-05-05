@@ -11,6 +11,17 @@ export class DataUtils {
         /** @type {DungeonTheme[]} */
         const data = scene.cache.json.get(DATA_ASSET_KEYS.DUNGEON_THEMES);
 
-        return data.find((attack) => attack.id === themeId);
+        return data.find((theme) => theme.id === themeId);
+    }
+
+    /**
+     * @param {Phaser.Scene} scene 
+     * @param {string} enemyId  
+     */
+    static getEnemyDetails(scene, enemyId) {
+        /** @type {EnemyDetails[]} */
+        const data = scene.cache.json.get(DATA_ASSET_KEYS.ENEMIES);
+
+        return data.find((enemy) => enemy.id === enemyId);
     }
 }
