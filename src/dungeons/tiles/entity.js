@@ -6,14 +6,12 @@ import { TILE_TYPE, Tile } from "./tile.js";
 /** @enum {EntityType} */
 export const ENTITY_TYPE = Object.freeze({
     EXIT: 'EXIT',
+    ENEMY: 'ENEMY',
 });
 
 export class Entity extends Tile {
     /** @protected @type {EntityType} */
     _entityType
-
-    /** @protected @type {Phaser.GameObjects.Image} */
-    _gameObject;
 
     /**
      * @param {EntityType} type 
@@ -28,6 +26,4 @@ export class Entity extends Tile {
     get entityType() {
         return this._entityType;
     }
-
-   
 }

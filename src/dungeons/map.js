@@ -116,7 +116,7 @@ export class Map {
 
         // Place exit
         this.#entities.forEach((singleTile) => {
-            console.log(singleTile.x, singleTile.y);
+            console.log(`${singleTile.x}x${singleTile.y}`);
             let gameObject = singleTile.create(this.#scene, theme.exit.assetKey, theme.exit.assetFrame);
             this.#entitiesContainer.add(gameObject);
         });
@@ -220,8 +220,6 @@ export class Map {
      * @param {number} y 
      */
     selectTile(x, y) {
-        console.log(`map.selectTile: ${x}x${y}`);
-
         // Pick the current valid tile, should always be one
         let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
         if (!tile) {
@@ -232,22 +230,41 @@ export class Map {
         if (!overlay) {
             return;
         }
+        
+        // Can't do NOTHING on FULLY hidden tile
+        if (overlay.overlayType === OVERLAY_TYPE.FULL) {
+            return;
+        }
 
-        overlay.reveal({
-            callback: () => {
-                let neighboors = this.getNeighboors(tile.x, tile.y);
-                neighboors.forEach((singleNeighboor) => {
-                    this.#overlays.forEach((singleOverlay) => {
-                        if (singleOverlay.x !== singleNeighboor.x || singleOverlay.y !== singleNeighboor.y) {
-                            return;
-                        }
-                        if (singleOverlay.overlayType === OVERLAY_TYPE.FULL) {
-                            singleOverlay.preview();
-                        }
+        // Reveal the tile if the OVERLAY was PARTIAL
+        if (overlay.overlayType === OVERLAY_TYPE.PARTIAL) {
+            overlay.reveal({
+                callback: () => {
+                    let neighboors = this.getNeighboors(tile.x, tile.y);
+                    neighboors.forEach((singleNeighboor) => {
+                        this.#overlays.forEach((singleOverlay) => {
+                            if (singleOverlay.x !== singleNeighboor.x || singleOverlay.y !== singleNeighboor.y) {
+                                return;
+                            }
+                            if (singleOverlay.overlayType === OVERLAY_TYPE.FULL) {
+                                singleOverlay.preview();
+                            }
+                        });
                     });
-                });
-            }
-        });
+                }
+            });
+            return;
+        }
+
+        let entity = this.#entities.find(singleEntity => singleEntity.x === x && singleEntity.y === y);
+
+        // Can't do NOTHING on REVEALED tile without ENTITY
+        if (!entity) {
+            return;
+        }
+
+        console.log(`map.selectTile: ${x}x${y}`);
+        console.log("LOGIC with ", entity);        
     }
 
     /**
@@ -294,9 +311,11 @@ export class Map {
 
         // Generate exit
         let emptyTiles = this.getEmptyTiles();
-        Phaser.Utils.Array.Shuffle(emptyTiles);
+        // TODO: SHUFFLE
+        //Phaser.Utils.Array.Shuffle(emptyTiles);
+        //let tile = emptyTiles.shift();
 
-        let tile = emptyTiles.shift();
+        let tile = emptyTiles[2];
 
         let exit = new Entity(tile.x, tile.y, ENTITY_TYPE.EXIT);
         this.#entities.push(exit);
@@ -304,8 +323,5 @@ export class Map {
         // Generate ennemies
 
         // Generate chest
-
-
-
     }
 }

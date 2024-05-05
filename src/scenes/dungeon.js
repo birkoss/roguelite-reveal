@@ -47,7 +47,8 @@ export class DungeonScene extends Phaser.Scene {
 
         // Pick a random position for the starting player
         let tiles = this.#map.getEmptyTiles();
-        Phaser.Utils.Array.Shuffle(tiles);
+        // TODO: Shuffle
+        //Phaser.Utils.Array.Shuffle(tiles);
 
         let startingPosition = tiles.shift();
         this.#map.previewTile(startingPosition.x, startingPosition.y, () => {
