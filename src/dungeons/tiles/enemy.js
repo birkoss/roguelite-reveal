@@ -1,4 +1,5 @@
 import { TILE_SIZE } from "../../config.js";
+import { DUNGEON_ASSET_KEYS } from "../../keys/asset.js";
 import Phaser from "../../lib/phaser.js";
 
 import { ENTITY_TYPE, Entity } from "./entity.js";
@@ -14,11 +15,6 @@ export class Enemy extends Entity {
     /** @type {number} */
     #attack;
 
-    /** @type {EnemyDetails} */
-    get enemyDetails() {
-        return this.#enemyDetails;
-    }
-
     constructor(x, y, enemyDetails) {
         super(x, y, ENTITY_TYPE.ENEMY);
 
@@ -26,6 +22,19 @@ export class Enemy extends Entity {
         
         this.#hp = this.#enemyDetails.hp;
         this.#attack = this.#attack;
+    }
+
+    /** @type {Phaser.GameObjects.Sprite} */
+    get animatedGameObject() {
+        return this.#animatedGameObject;
+    }
+    /** @type {EnemyDetails} */
+    get enemyDetails() {
+        return this.#enemyDetails;
+    }
+    /** @type {boolean} */
+    get isAlive() {
+        return this.#hp > 0;
     }
 
     /**
@@ -52,7 +61,16 @@ export class Enemy extends Entity {
         this.#animatedGameObject.anims.play('idle');
     }
 
-    isAlive() {
-        return this.#hp > 0;
+    /**
+     * @param {number} damage 
+     */
+    takeDamage(damage) {
+        this.#hp = Math.max(0, this.#hp - damage);
+
+        if (!this.isAlive) {
+            this.#animatedGameObject.anims.stop();
+            this.#animatedGameObject.setTexture(DUNGEON_ASSET_KEYS.WORLD);
+            this.#animatedGameObject.setFrame(89);
+        }
     }
 }

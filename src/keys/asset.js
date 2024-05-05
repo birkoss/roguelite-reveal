@@ -6,4 +6,6 @@ export const DATA_ASSET_KEYS = Object.freeze({
 export const DUNGEON_ASSET_KEYS = Object.freeze({
     WORLD: 'WORLD',
     UNITS: 'UNITS',
+    EFFECTS_LARGE: 'EFFECTS_LARGE',
+    EFFECTS_SMALL: 'EFFECTS_SMALL',
 });

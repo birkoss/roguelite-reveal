@@ -5,6 +5,7 @@ import { Map } from "../dungeons/map.js";
 import { DataUtils } from "../utils/data.js";
 import { TILE_SIZE } from "../config.js";
 import { StateMachine } from "../state-machine.js";
+import { DUNGEON_ASSET_KEYS } from "../keys/asset.js";
 
 const MAIN_STATES = Object.freeze({
     CREATE_DUNGEON: 'CREATE_DUNGEON',
@@ -81,6 +82,7 @@ export class DungeonScene extends Phaser.Scene {
                 this.#dungeonTheme = DataUtils.getDungeonTheme(this, "main");
 
                 this.#createMap();
+                this.#createAnimations();
 
                 this.time.delayedCall(500, () => {
                     this.#stateMachine.setState(MAIN_STATES.TURN_START);
@@ -132,7 +134,6 @@ export class DungeonScene extends Phaser.Scene {
                     return;
                 }
 
-
                 console.log("REVEALED ENEMY:", aliveAndRevealedEnemies);
 
                 this.cameras.main.shake(200);
@@ -146,6 +147,22 @@ export class DungeonScene extends Phaser.Scene {
         });
     }
 
+    #createAnimations() {
+        this.anims.create({
+            key: "attack",
+            frames: [{
+                frame: 10,
+                key: DUNGEON_ASSET_KEYS.EFFECTS_LARGE
+            },{
+                frame: 11,
+                key: DUNGEON_ASSET_KEYS.EFFECTS_LARGE
+            }],
+            frameRate: 20,
+            yoyo: true,
+            repeat: 1,
+        });
+    }
+
     /**
      * @param {number} x 
      * @param {number} y 
@@ -156,6 +173,23 @@ export class DungeonScene extends Phaser.Scene {
                 this.#stateMachine.setState(MAIN_STATES.WAITING_FOR_ACTION_FEEDBACK);
 
                 // TODO: Attack
+                let enemy = this.#map.enemies.find(singleEnemy => singleEnemy.x === x && singleEnemy.y === y);
+
+                let effect = this.add.sprite(
+                    enemy.animatedGameObject.x + enemy.animatedGameObject.displayWidth / 2,
+                    enemy.animatedGameObject.y + enemy.animatedGameObject.displayHeight / 2,
+                    DUNGEON_ASSET_KEYS.EFFECTS_LARGE
+                );
+                this.#map.container.add(effect);
+
+                effect.on("animationcomplete", (tween, sprite, element) => {
+                    element.destroy();
+
+                    enemy.takeDamage(100);
+
+                    this.#stateMachine.setState(MAIN_STATES.TURN_END);
+                });
+                effect.anims.play("attack", true);
 
                 return;
             }

@@ -20,6 +20,15 @@ export class PreloadScene extends Phaser.Scene {
             frameWidth: TILE_SIZE,
             frameHeight: TILE_SIZE,
         });
+        this.load.spritesheet(DUNGEON_ASSET_KEYS.EFFECTS_LARGE, 'assets/tilesets/effects-large.png', {
+            frameWidth: 64,
+            frameHeight: 64,
+        });
+        this.load.spritesheet(DUNGEON_ASSET_KEYS.EFFECTS_SMALL, 'assets/tilesets/effects-small.png', {
+            frameWidth: TILE_SIZE,
+            frameHeight: TILE_SIZE,
+        });
+
         this.load.json(
             DATA_ASSET_KEYS.DUNGEON_THEMES,
             'assets/data/dungeon-themes.json'

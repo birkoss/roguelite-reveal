@@ -175,7 +175,25 @@ export class Map {
      * @returns {boolean}
      */
     canAttackAt(x, y) {
-        return false;
+        // Is this tile valid ?
+        let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
+        if (!tile) {
+            return false;
+        }
+
+        // Is this overlay revealed ?
+        let overlay = this.#overlays.find(singleOverlay => singleOverlay.overlayType === OVERLAY_TYPE.NONE && singleOverlay.x === x && singleOverlay.y === y);
+        if (!overlay) {
+            return false;
+        }
+
+        // Is this enemy alive ?
+        let enemy = this.#enemies.find(singleEnemy => singleEnemy.isAlive && singleEnemy.x === overlay.x && singleEnemy.y === overlay.y);
+        if (!enemy) {
+            return false;
+        }
+
+        return true;
     }
     /**
      * @param {number} x 
@@ -355,8 +373,10 @@ export class Map {
 
                 let tile;
                 if (isWall) {
+                    // @TODO: Remove
                     tile = new Wall(x, y);
                 } else {
+                    // @TODO: Remove
                     tile = new Floor(x, y);
                 }
 
