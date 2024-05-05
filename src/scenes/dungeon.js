@@ -199,6 +199,8 @@ export class DungeonScene extends Phaser.Scene {
                     // TODO: Use player's stats
                     enemy.takeDamage(100);
 
+                    this.#map.refreshTileStatus();
+
                     this.#stateMachine.setState(MAIN_STATES.TURN_END);
                 });
                 effect.anims.play("attack", true);
