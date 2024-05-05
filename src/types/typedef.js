@@ -29,6 +29,8 @@
  * @property {string} name
  * @property {number} hp
  * @property {number} attack
+ * @property {number} defense
+ * @property {number} level
  * @property {string} assetKey
  * @property {number[]} assetFrames
  * @property {number} tileLockDistance

@@ -2,8 +2,9 @@
     {
         "id": "knight",
         "name": "Knight",
-        "hp": 8,
-        "attack": 1,
+        "hp": 14,
+        "attack": 10,
+        "defense": 6,
         "assetKey": "UNITS",
         "assetFrames": [
             0,

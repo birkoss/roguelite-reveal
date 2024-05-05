@@ -69,7 +69,7 @@ export class Panel {
         let text = this.#scene.add.text(120, 46, "HP").setOrigin(1, 0);
         this.#container.add(text);
         this.#hpBar = new HorizontalBar(this.#scene, 130, text.y + 8, 220, 3);
-        this.#hpBar.setText(`${dataDetails.hp}/${dataDetails.hp}`);
+        this.#hpBar.setText(`${this.#player.hp}/${this.#player.maxHp}`);
         this.#container.add(this.#hpBar.container);
 
         text = this.#scene.add.text(120, 70, "MP").setOrigin(1, 0);
@@ -82,7 +82,7 @@ export class Panel {
         text = this.#scene.add.text(120, 94, "XP").setOrigin(1, 0);
         this.#container.add(text);
         this.#xpBar = new HorizontalBar(this.#scene, 130, text.y + 8, 220, 9);
-        this.#xpBar.setText("0/100");
+        this.#xpBar.setText(`${this.#player.xp}/${this.#player.maxHp}`);
         this.#xpBar.setWidthAnimated(0, { duration: 1 });
         this.#container.add(this.#xpBar.container);
 

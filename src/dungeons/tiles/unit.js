@@ -16,6 +16,14 @@ export class Unit extends Entity {
     #maxHp;
     /** @type {number} */
     #attack;
+    /** @type {number} */
+    #defense;
+    /** @type {number} */
+    #level;
+    /** @type {number} */
+    #xp;
+    /** @type {number} */
+    #xpToNext;
 
     constructor(x, y, unitDetails) {
         super(x, y, ENTITY_TYPE.UNIT);
@@ -25,6 +33,11 @@ export class Unit extends Entity {
         this.#hp = this.#unitDetails.hp;
         this.#maxHp = this.#unitDetails.hp;
         this.#attack = this.#unitDetails.attack;
+        this.#defense = this.#unitDetails.defense;
+        this.#level = 1;
+
+        this.#xp = 0;
+        this.#xpToNext = this.#calculateXpToNext();
     }
 
     /** @type {Phaser.GameObjects.Sprite} */
@@ -50,6 +63,22 @@ export class Unit extends Entity {
     /** @type {number} */
     get attack() {
         return this.#attack;
+    }
+    /** @type {number} */
+    get defense() {
+        return this.#defense;
+    }
+    /** @type {number} */
+    get level() {
+        return this.#level;
+    }
+    /** @type {number} */
+    get xp() {
+        return this.#xp;
+    }
+    /** @type {number} */
+    get xpToNext() {
+        return this.#xpToNext;
     }
 
     /**
@@ -78,6 +107,16 @@ export class Unit extends Entity {
         this.#animatedGameObject.anims.play('idle');
     }
 
+    levelUp() {
+        this.#level++;
+
+        this.#attack = this.#getStats(this.#unitDetails.attack);
+        this.#defense = this.#getStats(this.#unitDetails.defense);
+        this.#hp = this.#calculateHealth(this.#unitDetails.hp);
+
+        this.#xpToNext = this.#calculateXpToNext();
+    }
+
     /**
      * @param {number} damage 
      */
@@ -91,5 +130,30 @@ export class Unit extends Entity {
             this.#animatedGameObject.setTexture(DUNGEON_ASSET_KEYS.WORLD);
             this.#animatedGameObject.setFrame(89);
         }
+    }
+
+    /**
+     * @param {number} base 
+     * @returns {number}
+     */
+    #getStats(base) {
+        let mod = 0.42; // (0.42 -> 0.5)
+        return Math.floor(base + ((base * mod) * (this.#level - 1)));
+    }
+
+    /**
+     * @param {number} base 
+     * @returns {number}
+     */
+    #calculateHealth(base) {
+        let mod = 0.47; // (0.47 -> 0.53)
+        return Math.floor( (this.#level + 165) / 100 * Math.floor(base * mod * (this.#level + 1)));
+    }
+
+    
+
+    #calculateXpToNext() {
+        // return (0.04 * this.#level^3) + (0.8 * this.#level^2) + (2 * this.#level);
+        return (2 * this.#level) + 1;
     }
 }
