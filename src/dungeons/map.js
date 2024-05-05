@@ -23,6 +23,8 @@ export class Map {
     #entities;
     /** @type {Enemy[]} */
     #enemies;
+    /** @type {Phaser.GameObjects.Sprite[]} */
+    #status;
 
     /** @type {Phaser.GameObjects.Container} */
     #container;
@@ -32,6 +34,8 @@ export class Map {
     #entitiesContainer;
     /** @type {Phaser.GameObjects.Container} */
     #overlayContainer;
+    /** @type {Phaser.GameObjects.Container} */
+    #statusContainer;
 
     /**
      * @param {Phaser.Scene} scene
@@ -46,11 +50,13 @@ export class Map {
         this.#tilesContainer = scene.add.container(0, 0);
         this.#entitiesContainer = scene.add.container(0, 0);
         this.#overlayContainer = scene.add.container(0, 0);
+        this.#statusContainer = scene.add.container(0, 0);
 
         this.#container = scene.add.container(0, 0, [
             this.#tilesContainer,
             this.#entitiesContainer, 
             this.#overlayContainer,
+            this.#statusContainer,
         ]);
 
         this.#generate();
@@ -415,6 +421,7 @@ export class Map {
         this.#enemies.push(enemy);
 
         // Generate chest
+        this.#status = [];
     }
 
     /**
@@ -450,40 +457,13 @@ export class Map {
             effect.on("animationcomplete", (tween, sprite, element) => {
                 element.destroy();
 
+                this.#refreshTileStatus();
+
                 if (callback) {
                     callback();
                 }
             });
             effect.anims.play("appear", true);
-
-            // Block tiles surrounding the enemy
-            // TODO: Apply lockTileDistance value
-            let neighboors = this.getNeighboors(x, y, false);
-            neighboors.forEach((singleNeighboor) => {
-                // Exclude WALL
-                if (singleNeighboor.type === TILE_TYPE.WALL) {
-                    return;
-                }
-                
-                // Need a valid overlay
-                let overlay = this.overlays.find(singleOverlay => singleOverlay.x === singleNeighboor.x && singleOverlay.y === singleNeighboor.y);
-                if (!overlay) {
-                    return;
-                }
-
-                // Must not effect revealed tile
-                if (overlay.overlayType === OVERLAY_TYPE.NONE) {
-                    return;
-                }
-                
-                let effect = this.#scene.add.sprite(
-                    overlay.gameObject.x + overlay.gameObject.displayWidth / 2,
-                    overlay.gameObject.y + overlay.gameObject.displayHeight / 2,
-                    DUNGEON_ASSET_KEYS.TILE_STATUS,
-                    16,
-                );
-                this.#container.add(effect);
-            });
 
             return;
         }
@@ -491,5 +471,46 @@ export class Map {
         if (callback) {
             callback();
         }
+    }
+
+    #refreshTileStatus() {
+        let revealedTiles = this.#overlays.filter(singleOverlay => singleOverlay.overlayType === OVERLAY_TYPE.NONE);
+        revealedTiles.forEach((singleTile) => {
+            let enemies = this.#enemies.filter(singleEnemy => singleEnemy.isAlive && singleEnemy.x === singleTile.x && singleEnemy.y === singleTile.y);
+
+            enemies.forEach((singleEnemy) => {
+                // Block tiles surrounding the enemy
+                // TODO: Apply lockTileDistance value
+                let neighboors = this.getNeighboors(singleEnemy.x, singleEnemy.y, false);
+                neighboors.forEach((singleNeighboor) => {
+                    // Exclude WALL
+                    if (singleNeighboor.type === TILE_TYPE.WALL) {
+                        return;
+                    }
+                    
+                    // Need a valid overlay
+                    let overlay = this.overlays.find(singleOverlay => singleOverlay.x === singleNeighboor.x && singleOverlay.y === singleNeighboor.y);
+                    if (!overlay) {
+                        return;
+                    }
+
+                    // Must not effect revealed tile
+                    if (overlay.overlayType === OVERLAY_TYPE.NONE) {
+                        return;
+                    }
+                    
+                    let effect = this.#scene.add.sprite(
+                        overlay.gameObject.x + overlay.gameObject.displayWidth / 2,
+                        overlay.gameObject.y + overlay.gameObject.displayHeight / 2,
+                        DUNGEON_ASSET_KEYS.TILE_STATUS,
+                        16,
+                    );
+                    
+                    this.#status.push(effect);
+                    this.#statusContainer.add(effect);
+                });
+            });
+
+        });
     }
 }

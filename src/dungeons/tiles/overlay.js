@@ -44,7 +44,7 @@ export class Overlay extends Tile {
      */
     create(scene, assetKey, assetFrame) {
         let gameObject = super.create(scene, assetKey, assetFrame);
-        gameObject.setAlpha(0.6);
+        gameObject.setAlpha(0.5);
 
         this.#background = scene.add.rectangle(gameObject.x, gameObject.y, gameObject.displayWidth, gameObject.displayHeight, 0x000000);
         this.#background.setOrigin(0);
