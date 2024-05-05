@@ -252,6 +252,7 @@ export class Map {
         if (overlay.overlayType === OVERLAY_TYPE.PARTIAL) {
             overlay.reveal({
                 callback: () => {
+                    // TODO: When an Enemy is revealed, animate it!
                     let neighboors = this.getNeighboors(tile.x, tile.y);
                     neighboors.forEach((singleNeighboor) => {
                         this.#overlays.forEach((singleOverlay) => {
