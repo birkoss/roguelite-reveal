@@ -45,6 +45,11 @@ export class Panel {
         return this.#container;
     }
 
+    /** @type {Unit} */
+    get player() {
+        return this.#player;
+    }
+
     /**
      * @param {UnitDetails} dataDetails 
      */

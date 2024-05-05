@@ -26,7 +26,7 @@ export class Unit extends Entity {
         
         this.#hp = this.#unitDetails.hp;
         this.#maxHp = this.#unitDetails.hp;
-        this.#attack = this.#attack;
+        this.#attack = this.#unitDetails.attack;
     }
 
     /** @type {Phaser.GameObjects.Sprite} */
@@ -48,6 +48,10 @@ export class Unit extends Entity {
     /** @type {number} */
     get maxHp() {
         return this.#maxHp;
+    }
+    /** @type {number} */
+    get attack() {
+        return this.#attack;
     }
 
     /**

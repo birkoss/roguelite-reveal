@@ -2,7 +2,7 @@
     {
         "id": "knight",
         "name": "Knight",
-        "hp": 3,
+        "hp": 8,
         "attack": 1,
         "assetKey": "UNITS",
         "assetFrames": [

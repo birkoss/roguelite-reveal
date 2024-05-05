@@ -147,7 +147,7 @@ export class DungeonScene extends Phaser.Scene {
 
                 this.time.delayedCall(500, () => {
                     aliveAndRevealedEnemies.forEach((singleEnemy) => {
-                        this.#panel.damagePlayer(singleEnemy.unitDetails.attack);
+                        this.#panel.damagePlayer(singleEnemy.attack);
                         this.cameras.main.shake(200);
                         this.cameras.main.flash(200, 255, 0, 0);
                     });
@@ -214,8 +214,7 @@ export class DungeonScene extends Phaser.Scene {
                 effect.on("animationcomplete", (tween, sprite, element) => {
                     element.destroy();
 
-                    // TODO: Use player's stats
-                    enemy.takeDamage(100);
+                    enemy.takeDamage(this.#panel.player.attack);
 
                     this.#map.refreshTileStatus();
 
