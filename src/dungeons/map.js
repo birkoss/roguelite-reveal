@@ -128,8 +128,6 @@ export class Map {
 
         // Place entities
         this.#entities.forEach((singleTile) => {
-            console.log(`${singleTile.x}x${singleTile.y}`);
-
             if (singleTile.entityType === ENTITY_TYPE.EXIT) {
                 let gameObject = singleTile.create(this.#scene, theme.exit.assetKey, theme.exit.assetFrame);
                 this.#entitiesContainer.add(gameObject);
@@ -301,8 +299,6 @@ export class Map {
      * @param {() => void} [callback]
      */
     previewTileAt(x, y, callback) {
-        console.log(`map.previewTile: ${x}x${y}`);
-
         let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
         if (!tile) {
             return;
@@ -333,7 +329,6 @@ export class Map {
             callback: () => {
                 // Animate enemy on this tile
                 let enemy = this.#enemies.find(singleEnemy => singleEnemy.x === overlay.x && singleEnemy.y === overlay.y);
-                console.log(enemy);
                 if (enemy) {
                     enemy.animate();
                 }

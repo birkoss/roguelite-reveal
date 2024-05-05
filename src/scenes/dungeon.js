@@ -118,18 +118,28 @@ export class DungeonScene extends Phaser.Scene {
                 let revealedTiles = this.#map.getRevealedTiles();
                 let enemies = this.#map.enemies;
                 let aliveAndRevealedEnemies = this.#map.enemies.filter((singleEnemy) => {
-                    // TODO: Check for enemy health
-                    // if (singleEnemy.isAlive) {
-                    //     return;
-                    // }
+                    // Only count ALIVE enemy
+                    if (!singleEnemy.isAlive) {
+                        return;
+                    }
+                    
                     return revealedTiles.find((singleTile) => singleTile.x === singleEnemy.x && singleTile.y === singleEnemy.y);
                 });
 
-                console.log(aliveAndRevealedEnemies);
+                // No enemy to counter-attack
+                if (aliveAndRevealedEnemies.length === 0) {
+                    this.#stateMachine.setState(MAIN_STATES.TURN_START);
+                    return;
+                }
 
+
+                console.log("REVEALED ENEMY:", aliveAndRevealedEnemies);
+
+                this.cameras.main.shake(200);
+                this.cameras.main.flash(200, 255, 0, 0);
 
                 // let enemies = this.#map.enemies.filter()
-                this.time.delayedCall(500, () => {
+                this.time.delayedCall(1000, () => {
                     this.#stateMachine.setState(MAIN_STATES.TURN_START);
                 });
             },

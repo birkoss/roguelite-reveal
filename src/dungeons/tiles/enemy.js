@@ -9,6 +9,10 @@ export class Enemy extends Entity {
 
     /** @type {Phaser.GameObjects.Sprite} */
     #animatedGameObject;
+    /** @type {number} */
+    #hp;
+    /** @type {number} */
+    #attack;
 
     /** @type {EnemyDetails} */
     get enemyDetails() {
@@ -19,6 +23,9 @@ export class Enemy extends Entity {
         super(x, y, ENTITY_TYPE.ENEMY);
 
         this.#enemyDetails = enemyDetails;
+        
+        this.#hp = this.#enemyDetails.hp;
+        this.#attack = this.#attack;
     }
 
     /**
@@ -43,5 +50,9 @@ export class Enemy extends Entity {
 
     animate() {
         this.#animatedGameObject.anims.play('idle');
+    }
+
+    isAlive() {
+        return this.#hp > 0;
     }
 }
