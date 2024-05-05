@@ -6,6 +6,7 @@ import { DataUtils } from "../utils/data.js";
 import { TILE_SIZE } from "../config.js";
 import { StateMachine } from "../state-machine.js";
 import { DUNGEON_ASSET_KEYS } from "../keys/asset.js";
+import { ENTITY_TYPE } from "../dungeons/tiles/entity.js";
 
 const MAIN_STATES = Object.freeze({
     CREATE_DUNGEON: 'CREATE_DUNGEON',
@@ -146,32 +147,37 @@ export class DungeonScene extends Phaser.Scene {
     }
 
     #createAnimations() {
-        this.anims.create({
-            key: "attack",
-            frames: [{
-                frame: 10,
-                key: DUNGEON_ASSET_KEYS.EFFECTS_LARGE,
-            },{
-                frame: 11,
-                key: DUNGEON_ASSET_KEYS.EFFECTS_LARGE,
-            }],
-            frameRate: 20,
-            yoyo: true,
-            repeat: 1,
-        });
-        this.anims.create({
-            key: "appear",
-            frames: [{
-                frame: 76,
-                key: DUNGEON_ASSET_KEYS.EFFECTS_SMALL,
-            },{
-                frame: 77,
-                key: DUNGEON_ASSET_KEYS.EFFECTS_SMALL,
-            }],
-            frameRate: 10,
-            yoyo: true,
-            repeat: 3,
-        });
+        if (!this.anims.exists("attack")) {
+            this.anims.create({
+                key: "attack",
+                frames: [{
+                    frame: 10,
+                    key: DUNGEON_ASSET_KEYS.EFFECTS_LARGE,
+                },{
+                    frame: 11,
+                    key: DUNGEON_ASSET_KEYS.EFFECTS_LARGE,
+                }],
+                frameRate: 20,
+                yoyo: true,
+                repeat: 1,
+            });
+        }
+
+        if (!this.anims.exists("appear")) {
+            this.anims.create({
+                key: "appear",
+                frames: [{
+                    frame: 76,
+                    key: DUNGEON_ASSET_KEYS.EFFECTS_SMALL,
+                },{
+                    frame: 77,
+                    key: DUNGEON_ASSET_KEYS.EFFECTS_SMALL,
+                }],
+                frameRate: 10,
+                yoyo: true,
+                repeat: 3,
+            });
+        }
     }
 
     /**
@@ -207,6 +213,15 @@ export class DungeonScene extends Phaser.Scene {
 
                 return;
             }
+
+            if (this.#map.canInterac(x, y)) {
+                let entity = this.#map.entities.find(singleEntity => singleEntity.x === x && singleEntity.y === y);
+                if (entity.entityType === ENTITY_TYPE.EXIT) {
+                    this.scene.start(SCENE_KEYS.DUNGEON_SCENE);
+                }
+                return;
+            }
+
             if (this.#map.canRevealAt(x, y)) {
                 this.#stateMachine.setState(MAIN_STATES.WAITING_FOR_ACTION_FEEDBACK);
 

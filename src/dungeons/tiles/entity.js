@@ -6,7 +6,7 @@ import { TILE_TYPE, Tile } from "./tile.js";
 /** @enum {EntityType} */
 export const ENTITY_TYPE = Object.freeze({
     EXIT: 'EXIT',
-    ENEMY: 'ENEMY',
+    UNIT: 'UNIT',
 });
 
 export class Entity extends Tile {

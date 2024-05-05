@@ -23,7 +23,7 @@
  */
 
 /** 
- * @typedef EnemyDetails
+ * @typedef UnitDetails
  * @type {Object}
  * @property {string} id
  * @property {string} name

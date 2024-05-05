@@ -6,9 +6,9 @@ import { DUNGEON_ASSET_KEYS } from "../../keys/asset.js";
 import { ENTITY_TYPE, Entity } from "./entity.js";
 
 // TODO: Refactor to Unit class instead
-export class Enemy extends Entity {
-    /** @type {EnemyDetails} */
-    #enemyDetails;
+export class Unit extends Entity {
+    /** @type {UnitDetails} */
+    #unitDetails; 
 
     /** @type {Phaser.GameObjects.Sprite} */
     #animatedGameObject;
@@ -17,12 +17,12 @@ export class Enemy extends Entity {
     /** @type {number} */
     #attack;
 
-    constructor(x, y, enemyDetails) {
-        super(x, y, ENTITY_TYPE.ENEMY);
+    constructor(x, y, unitDetails) {
+        super(x, y, ENTITY_TYPE.UNIT);
 
-        this.#enemyDetails = enemyDetails;
+        this.#unitDetails = unitDetails;
         
-        this.#hp = this.#enemyDetails.hp;
+        this.#hp = this.#unitDetails.hp;
         this.#attack = this.#attack;
     }
 
@@ -30,9 +30,9 @@ export class Enemy extends Entity {
     get animatedGameObject() {
         return this.#animatedGameObject;
     }
-    /** @type {EnemyDetails} */
-    get enemyDetails() {
-        return this.#enemyDetails;
+    /** @type {UnitDetails} */
+    get unitDetails() {
+        return this.#unitDetails;
     }
     /** @type {boolean} */
     get isAlive() {
@@ -44,10 +44,10 @@ export class Enemy extends Entity {
      * @returns {Phaser.GameObjects.Image}
      */
     create(scene) {
-        this.#animatedGameObject = scene.add.sprite(this.x * TILE_SIZE, this.y * TILE_SIZE, this.#enemyDetails.assetKey, this.#enemyDetails.assetFrames[0]);
+        this.#animatedGameObject = scene.add.sprite(this.x * TILE_SIZE, this.y * TILE_SIZE, this.#unitDetails.assetKey, this.#unitDetails.assetFrames[0]);
         this.#animatedGameObject.setOrigin(0);
 
-        let frames = this.#animatedGameObject.anims.generateFrameNumbers(this.#enemyDetails.assetKey, { frames: this.#enemyDetails.assetFrames });
+        let frames = this.#animatedGameObject.anims.generateFrameNumbers(this.#unitDetails.assetKey, { frames: this.#unitDetails.assetFrames });
 
         this.#animatedGameObject.anims.create({
             key: 'idle',

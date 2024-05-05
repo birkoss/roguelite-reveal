@@ -2,7 +2,7 @@ import Phaser from "../lib/phaser.js";
 
 import { DUNGEON_ASSET_KEYS } from "../keys/asset.js";
 import { DataUtils } from "../utils/data.js";
-import { Enemy } from "./tiles/enemy.js";
+import { Unit } from "./tiles/unit.js";
 import { ENTITY_TYPE, Entity } from "./tiles/entity.js";
 import { OVERLAY_TYPE, Overlay } from "./tiles/overlay.js";
 import { TILE_TYPE, Tile } from "./tiles/tile.js";
@@ -21,7 +21,7 @@ export class Map {
     #overlays;
     /** @type {Entity[]} */
     #entities;
-    /** @type {Enemy[]} */
+    /** @type {Unit[]} */
     #enemies;
     /** @type {Phaser.GameObjects.Sprite[]} */
     #status;
@@ -78,9 +78,13 @@ export class Map {
     get container() {
         return this.#container;
     }
-    /** @type {Enemy[]} */
+    /** @type {Unit[]} */
     get enemies() {
         return this.#enemies;
+    }
+    /** @type {Entity[]} */
+    get entities() {
+        return this.#entities;
     }
     /** @type {Overlay[]} */
     get overlays() {
@@ -139,7 +143,7 @@ export class Map {
                 return;
             }
 
-            if (singleTile.entityType === ENTITY_TYPE.ENEMY) {
+            if (singleTile.entityType === ENTITY_TYPE.UNIT) {
                 let gameObject = singleTile.create(this.#scene);
                 this.#entitiesContainer.add(gameObject);
                 return;
@@ -200,6 +204,32 @@ export class Map {
 
         return true;
     }
+    /**
+     * @param {number} x 
+     * @param {number} y 
+     * @returns {boolean}
+     */
+    canInterac(x, y) {
+    // Is this tile valid ?
+    let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
+    if (!tile) {
+        return false;
+    }
+
+    // Is this overlay revealed ?
+    let overlay = this.#overlays.find(singleOverlay => singleOverlay.overlayType === OVERLAY_TYPE.NONE && singleOverlay.x === x && singleOverlay.y === y);
+    if (!overlay) {
+        return false;
+    }
+
+    // Is an entity present ?
+    let entity = this.#entities.find(singleEntity => singleEntity.x === overlay.x && singleEntity.y === overlay.y);
+    if (!entity) {
+        return false;
+    }
+
+    return true;
+}
     /**
      * @param {number} x 
      * @param {number} y 
@@ -471,7 +501,7 @@ export class Map {
         tile = emptyTiles[8];
 
         let enemyDetails = DataUtils.getEnemyDetails(this.#scene, 'skeleton');
-        let enemy = new Enemy(tile.x, tile.y, enemyDetails);
+        let enemy = new Unit(tile.x, tile.y, enemyDetails);
         this.#enemies.push(enemy);
 
         // Generate chest

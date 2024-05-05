@@ -19,7 +19,7 @@ export class DataUtils {
      * @param {string} enemyId  
      */
     static getEnemyDetails(scene, enemyId) {
-        /** @type {EnemyDetails[]} */
+        /** @type {UnitDetails[]} */
         const data = scene.cache.json.get(DATA_ASSET_KEYS.ENEMIES);
 
         return data.find((enemy) => enemy.id === enemyId);
