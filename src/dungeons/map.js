@@ -1,13 +1,11 @@
-import { DUNGEON_ASSET_KEYS } from "../keys/asset.js";
 import Phaser from "../lib/phaser.js";
+
+import { DUNGEON_ASSET_KEYS } from "../keys/asset.js";
 import { DataUtils } from "../utils/data.js";
 import { Enemy } from "./tiles/enemy.js";
 import { ENTITY_TYPE, Entity } from "./tiles/entity.js";
-
-import { Floor } from "./tiles/floor.js";
 import { OVERLAY_TYPE, Overlay } from "./tiles/overlay.js";
 import { TILE_TYPE, Tile } from "./tiles/tile.js";
-import { Wall } from "./tiles/wall.js";
 
 export class Map {
     /** @type {Phaser.Scene} */
@@ -391,14 +389,7 @@ export class Map {
             for (let x=0; x<this.#width; x++) {
                 let isWall = (x === 0 || y === 0 || y === this.#height-1 || x === this.#width-1);
 
-                let tile;
-                if (isWall) {
-                    // @TODO: Remove
-                    tile = new Wall(x, y);
-                } else {
-                    // @TODO: Remove
-                    tile = new Floor(x, y);
-                }
+                let tile = new Tile(x, y, isWall ? TILE_TYPE.WALL : TILE_TYPE.FLOOR);
 
                 this.#tiles.push(tile);
             }

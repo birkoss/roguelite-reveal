@@ -182,7 +182,7 @@ export class DungeonScene extends Phaser.Scene {
             if (this.#map.canAttackAt(x, y)) {
                 this.#stateMachine.setState(MAIN_STATES.WAITING_FOR_ACTION_FEEDBACK);
 
-                // TODO: Attack
+                // Find the enemy to attack
                 let enemy = this.#map.enemies.find(singleEnemy => singleEnemy.x === x && singleEnemy.y === y);
 
                 let effect = this.add.sprite(
@@ -195,6 +195,7 @@ export class DungeonScene extends Phaser.Scene {
                 effect.on("animationcomplete", (tween, sprite, element) => {
                     element.destroy();
 
+                    // TODO: Use player's stats
                     enemy.takeDamage(100);
 
                     this.#stateMachine.setState(MAIN_STATES.TURN_END);
