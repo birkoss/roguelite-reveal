@@ -68,7 +68,7 @@ export class DungeonScene extends Phaser.Scene {
 
         let startingPosition = tiles.shift();
         this.#map.previewTileAt(startingPosition.x, startingPosition.y, () => {
-            this.#map.selectTile(startingPosition.x, startingPosition.y);
+            this.#map.revealTileAt(startingPosition.x, startingPosition.y);
         });
     }
 

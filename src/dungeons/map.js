@@ -297,76 +297,6 @@ export class Map {
 
     /**
      * @param {number} x 
-     * @param {number} y
-     * @param {() => void} [callback]
-     */
-    selectTile(x, y, callback) {
-        // Pick the current valid tile, should always be one
-        let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
-        if (!tile) {
-            if (callback) {
-                callback();
-            }
-            return;
-        }
-
-        let overlay = this.#overlays.find(singleOverlay => singleOverlay.x === x && singleOverlay.y === y);
-        if (!overlay) {
-            if (callback) {
-                callback();
-            }
-            return;
-        }
-        
-        // Can't do NOTHING on FULLY hidden tile
-        if (overlay.overlayType === OVERLAY_TYPE.FULL) {
-            if (callback) {
-                callback();
-            }
-            return;
-        }
-
-        // Reveal the tile if the OVERLAY was PARTIAL
-        if (overlay.overlayType === OVERLAY_TYPE.PARTIAL) {
-            overlay.reveal({
-                callback: () => {
-                    // TODO: When an Enemy is revealed, animate it!
-                    let neighboors = this.getNeighboors(tile.x, tile.y);
-                    neighboors.forEach((singleNeighboor) => {
-                        this.#overlays.forEach((singleOverlay) => {
-                            if (singleOverlay.x !== singleNeighboor.x || singleOverlay.y !== singleNeighboor.y) {
-                                return;
-                            }
-                            if (singleOverlay.overlayType === OVERLAY_TYPE.FULL) {
-                                singleOverlay.preview();
-                            }
-                        });
-                    });
-
-                    if (callback) {
-                        callback();
-                    }
-                }
-            });
-            return;
-        }
-
-        let entity = this.#entities.find(singleEntity => singleEntity.x === x && singleEntity.y === y);
-
-        // Can't do NOTHING on REVEALED tile without ENTITY
-        if (!entity) {
-            if (callback) {
-                callback();
-            }
-            return;
-        }
-
-        console.log(`map.selectTile: ${x}x${y}`);
-        console.log("LOGIC with ", entity);        
-    }
-
-    /**
-     * @param {number} x 
      * @param {number} y 
      * @param {() => void} [callback]
      */
@@ -401,7 +331,13 @@ export class Map {
 
         overlay.reveal({
             callback: () => {
-                // TODO: When an Enemy is revealed, animate it!
+                // Animate enemy on this tile
+                let enemy = this.#enemies.find(singleEnemy => singleEnemy.x === overlay.x && singleEnemy.y === overlay.y);
+                console.log(enemy);
+                if (enemy) {
+                    enemy.animate();
+                }
+
                 let neighboors = this.getNeighboors(overlay.x, overlay.y);
                 neighboors.forEach((singleNeighboor) => {
                     this.previewTileAt(singleNeighboor.x, singleNeighboor.y);
