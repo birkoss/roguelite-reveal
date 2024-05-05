@@ -2,7 +2,6 @@ import Phaser from "../lib/phaser.js";
 
 import { SCENE_KEYS } from "../keys/scene.js";
 import { Map } from "../dungeons/map.js";
-import { TILE_FOG_OF_WAR, TILE_TYPE } from "../dungeons/tiles/tile.js";
 import { DataUtils } from "../utils/data.js";
 import { TILE_SIZE } from "../config.js";
 
@@ -47,12 +46,11 @@ export class DungeonScene extends Phaser.Scene {
         });
 
         // Pick a random position for the starting player
-        // TODO: Pick an EMPTY tile
-        let tiles = this.#map.tiles.filter(singleTile => !singleTile.isRevealed);
+        let tiles = this.#map.getEmptyTiles();
         Phaser.Utils.Array.Shuffle(tiles);
 
         let startingPosition = tiles.shift();
-        startingPosition.preview(() => {
+        this.#map.previewTile(startingPosition.x, startingPosition.y, () => {
             this.#selectTile(startingPosition.x, startingPosition.y);
         });
     }

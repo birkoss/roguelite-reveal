@@ -13,7 +13,7 @@ const game = new Phaser.Game({
         width: window.innerWidth,
         height: window.innerHeight,
     },
-    backgroundColor: '#CCCCCC',
+    backgroundColor: '#000000',
 });
 
 game.scene.add(SCENE_KEYS.PRELOAD_SCENE, PreloadScene);

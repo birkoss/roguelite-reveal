@@ -1,8 +1,8 @@
-import { TILE_SIZE } from "../config.js";
 import Phaser from "../lib/phaser.js";
-import { Floor } from "./tiles/floor.js";
 
-import { TILE_FOG_OF_WAR, TILE_TYPE, Tile } from "./tiles/tile.js";
+import { Floor } from "./tiles/floor.js";
+import { OVERLAY_TYPE, Overlay } from "./tiles/overlay.js";
+import { TILE_TYPE, Tile } from "./tiles/tile.js";
 import { Wall } from "./tiles/wall.js";
 
 export class Map {
@@ -15,7 +15,7 @@ export class Map {
 
     /** @type {Tile[]} */
     #tiles;
-    /** @type {Tile[]} */
+    /** @type {Overlay[]} */
     #overlays;
 
     /** @type {Phaser.GameObjects.Container} */
@@ -104,11 +104,11 @@ export class Map {
                 return;
             }
             
-            let overlay = new Tile(singleTile.x, singleTile.y, TILE_TYPE.OVERLAY);
+            let overlay = new Overlay(singleTile.x, singleTile.y);
             this.#overlays.push(overlay);
 
             let overlayGameObject = overlay.create(this.#scene, theme.floor.assetKey, 2);
-            overlayGameObject.setAlpha(0.3);
+            this.#overlayContainer.add(overlay.background);
             this.#overlayContainer.add(overlayGameObject);
         });
 
@@ -225,33 +225,54 @@ export class Map {
      * @param {number} y 
      */
     revealTile(x, y) {
-        console.log(`TILE CLICKED ON ${x}x${y}`);
+        console.log(`map.revealTile: ${x}x${y}`);
 
-        this.#overlays.forEach((singleTile) => {
-            if (singleTile.x !== x || singleTile.y !== y) {
-                return;
-            }
-   
-            singleTile.reveal({
-                callback: () => {
-                    // Preview adjacent tiles
-                    let neighboors = this.getNeighboors(singleTile.x, singleTile.y);
-                    neighboors.forEach((singleNeighboor) => {
-                        this.#overlays.forEach((singleOverlay) => {
-                            if (singleOverlay.x !== singleNeighboor.x || singleOverlay.y !== singleNeighboor.y) {
-                                return;
-                            }
+        let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
+        if (!tile) {
+            return;
+        }
+
+        let overlay = this.#overlays.find(singleOverlay => singleOverlay.x === x && singleOverlay.y === y);
+        if (!overlay) {
+            return;
+        }
+
+        overlay.reveal({
+            callback: () => {
+                let neighboors = this.getNeighboors(tile.x, tile.y);
+                neighboors.forEach((singleNeighboor) => {
+                    this.#overlays.forEach((singleOverlay) => {
+                        if (singleOverlay.x !== singleNeighboor.x || singleOverlay.y !== singleNeighboor.y) {
+                            return;
+                        }
+                        if (singleOverlay.overlayType === OVERLAY_TYPE.FULL) {
                             singleOverlay.preview();
-                        });
+                        }
                     });
-                }
-            });
-
-            singleTile.gameObject.destroy();
-
-            this.#overlays.indexOf(singleTile);
-            this.#overlays.splice(this.#overlays.indexOf(singleTile), 1);
+                });
+            }
         });
+    }
+
+    /**
+     * @param {number} x 
+     * @param {number} y 
+     * @param {() => void} [callback]
+     */
+    previewTile(x, y, callback) {
+        console.log(`map.previewTile: ${x}x${y}`);
+
+        let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
+        if (!tile) {
+            return;
+        }
+
+        let overlay = this.#overlays.find(singleOverlay => singleOverlay.x === x && singleOverlay.y === y);
+        if (!overlay) {
+            return;
+        }
+
+        overlay.preview(callback);
     }
 
     #generate() {

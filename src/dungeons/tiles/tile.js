@@ -10,16 +10,6 @@ export const TILE_TYPE = Object.freeze({
     OVERLAY: 'OVERLAY',
 });
 
-
-/** @typedef {keyof typeof TILE_FOG_OF_WAR} TileFogOfWar */
-/** @enum {TileFogOfWar} */
-export const TILE_FOG_OF_WAR = Object.freeze({
-    NONE: 'NONE',
-    PARTIAL: 'PARTIAL',
-    FULL: 'FULL',
-});
-
-
 export class Tile {
     /** @protected @type {number} */
     _x;
@@ -33,9 +23,6 @@ export class Tile {
     /** @protected @type {Phaser.GameObjects.Image} */
     _gameObject;
 
-    /** @type {TileFogOfWar} */
-    _fogOfWar;
-
     /**
      * @param {number} x 
      * @param {number} y 
@@ -47,7 +34,6 @@ export class Tile {
         this._type = type;
 
         this._isRevealed = false;
-        this._fogOfWar = TILE_FOG_OF_WAR.FULL;
     }
 
     /** @type {number} */
@@ -65,10 +51,6 @@ export class Tile {
     /** @type {boolean} */
     get isRevealed() {
         return this._isRevealed;
-    }
-    /** @type {TileFogOfWar} */
-    get fogOfWar() {
-        return this._fogOfWar;
     }
     /** @type {Phaser.GameObjects.Image} */
     get gameObject() {
@@ -96,48 +78,5 @@ export class Tile {
         return this._gameObject;
     }
 
-    /**
-     * @param {object} [options]
-     * @param {() => void} [options.callback]
-     * @param {boolean} [options.skipAnimation=false]
-     */
-    reveal(options) {
-        const skipAnimation = options?.skipAnimation || false;
-
-        if (skipAnimation) {
-            this._gameObject.setAlpha(0);
-
-            if (options?.callback) {
-                options.callback();
-            }
-        }
-
-        this._gameObject.scene.add.tween({
-            targets: this._gameObject,
-            alpha: 0,
-            duration: 200,
-            onComplete: () => {
-                if (options?.callback) {
-                    options.callback();
-                }
-            }
-        });
-    }
-
-    /**
-     * @param {() => void} [callback]
-     */
-    preview(callback) {
-        this._gameObject.scene.add.tween({
-            targets: this._gameObject,
-            alpha: 1,
-            ease: Phaser.Math.Easing.Sine.Out,
-            duration: 400,
-            onComplete: () => {
-                if (callback) {
-                    callback();
-                }
-            }
-        });
-    }
+   
 }
