@@ -271,11 +271,11 @@ export class DungeonScene extends Phaser.Scene {
     #calculateDamage(attacker, defender) {
         console.log(`${attacker.attack} -> ${defender.defense}`);
 
-        // let atk_mod = 0.9;  // (0.9 -> 1.1)
-        // let def_mod = 0.45; // (0.45 -> 0.6)
-        // let dmg = Math.ceil(((attacker.attack / 3) * (atk_mod)) - ((defender.defense/3) * def_mod));
+        let atk_mod = 0.9;  // (0.9 -> 1.1)
+        let def_mod = 0.45; // (0.45 -> 0.6)
+        let dmg = Math.max(1, Math.ceil(((attacker.attack / 2) * (atk_mod)) - ((defender.defense / 2) * def_mod)));
 
-        let dmg = Math.ceil((attacker.attack * 0.5) - (defender.defense * 0.25));
+        // let dmg = Math.max(1, Math.ceil((attacker.attack * 0.5) - (defender.defense * 0.25)));
 
         console.log("===", dmg);
 

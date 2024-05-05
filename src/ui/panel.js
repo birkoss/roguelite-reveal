@@ -63,6 +63,11 @@ export class Panel {
         this.#player.animate();
         this.#container.add(this.#player.animatedGameObject);
 
+        // for (let i=0; i<20; i++) {
+        //     console.log(this.#player);
+        //     this.#player.levelUp();
+        // }
+
         this.#textLevel = this.#scene.add.text(366, 20, `LV ${this.#player.level}`).setOrigin(1, 0);
         this.#container.add(this.#textLevel);
 
@@ -101,8 +106,7 @@ export class Panel {
      */
     damagePlayer(damage) {
         this.#player.takeDamage(damage);
-        this.#hpBar.setText(`${this.#player.hp}/${this.#player.maxHp}`);
-        this.#hpBar.setWidthAnimated(this.#player.hp/this.#player.maxHp);
+        this.refresh();
     }
 
     /**
@@ -110,17 +114,24 @@ export class Panel {
      */
     gainXp(xp) {
         this.#player.gainXp(xp);
-        this.#xpBar.setText(`${this.#player.xp}/${this.#player.xpToNext}`);
-        this.#xpBar.setWidthAnimated(this.#player.xp/this.#player.xpToNext);
+        this.refresh();
 
         while (this.#player.xp >= this.#player.xpToNext) {
             // TODO: Animation for levelling up
             // - Callback to the scene if animation are long
             this.player.levelUp();
-            this.#textLevel.setText(`LV ${this.#player.level}`);
 
-            this.#xpBar.setText(`${this.#player.xp}/${this.#player.xpToNext}`);
-            this.#xpBar.setWidthAnimated(this.#player.xp/this.#player.xpToNext);
+            this.refresh();
         }
+    }
+
+    refresh() {
+        this.#textLevel.setText(`LV ${this.#player.level}`);
+
+        this.#hpBar.setText(`${this.#player.hp}/${this.#player.maxHp}`);
+        this.#hpBar.setWidthAnimated(this.#player.hp/this.#player.maxHp);
+
+        this.#xpBar.setText(`${this.#player.xp}/${this.#player.xpToNext}`);
+        this.#xpBar.setWidthAnimated(this.#player.xp/this.#player.xpToNext);
     }
 }

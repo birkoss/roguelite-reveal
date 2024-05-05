@@ -119,9 +119,9 @@ export class Unit extends Entity {
 
         this.#level++;
 
-        this.#attack = this.#getStats(this.#unitDetails.attack);
-        this.#defense = this.#getStats(this.#unitDetails.defense);
-        this.#hp = this.#calculateHealth(this.#unitDetails.hp);
+        this.#attack = this.#calculateStat(this.#unitDetails.attack);
+        this.#defense = this.#calculateStat(this.#unitDetails.defense);
+        this.#maxHp = this.#hp = this.#calculateStat(this.#unitDetails.hp);
 
         this.#xpToNext = this.#calculateXpToNext();
     }
@@ -145,7 +145,7 @@ export class Unit extends Entity {
      * @param {number} base 
      * @returns {number}
      */
-    #getStats(base) {
+    #calculateStat(base) {
         let mod = 0.42; // (0.42 -> 0.5)
         return Math.floor(base + ((base * mod) * (this.#level - 1)));
     }
@@ -156,7 +156,7 @@ export class Unit extends Entity {
      */
     #calculateHealth(base) {
         let mod = 0.47; // (0.47 -> 0.53)
-        return Math.floor( (this.#level + 165) / 100 * Math.floor(base * mod * (this.#level + 1)));
+        return Math.floor( (this.#level + 120) / 100 * Math.floor(base * mod * (this.#level + 1)));
     }
 
     
