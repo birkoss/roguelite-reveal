@@ -7,6 +7,7 @@ import { TILE_SIZE } from "../config.js";
 import { StateMachine } from "../state-machine.js";
 import { DUNGEON_ASSET_KEYS } from "../keys/asset.js";
 import { ENTITY_TYPE } from "../dungeons/tiles/entity.js";
+import { Unit } from "../dungeons/tiles/unit.js";
 
 const MAIN_STATES = Object.freeze({
     CREATE_DUNGEON: 'CREATE_DUNGEON',
@@ -33,13 +34,24 @@ export class DungeonScene extends Phaser.Scene {
     }
 
     create() {
-        this.#createStateMachine();
+        let dataDetails = DataUtils.getCharacterDetails(this, 'knight');
+        console.log(dataDetails);
 
+        let tile = new Unit(100, 100, dataDetails);
+        tile.create(this);
+
+        tile.animatedGameObject.setOrigin(0);
+        tile.animatedGameObject.setPosition(10, 10);
+        tile.animate();
+
+        this.#createStateMachine();
         this.#stateMachine.setState(MAIN_STATES.CREATE_DUNGEON);
     }
 
     update() {
-        this.#stateMachine.update();
+        if (this.#stateMachine) {
+            this.#stateMachine.update();
+        }
     }
 
     #createMap() {

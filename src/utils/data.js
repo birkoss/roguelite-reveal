@@ -9,7 +9,7 @@ export class DataUtils {
      */
     static getCharacterDetails(scene, characterId) {
         /** @type {UnitDetails[]} */
-        const data = scene.cache.json.get(DATA_ASSET_KEYS.ENEMIES);
+        const data = scene.cache.json.get(DATA_ASSET_KEYS.CHARACTERS);
 
         return data.find((unit) => unit.id === characterId);
     }
