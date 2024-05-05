@@ -145,13 +145,23 @@ export class DungeonScene extends Phaser.Scene {
                     return;
                 }
 
-                this.time.delayedCall(500, () => {
-                    aliveAndRevealedEnemies.forEach((singleEnemy) => {
-                        this.#panel.damagePlayer(singleEnemy.attack);
-                        this.cameras.main.shake(200);
-                        this.cameras.main.flash(200, 255, 0, 0);
-                    });
+                let totalDamage = 0;
+                aliveAndRevealedEnemies.forEach((singleEnemy) => {
+                    totalDamage += singleEnemy.attack;
+                });
 
+                // Weird, but no damage ?
+                if (totalDamage === 0) {
+                    this.#stateMachine.setState(MAIN_STATES.TURN_START);
+                    return;
+                }
+
+                // Wait a bit and damage the player
+                this.time.delayedCall(500, () => {
+                    this.#panel.damagePlayer(totalDamage);
+                    this.cameras.main.shake(200);
+                    this.cameras.main.flash(200, 255, 0, 0);
+                    
                     this.#stateMachine.setState(MAIN_STATES.TURN_START);
                 });
             },

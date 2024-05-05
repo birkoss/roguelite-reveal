@@ -504,6 +504,10 @@ export class Map {
         let enemy = new Unit(tile.x, tile.y, enemyDetails);
         this.#enemies.push(enemy);
 
+        tile = emptyTiles[2];
+         enemy = new Unit(tile.x, tile.y, enemyDetails);
+        this.#enemies.push(enemy);
+
         // Generate chest
         this.#status = [];
     }
