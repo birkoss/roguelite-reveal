@@ -1,7 +1,7 @@
 import Phaser from "../lib/phaser.js";
 
 import { SCENE_KEYS } from "../keys/scene.js";
-import { DATA_ASSET_KEYS, DUNGEON_ASSET_KEYS } from "../keys/asset.js";
+import { DATA_ASSET_KEYS, DUNGEON_ASSET_KEYS, UI_ASSET_KEYS } from "../keys/asset.js";
 import { TILE_SIZE } from "../config.js";
 
 export class PreloadScene extends Phaser.Scene {
@@ -12,6 +12,8 @@ export class PreloadScene extends Phaser.Scene {
     }
 
     preload() {
+        this.load.image(UI_ASSET_KEYS.PANEL, 'assets/images/panel.png');
+
         this.load.spritesheet(DUNGEON_ASSET_KEYS.WORLD, 'assets/tilesets/world.png', {
             frameWidth: TILE_SIZE,
             frameHeight: TILE_SIZE,
@@ -31,6 +33,14 @@ export class PreloadScene extends Phaser.Scene {
         this.load.spritesheet(DUNGEON_ASSET_KEYS.TILE_STATUS, 'assets/tilesets/tile-status.png', {
             frameWidth: TILE_SIZE,
             frameHeight: TILE_SIZE,
+        });
+        this.load.spritesheet(UI_ASSET_KEYS.HORIZONTAL_BARS, 'assets/tilesets/horizontal-bars.png', {
+            frameWidth: 9,
+            frameHeight: 18,
+        });
+        this.load.spritesheet(UI_ASSET_KEYS.BUTTON_SKILLS, 'assets/tilesets/button-skills.png', {
+            frameWidth: 45,
+            frameHeight: 49,
         });
 
         this.load.json(

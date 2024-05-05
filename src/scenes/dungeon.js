@@ -5,9 +5,11 @@ import { Map } from "../dungeons/map.js";
 import { DataUtils } from "../utils/data.js";
 import { TILE_SIZE } from "../config.js";
 import { StateMachine } from "../state-machine.js";
-import { DUNGEON_ASSET_KEYS } from "../keys/asset.js";
+import { DUNGEON_ASSET_KEYS, UI_ASSET_KEYS } from "../keys/asset.js";
 import { ENTITY_TYPE } from "../dungeons/tiles/entity.js";
 import { Unit } from "../dungeons/tiles/unit.js";
+import { HorizontalBar } from "../ui/horizontal-bar.js";
+import { Panel } from "../ui/panel.js";
 
 const MAIN_STATES = Object.freeze({
     CREATE_DUNGEON: 'CREATE_DUNGEON',
@@ -20,6 +22,9 @@ const MAIN_STATES = Object.freeze({
 export class DungeonScene extends Phaser.Scene {
     /** @type {Map} */
     #map;
+
+    /** @type {Panel} */
+    #panel;
 
     /** @type {DungeonTheme} */
     #dungeonTheme;
@@ -35,14 +40,9 @@ export class DungeonScene extends Phaser.Scene {
 
     create() {
         let dataDetails = DataUtils.getCharacterDetails(this, 'knight');
-        console.log(dataDetails);
 
-        let tile = new Unit(100, 100, dataDetails);
-        tile.create(this);
-
-        tile.animatedGameObject.setOrigin(0);
-        tile.animatedGameObject.setPosition(10, 10);
-        tile.animate();
+        this.#panel = new Panel(this, 9, 9);
+        this.#panel.setCharacter(dataDetails);
 
         this.#createStateMachine();
         this.#stateMachine.setState(MAIN_STATES.CREATE_DUNGEON);
