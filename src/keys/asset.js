@@ -8,4 +8,5 @@ export const DUNGEON_ASSET_KEYS = Object.freeze({
     UNITS: 'UNITS',
     EFFECTS_LARGE: 'EFFECTS_LARGE',
     EFFECTS_SMALL: 'EFFECTS_SMALL',
+    TILE_STATUS: 'TILE_STATUS',
 });

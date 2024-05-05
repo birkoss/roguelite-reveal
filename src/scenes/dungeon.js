@@ -66,8 +66,9 @@ export class DungeonScene extends Phaser.Scene {
         let tiles = this.#map.getEmptyTiles();
         // TODO: Shuffle
         //Phaser.Utils.Array.Shuffle(tiles);
-
         let startingPosition = tiles.shift();
+
+        // let startingPosition = tiles[20];
         this.#map.previewTileAt(startingPosition.x, startingPosition.y, () => {
             this.#map.revealTileAt(startingPosition.x, startingPosition.y);
         });

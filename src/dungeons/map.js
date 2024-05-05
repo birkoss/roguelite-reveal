@@ -226,7 +226,6 @@ export class Map {
         return true;
     }
 
-
     /**
      * @param {number} x 
      * @param {number} y 
@@ -261,15 +260,16 @@ export class Map {
     /**
      * @param {number} x 
      * @param {number} y 
+     * @param {boolean} [includeAdjacent = false] 
      * @returns {Tile[]}
      */
-    getNeighboors(x, y) {
+    getNeighboors(x, y, includeAdjacent) {
         let neighboors = [];
 
         for (let y2=-1; y2<= 1; y2++) {
             for (let x2=-1; x2<= 1; x2++) {
-                // Skip non-adjacent
-                if (Math.abs(x2) == Math.abs(y2)) {
+                // Skip non-adjacent ?
+                if (!includeAdjacent && Math.abs(x2) == Math.abs(y2)) {
                     continue;
                 }
 
@@ -318,16 +318,28 @@ export class Map {
     previewTileAt(x, y, callback) {
         let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
         if (!tile) {
+            if (callback) {
+                callback();
+            }
+
             return;
         }
 
         let overlay = this.#overlays.find(singleOverlay => singleOverlay.x === x && singleOverlay.y === y);
         if (!overlay) {
+            if (callback) {
+                callback();
+            }
+
             return;
         }
 
         // Can only preview FULL overlay
         if (overlay.overlayType !== OVERLAY_TYPE.FULL) {
+            if (callback) {
+                callback();
+            }
+
             return;
         }
 
@@ -342,41 +354,25 @@ export class Map {
     revealTileAt(x, y, callback) {
         let overlay = this.#overlays.find(singleOverlay => singleOverlay.x === x && singleOverlay.y === y);
 
+        // Reveal adjacent tiles first is any
+        let neighboors = this.getNeighboors(overlay.x, overlay.y);
+        if (neighboors.length > 0) {
+            this.#previewTiles(neighboors, () => {
+                // Reveal the tile when it's done
+                overlay.reveal({
+                    callback: () => {
+                        this.#tileRevealed(x, y, callback);
+                    }
+                });
+            }); 
+
+            return;
+        }
+
+        // Reveal the tile right now when no neighboor 
         overlay.reveal({
             callback: () => {
-                // Reveal adjacent tiles
-                let neighboors = this.getNeighboors(overlay.x, overlay.y);
-                neighboors.forEach((singleNeighboor) => {
-                    this.previewTileAt(singleNeighboor.x, singleNeighboor.y);
-                });
-
-                // Animate enemy on this tile
-                let enemy = this.#enemies.find(singleEnemy => singleEnemy.x === overlay.x && singleEnemy.y === overlay.y);
-                if (enemy) {
-                    enemy.animate();
-                
-                    let effect = this.#scene.add.sprite(
-                        enemy.animatedGameObject.x + enemy.animatedGameObject.displayWidth / 2,
-                        enemy.animatedGameObject.y + enemy.animatedGameObject.displayHeight / 2 - enemy.animatedGameObject.displayHeight,
-                        DUNGEON_ASSET_KEYS.EFFECTS_LARGE
-                    );
-                    this.#container.add(effect);
-
-                    effect.on("animationcomplete", (tween, sprite, element) => {
-                        element.destroy();
-
-                        if (callback) {
-                            callback();
-                        }
-                    });
-                    effect.anims.play("appear", true);
-
-                    return;
-                }
-
-                if (callback) {
-                    callback();
-                }
+                this.#tileRevealed(x, y, callback);
             }
         });
     }
@@ -419,5 +415,81 @@ export class Map {
         this.#enemies.push(enemy);
 
         // Generate chest
+    }
+
+    /**
+     * @param {Tile[]} tiles 
+     * @param {() => void} [callback]
+     */
+    #previewTiles(tiles, callback) {
+        let singleTile = tiles.shift();
+        this.previewTileAt(singleTile.x, singleTile.y, () => {
+            if (tiles.length > 0) {
+                this.#previewTiles(tiles, callback);
+            } else {
+                callback();
+            }
+        });
+    }
+
+    #tileRevealed(x, y, callback) {
+        let overlay = this.#overlays.find(singleOverlay => singleOverlay.x === x && singleOverlay.y === y);
+
+        // An enemy is on the tile ?
+        let enemy = this.#enemies.find(singleEnemy => singleEnemy.x === overlay.x && singleEnemy.y === overlay.y);
+        if (enemy) {
+            enemy.animate();
+
+            // Animate an appear effect
+            let effect = this.#scene.add.sprite(
+                enemy.animatedGameObject.x + enemy.animatedGameObject.displayWidth / 2,
+                enemy.animatedGameObject.y + enemy.animatedGameObject.displayHeight / 2 - enemy.animatedGameObject.displayHeight,
+                DUNGEON_ASSET_KEYS.EFFECTS_LARGE
+            );
+            this.#container.add(effect);
+            effect.on("animationcomplete", (tween, sprite, element) => {
+                element.destroy();
+
+                if (callback) {
+                    callback();
+                }
+            });
+            effect.anims.play("appear", true);
+
+            // Block tiles surrounding the enemy
+            // TODO: Apply lockTileDistance value
+            let neighboors = this.getNeighboors(x, y, false);
+            neighboors.forEach((singleNeighboor) => {
+                // Exclude WALL
+                if (singleNeighboor.type === TILE_TYPE.WALL) {
+                    return;
+                }
+                
+                // Need a valid overlay
+                let overlay = this.overlays.find(singleOverlay => singleOverlay.x === singleNeighboor.x && singleOverlay.y === singleNeighboor.y);
+                if (!overlay) {
+                    return;
+                }
+
+                // Must not effect revealed tile
+                if (overlay.overlayType === OVERLAY_TYPE.NONE) {
+                    return;
+                }
+                
+                let effect = this.#scene.add.sprite(
+                    overlay.gameObject.x + overlay.gameObject.displayWidth / 2,
+                    overlay.gameObject.y + overlay.gameObject.displayHeight / 2,
+                    DUNGEON_ASSET_KEYS.TILE_STATUS,
+                    16,
+                );
+                this.#container.add(effect);
+            });
+
+            return;
+        }
+
+        if (callback) {
+            callback();
+        }
     }
 }

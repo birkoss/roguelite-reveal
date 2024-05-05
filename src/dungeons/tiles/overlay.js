@@ -60,10 +60,11 @@ export class Overlay extends Tile {
     reveal(options) {
         const skipAnimation = options?.skipAnimation || false;
 
+        this.#overlayType = OVERLAY_TYPE.NONE;
+
         if (skipAnimation) {
             this._gameObject.setAlpha(0);
             this.#background.setAlpha(0);
-            this.#overlayType = OVERLAY_TYPE.NONE;
 
             if (options?.callback) {
                 options.callback();
@@ -78,8 +79,6 @@ export class Overlay extends Tile {
             alpha: 0,
             duration: 200,
             onComplete: () => {
-                this.#overlayType = OVERLAY_TYPE.NONE;
-
                 if (options?.callback) {
                     options.callback();
                 }
@@ -91,14 +90,14 @@ export class Overlay extends Tile {
      * @param {() => void} [callback]
      */
     preview(callback) {
+        this.#overlayType = OVERLAY_TYPE.PARTIAL;
+
         this._gameObject.scene.add.tween({
             targets: this._gameObject,
             alpha: 1,
             ease: Phaser.Math.Easing.Sine.Out,
-            duration: 200,
+            duration: 150,
             onComplete: () => {
-                this.#overlayType = OVERLAY_TYPE.PARTIAL;
-
                 if (callback) {
                     callback();
                 }
