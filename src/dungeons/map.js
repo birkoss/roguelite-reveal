@@ -393,24 +393,25 @@ export class Map {
      * @param {() => void} [callback]
      */
     revealTileAt(x, y, callback) {
-        let overlays = [];
+        let tilesToExplore = [];
 
+        // Add the main tile
         let overlay = this.#overlays.find(singleOverlay => singleOverlay.x === x && singleOverlay.y === y);
+        tilesToExplore.push(overlay);
 
-        overlays.push(overlay);
-
-        // Reveal adjacent tiles first is any
+        // Add adjacents tiles
         let neighboors = this.getNeighboors(overlay.x, overlay.y);
-        if (neighboors.length > 0) {
-            neighboors.forEach((singleNeighboor) => {
-                let overlayNeighboor = this.#overlays.find(singleOverlayN => singleOverlayN.x === singleNeighboor.x && singleOverlayN.y === singleNeighboor.y);
-                if (overlayNeighboor) {
-                    overlays.push(overlayNeighboor);
-                }
-            });
-        }
-
-        this.#revealTiles(overlays, () => {
+        neighboors.forEach((singleNeighboor) => {
+            let overlayNeighboor = this.#overlays.find(singleOverlayN => singleOverlayN.x === singleNeighboor.x && singleOverlayN.y === singleNeighboor.y);
+            if (overlayNeighboor) {
+                tilesToExplore.push(overlayNeighboor);
+            }
+        });
+        
+        // Reveal all those tiles
+        // TODO: If a revealed tile is under protection from an enemy, exclude it and add status
+        this.#revealTiles(tilesToExplore, () => {
+            // Reveal all things on those tiles
             this.#tileRevealed(x, y, callback);
         }); 
     }
