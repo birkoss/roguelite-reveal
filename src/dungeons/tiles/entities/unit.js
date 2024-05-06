@@ -102,7 +102,7 @@ export class TileUnit extends TileEntity {
             repeat: -1,
         });
 
-        // TODO: Add shadow under the character
+        // Add shadow under the Unit
         let shadow = new TileEntity();
         shadow.create(scene, DUNGEON_ASSET_KEYS.WORLD, 2017);
 

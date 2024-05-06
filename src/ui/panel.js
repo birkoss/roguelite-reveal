@@ -59,7 +59,7 @@ export class Panel {
 
         this.#player = new TileUnit(dataDetails);
         let container = this.#player.createUnit(this.#scene);
-        container.setPosition(22, 54);
+        container.setPosition(22, 62);
         this.#player.gameObject.setFlipX(true);
         this.#player.animate();
         this.#container.add(container);
