@@ -5,6 +5,7 @@
  * @property {string} name
  * @property {DungeonSingleFrame} floor
  * @property {DungeonSingleFrame} exit
+ * @property {DungeonSingleFrame} hidden
  * @property {DungeonMultipleFrames} walls
  */
 

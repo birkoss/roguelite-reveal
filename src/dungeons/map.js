@@ -99,8 +99,7 @@ export class Map {
                 singleTile.createItem(this.#scene, assetKey, assetFrame);
             }
 
-            // TODO: assetFrame dynamic from the theme
-            singleTile.createOverlay(this.#scene, theme.floor.assetKey, 2);
+            singleTile.createOverlay(this.#scene, theme.hidden.assetKey, theme.hidden.assetFrame);
         });
     }
 

@@ -10,6 +10,10 @@
             "assetKey": "WORLD",
             "assetFrame": 8
         },
+        "hidden": {
+            "assetKey": "WORLD",
+            "assetFrame": 2
+        },
         "walls": {
             "assetKey": "WORLD",
             "assetFrames": [
