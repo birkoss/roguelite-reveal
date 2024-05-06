@@ -1,8 +1,8 @@
 import Phaser from "../lib/phaser.js";
 
-import { Unit } from "../dungeons/tiles/unit.js";
 import { UI_ASSET_KEYS } from "../keys/asset.js";
 import { HorizontalBar } from "./horizontal-bar.js";
+import { TileUnit } from "../dungeons/tiles/entities/unit.js";
 
 export class Panel {
     /** @type {Phaser.Scene} */
@@ -16,7 +16,7 @@ export class Panel {
     #textName;
     /** @type {Phaser.GameObjects.Text} */
     #textLevel;
-    /** @type {Unit} */
+    /** @type {TileUnit} */
     #player;
     /** @type {HorizontalBar} */
     #hpBar;
@@ -45,7 +45,7 @@ export class Panel {
         return this.#container;
     }
 
-    /** @type {Unit} */
+    /** @type {TileUnit} */
     get player() {
         return this.#player;
     }
@@ -57,11 +57,11 @@ export class Panel {
         this.#textName = this.#scene.add.text(22, 20, dataDetails.name).setOrigin(0);
         this.#container.add(this.#textName);
 
-        this.#player = new Unit(0, 0, dataDetails);
-        this.#player.create(this.#scene);
-        this.#player.animatedGameObject.setOrigin(0).setPosition(22, 54).setFlipX(true);
+        this.#player = new TileUnit(dataDetails);
+        this.#player.createUnit(this.#scene);
+        this.#player.gameObject.setOrigin(0).setPosition(22, 54).setFlipX(true);
         this.#player.animate();
-        this.#container.add(this.#player.animatedGameObject);
+        this.#container.add(this.#player.gameObject);
 
         // for (let i=0; i<20; i++) {
         //     console.log(this.#player.level, this.#player.xpToNext);
@@ -105,7 +105,7 @@ export class Panel {
      * @param {number} damage 
      */
     damagePlayer(damage) {
-        this.#player.takeDamage(damage);
+        // this.#player.takeDamage(damage);
         this.refresh();
     }
 
@@ -113,25 +113,25 @@ export class Panel {
      * @param {number} xp 
      */
     gainXp(xp) {
-        this.#player.gainXp(xp);
+        // this.#player.gainXp(xp);
         this.refresh();
 
-        while (this.#player.xp >= this.#player.xpToNext) {
-            // TODO: Animation for levelling up
-            // - Callback to the scene if animation are long
-            this.player.levelUp();
+        // while (this.#player.xp >= this.#player.xpToNext) {
+        //     // TODO: Animation for levelling up
+        //     // - Callback to the scene if animation are long
+        //     this.player.levelUp();
 
-            this.refresh();
-        }
+        //     this.refresh();
+        // }
     }
 
     refresh() {
-        this.#textLevel.setText(`LV ${this.#player.level}`);
+        // this.#textLevel.setText(`LV ${this.#player.level}`);
 
-        this.#hpBar.setText(`${this.#player.hp}/${this.#player.maxHp}`);
-        this.#hpBar.setWidthAnimated(this.#player.hp/this.#player.maxHp);
+        // this.#hpBar.setText(`${this.#player.hp}/${this.#player.maxHp}`);
+        // this.#hpBar.setWidthAnimated(this.#player.hp/this.#player.maxHp);
 
-        this.#xpBar.setText(`${this.#player.xp}/${this.#player.xpToNext}`);
-        this.#xpBar.setWidthAnimated(this.#player.xp/this.#player.xpToNext);
+        // this.#xpBar.setText(`${this.#player.xp}/${this.#player.xpToNext}`);
+        // this.#xpBar.setWidthAnimated(this.#player.xp/this.#player.xpToNext);
     }
 }

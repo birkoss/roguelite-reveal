@@ -35,3 +35,12 @@
  * @property {number[]} assetFrames
  * @property {number} tileLockDistance
  */
+
+/** 
+ * @typedef ItemDetails
+ * @type {Object}
+ * @property {string} id
+ * @property {string} name
+ * @property {string} assetKey
+ * @property {number} assetFrame
+ */

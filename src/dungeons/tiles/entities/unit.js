@@ -1,15 +1,12 @@
-import Phaser from "../../lib/phaser.js";
+import { DUNGEON_ASSET_KEYS } from "../../../keys/asset.js";
+import Phaser from "../../../lib/phaser.js";
 
-import { TILE_SIZE } from "../../config.js";
-import { DUNGEON_ASSET_KEYS } from "../../keys/asset.js";
-import { ENTITY_TYPE, Entity } from "./entity.js";
+import { TileEntity } from "./entity.js";
 
-export class Unit extends Entity {
+export class TileUnit extends TileEntity {
     /** @type {UnitDetails} */
-    #unitDetails; 
+    #unitDetails;
 
-    /** @type {Phaser.GameObjects.Sprite} */
-    #animatedGameObject;
     /** @type {number} */
     #hp;
     /** @type {number} */
@@ -25,8 +22,8 @@ export class Unit extends Entity {
     /** @type {number} */
     #xpToNext;
 
-    constructor(x, y, unitDetails) {
-        super(x, y, ENTITY_TYPE.UNIT);
+    constructor(unitDetails) {
+        super();
 
         this.#unitDetails = unitDetails;
         
@@ -40,10 +37,6 @@ export class Unit extends Entity {
         this.#xpToNext = this.#calculateXpToNext();
     }
 
-    /** @type {Phaser.GameObjects.Sprite} */
-    get animatedGameObject() {
-        return this.#animatedGameObject;
-    }
     /** @type {UnitDetails} */
     get unitDetails() {
         return this.#unitDetails;
@@ -83,28 +76,39 @@ export class Unit extends Entity {
 
     /**
      * @param {Phaser.Scene} scene 
-     * @returns {Phaser.GameObjects.Image}
+     * @param {string} [assetKey='']
+     * @param {number[]} [assetFrames]
+     * @returns {Phaser.GameObjects.Sprite}
      */
-    create(scene) {
-        this.#animatedGameObject = scene.add.sprite(this.x * TILE_SIZE, this.y * TILE_SIZE, this.#unitDetails.assetKey, this.#unitDetails.assetFrames[0]);
-        this.#animatedGameObject.setOrigin(0);
+    createUnit(scene, assetKey, assetFrames) {
+        this._gameObject = scene.add.sprite(
+            0,
+            0,
+            this.#unitDetails.assetKey,
+            this.#unitDetails.assetFrames[0]
+        ).setOrigin(0);
 
-        let frames = this.#animatedGameObject.anims.generateFrameNumbers(this.#unitDetails.assetKey, { frames: this.#unitDetails.assetFrames });
+        let frames = this._gameObject.anims.generateFrameNumbers(
+            this.#unitDetails.assetKey, 
+            {
+                frames: this.#unitDetails.assetFrames
+            }
+        );
 
-        this.#animatedGameObject.anims.create({
+        this._gameObject.anims.create({
             key: 'idle',
             frames: frames,
             frameRate: 2,
             repeat: -1,
-          });
+        });
 
-          // TODO: Add shadow under the character
+        // TODO: Add shadow under the character
 
-        return this.#animatedGameObject;
+        return this._gameObject;
     }
 
     animate() {
-        this.#animatedGameObject.anims.play('idle');
+        this._gameObject.anims.play('idle');
     }
 
     /**
@@ -133,11 +137,11 @@ export class Unit extends Entity {
         this.#hp = Math.max(0, this.#hp - damage);
 
         if (!this.isAlive) {
-            this.#animatedGameObject.anims.stop();
+            this._gameObject.anims.stop();
             // TODO: Depending on Unit Data
             // TODO: Randomize the death frame
-            this.#animatedGameObject.setTexture(DUNGEON_ASSET_KEYS.WORLD);
-            this.#animatedGameObject.setFrame(89);
+            this._gameObject.setTexture(DUNGEON_ASSET_KEYS.WORLD);
+            this._gameObject.setFrame(89);
         }
     }
 
@@ -158,8 +162,6 @@ export class Unit extends Entity {
         let mod = 0.47; // (0.47 -> 0.53)
         return Math.floor( (this.#level + 120) / 100 * Math.floor(base * mod * (this.#level + 1)));
     }
-
-    
 
     #calculateXpToNext() {
         return Math.round((0.04 * Math.pow(this.#level, 3)) + (0.8 * Math.pow(this.#level, 2)) + (2 * this.#level));

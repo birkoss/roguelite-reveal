@@ -6,9 +6,9 @@ import { DataUtils } from "../utils/data.js";
 import { TILE_SIZE } from "../config.js";
 import { StateMachine } from "../state-machine.js";
 import { DUNGEON_ASSET_KEYS } from "../keys/asset.js";
-import { ENTITY_TYPE } from "../dungeons/tiles/entity.js";
 import { Panel } from "../ui/panel.js";
-import { Unit } from "../dungeons/tiles/unit.js";
+import { TileUnit } from "../dungeons/tiles/entities/unit.js";
+import { TILE_ITEM_TYPE } from "../dungeons/tiles/entities/item.js";
 
 const MAIN_STATES = Object.freeze({
     CREATE_DUNGEON: 'CREATE_DUNGEON',
@@ -118,14 +118,7 @@ export class DungeonScene extends Phaser.Scene {
             onEnter: () => {
                 // Find all REVEALED enemy
                 let revealedTiles = this.#map.getRevealedTiles();
-                let aliveAndRevealedEnemies = this.#map.enemies.filter((singleEnemy) => {
-                    // Only count ALIVE enemy
-                    if (!singleEnemy.isAlive) {
-                        return;
-                    }
-                    
-                    return revealedTiles.find((singleTile) => singleTile.x === singleEnemy.x && singleTile.y === singleEnemy.y);
-                });
+                let aliveAndRevealedEnemies = revealedTiles.filter(singleTile => singleTile.enemy !== undefined && singleTile.enemy.isAlive);
 
                 // No enemy to counter-attack ?
                 if (aliveAndRevealedEnemies.length === 0) {
@@ -134,8 +127,8 @@ export class DungeonScene extends Phaser.Scene {
                 }
 
                 let totalDamage = 0;
-                aliveAndRevealedEnemies.forEach((singleEnemy) => {
-                    let dmg = this.#calculateDamage(singleEnemy, this.#panel.player);
+                aliveAndRevealedEnemies.forEach((singleTile) => {
+                    let dmg = this.#calculateDamage(singleTile.enemy, this.#panel.player);
                     totalDamage += dmg;
                 });
 
@@ -198,15 +191,16 @@ export class DungeonScene extends Phaser.Scene {
      */
     #selectTile(x, y) {
         if (this.#stateMachine.currentStateName === MAIN_STATES.WAITING_FOR_PLAYER_ACTION) {
+
             if (this.#map.canAttackAt(x, y)) {
                 this.#stateMachine.setState(MAIN_STATES.WAITING_FOR_ACTION_FEEDBACK);
 
                 // Find the enemy to attack
-                let enemy = this.#map.enemies.find(singleEnemy => singleEnemy.x === x && singleEnemy.y === y);
+                let tile = this.#map.tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
 
                 let effect = this.add.sprite(
-                    enemy.animatedGameObject.x + enemy.animatedGameObject.displayWidth / 2,
-                    enemy.animatedGameObject.y + enemy.animatedGameObject.displayHeight / 2,
+                    tile.container.x + tile.enemy.gameObject.displayWidth / 2,
+                    tile.container.y + tile.enemy.gameObject.displayHeight / 2,
                     DUNGEON_ASSET_KEYS.EFFECTS_LARGE
                 );
                 this.#map.container.add(effect);
@@ -214,11 +208,11 @@ export class DungeonScene extends Phaser.Scene {
                 effect.on("animationcomplete", (tween, sprite, element) => {
                     element.destroy();
 
-                    let dmg = this.#calculateDamage(this.#panel.player, enemy);
+                    let dmg = this.#calculateDamage(this.#panel.player, tile.enemy);
 
-                    enemy.takeDamage(dmg);
-                    if (!enemy.isAlive) {
-                        let xp = enemy.xpToNext;
+                    tile.enemy.takeDamage(dmg);
+                    if (!tile.enemy.isAlive) {
+                        let xp = tile.enemy.xpToNext;
                         this.#panel.gainXp(xp);
                     }
 
@@ -232,8 +226,8 @@ export class DungeonScene extends Phaser.Scene {
             }
 
             if (this.#map.canInteracAt(x, y)) {
-                let entity = this.#map.entities.find(singleEntity => singleEntity.x === x && singleEntity.y === y);
-                if (entity.entityType === ENTITY_TYPE.EXIT) {
+                let tile = this.#map.tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
+                if (tile.item.type === TILE_ITEM_TYPE.EXIT) {
                     this.scene.start(SCENE_KEYS.DUNGEON_SCENE);
                 }
                 return;
@@ -253,8 +247,8 @@ export class DungeonScene extends Phaser.Scene {
 
     /**
      * 
-     * @param {Unit} attacker 
-     * @param {Unit} defender 
+     * @param {TileUnit} attacker 
+     * @param {TileUnit} defender 
      * @returns {number}
      */
     #calculateDamage(attacker, defender) {

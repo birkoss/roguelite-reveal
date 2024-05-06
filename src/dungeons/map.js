@@ -2,10 +2,8 @@ import Phaser from "../lib/phaser.js";
 
 import { DUNGEON_ASSET_KEYS } from "../keys/asset.js";
 import { DataUtils } from "../utils/data.js";
-import { Unit } from "./tiles/unit.js";
-import { ENTITY_TYPE, Entity } from "./tiles/entity.js";
-import { OVERLAY_TYPE, Overlay } from "./tiles/overlay.js";
 import { TILE_TYPE, Tile } from "./tiles/tile.js";
+import { TILE_ITEM_TYPE, TileItem } from "./tiles/entities/item.js";
 
 export class Map {
     /** @type {Phaser.Scene} */
@@ -17,25 +15,9 @@ export class Map {
 
     /** @type {Tile[]} */
     #tiles;
-    /** @type {Overlay[]} */
-    #overlays;
-    /** @type {Entity[]} */
-    #entities;
-    /** @type {Unit[]} */
-    #enemies;
-    /** @type {Phaser.GameObjects.Sprite[]} */
-    #status;
 
     /** @type {Phaser.GameObjects.Container} */
     #container;
-    /** @type {Phaser.GameObjects.Container} */
-    #tilesContainer;
-    /** @type {Phaser.GameObjects.Container} */
-    #entitiesContainer;
-    /** @type {Phaser.GameObjects.Container} */
-    #overlayContainer;
-    /** @type {Phaser.GameObjects.Container} */
-    #statusContainer;
 
     /**
      * @param {Phaser.Scene} scene
@@ -47,17 +29,7 @@ export class Map {
         this.#width = width;
         this.#height = height;
 
-        this.#tilesContainer = scene.add.container(0, 0);
-        this.#entitiesContainer = scene.add.container(0, 0);
-        this.#overlayContainer = scene.add.container(0, 0);
-        this.#statusContainer = scene.add.container(0, 0);
-
-        this.#container = scene.add.container(0, 0, [
-            this.#tilesContainer,
-            this.#entitiesContainer, 
-            this.#overlayContainer,
-            this.#statusContainer,
-        ]);
+        this.#container = scene.add.container(0, 0);
 
         this.#generate();
     }
@@ -78,18 +50,6 @@ export class Map {
     get container() {
         return this.#container;
     }
-    /** @type {Unit[]} */
-    get enemies() {
-        return this.#enemies;
-    }
-    /** @type {Entity[]} */
-    get entities() {
-        return this.#entities;
-    }
-    /** @type {Overlay[]} */
-    get overlays() {
-        return this.#overlays;
-    }
 
     /**
      * @param {DungeonTheme} theme 
@@ -102,23 +62,20 @@ export class Map {
 
             if (singleTile.type == TILE_TYPE.WALL) {
                 assetKey = theme.walls.assetKey;
-
                 assetFrame = 0;
-
                 // Get the first frame, should always be the default wall
                 if (theme.walls.assetFrames.length > 0) {
                     assetFrame = theme.walls.assetFrames[0];
                 }
 
                 let dungeonWallLayout = this.getTileLayout(singleTile.x, singleTile.y, TILE_TYPE.WALL);
-
                 if (dungeonWallLayout < theme.walls.assetFrames.length) {
                     assetFrame = theme.walls.assetFrames[dungeonWallLayout];
                 }
             }
 
-            let tileGameObject = singleTile.create(this.#scene, assetKey, assetFrame);
-            this.#tilesContainer.add(tileGameObject);
+            let tileContainer = singleTile.create(this.#scene, assetKey, assetFrame);
+            this.#container.add(tileContainer);
         });
 
         // Create Overlays
@@ -127,36 +84,13 @@ export class Map {
                 return;
             }
             
-            let overlay = new Overlay(singleTile.x, singleTile.y);
-            this.#overlays.push(overlay);
-
-            let overlayGameObject = overlay.create(this.#scene, theme.floor.assetKey, 2);
-            this.#overlayContainer.add(overlayGameObject);
-        });
-
-        // Place entities
-        this.#entities.forEach((singleTile) => {
-            if (singleTile.entityType === ENTITY_TYPE.EXIT) {
-                let gameObject = singleTile.create(this.#scene, theme.exit.assetKey, theme.exit.assetFrame);
-                this.#entitiesContainer.add(gameObject);
-                return;
+            if (singleTile.item) {
+                // TODO: Dynamic object and assets depending on the type (or ItemDetails)
+                singleTile.createItem(this.#scene, theme.exit.assetKey, theme.exit.assetFrame);
             }
 
-            if (singleTile.entityType === ENTITY_TYPE.UNIT) {
-                let gameObject = singleTile.create(this.#scene);
-                this.#entitiesContainer.add(gameObject);
-                return;
-            }
+            singleTile.createOverlay(this.#scene, theme.floor.assetKey, 2);
         });
-
-        // Place enemies
-        this.#enemies.forEach((singleTile) => {
-            console.log(`enemy @ ${singleTile.x}x${singleTile.y}`);
-
-            let gameObject = singleTile.create(this.#scene);
-            this.#entitiesContainer.add(gameObject);
-            return;
-        });   
     }
 
     /**
@@ -190,14 +124,12 @@ export class Map {
         }
 
         // Is this overlay revealed ?
-        let overlay = this.#overlays.find(singleOverlay => singleOverlay.overlayType === OVERLAY_TYPE.NONE && singleOverlay.x === x && singleOverlay.y === y);
-        if (!overlay) {
+        if (tile.overlay) {
             return false;
         }
 
         // Is this enemy alive ?
-        let enemy = this.#enemies.find(singleEnemy => singleEnemy.isAlive && singleEnemy.x === overlay.x && singleEnemy.y === overlay.y);
-        if (!enemy) {
+        if (!tile.enemy) {
             return false;
         }
 
@@ -215,15 +147,13 @@ export class Map {
             return false;
         }
 
-        // Is this overlay revealed ?
-        let overlay = this.#overlays.find(singleOverlay => singleOverlay.overlayType === OVERLAY_TYPE.NONE && singleOverlay.x === x && singleOverlay.y === y);
-        if (!overlay) {
+        // Still an overlay ?
+        if (tile.overlay) {
             return false;
         }
 
-        // Is an entity present ?
-        let entity = this.#entities.find(singleEntity => singleEntity.x === overlay.x && singleEntity.y === overlay.y);
-        if (!entity) {
+        // Is an item present ?
+        if (!tile.item) {
             return false;
         }
 
@@ -241,23 +171,17 @@ export class Map {
             return false;
         }
 
-        let overlay = this.#overlays.find(singleOverlay => singleOverlay.x === x && singleOverlay.y === y);
-        if (!overlay) {
+        if (!tile.overlay) {
             return false;
-        }
-
-        // Already revealed ?
-        if (overlay.overlayType === OVERLAY_TYPE.NONE) {
-            return;
         }
 
         // Must NOT have an effect at the same tile
         // TODO: Track using X, Y and not the Sprite position
         // TODO: Detect the status type to react differently
-        let sprite = this.#status.find(singleStatus => singleStatus.x === overlay.gameObject.x + overlay.gameObject.displayWidth/2 && singleStatus.y === overlay.gameObject.y + overlay.gameObject.displayHeight / 2);
-        if (sprite) {
-            return false;
-        }
+        // let sprite = this.#status.find(singleStatus => singleStatus.x === tile.overlay.gameObject.x + tile.overlay.gameObject.displayWidth/2 && singleStatus.y === tile.overlay.gameObject.y + tile.overlay.gameObject.displayHeight / 2);
+        // if (sprite) {
+        //     return false;
+        // }
 
         return true;
     }
@@ -333,6 +257,7 @@ export class Map {
             if (singleTile.type === TILE_TYPE.WALL) {
                 return;
             }
+            // TODO: Also check for enemy
             return singleTile;
         });
     }
@@ -341,55 +266,53 @@ export class Map {
      * @returns {Tile[]}
      */
     getRevealedTiles() {
-        return this.#tiles.filter((singleTile) => {
-            return this.#overlays.find(singleOverlay => singleOverlay.x === singleTile.x && singleOverlay.y === singleTile.y && singleOverlay.overlayType === OVERLAY_TYPE.NONE);
-        });
+        return this.#tiles.filter(singleTile => !singleTile.overlay && !this.isBorder(singleTile.x, singleTile.y));
     }
 
     refreshTileStatus() {
-        this.#statusContainer.getAll().forEach((singleSprite) => {
-            singleSprite.destroy();
-        });
-        this.#status = [];
+        // this.#statusContainer.getAll().forEach((singleSprite) => {
+        //     singleSprite.destroy();
+        // });
+        // this.#status = [];
 
-        let revealedTiles = this.#overlays.filter(singleOverlay => singleOverlay.overlayType === OVERLAY_TYPE.NONE);
-        revealedTiles.forEach((singleTile) => {
-            let enemies = this.#enemies.filter(singleEnemy => singleEnemy.isAlive && singleEnemy.x === singleTile.x && singleEnemy.y === singleTile.y);
+        // let revealedTiles = this.#overlays.filter(singleOverlay => singleOverlay.overlayType === OVERLAY_TYPE.NONE);
+        // revealedTiles.forEach((singleTile) => {
+        //     let enemies = this.#enemies.filter(singleEnemy => singleEnemy.isAlive && singleEnemy.x === singleTile.x && singleEnemy.y === singleTile.y);
 
-            enemies.forEach((singleEnemy) => {
-                // Block tiles surrounding the enemy
-                // TODO: Apply lockTileDistance value
-                let neighboors = this.getNeighboors(singleEnemy.x, singleEnemy.y, false);
-                neighboors.forEach((singleNeighboor) => {
-                    // Exclude WALL
-                    if (singleNeighboor.type === TILE_TYPE.WALL) {
-                        return;
-                    }
+        //     enemies.forEach((singleEnemy) => {
+        //         // Block tiles surrounding the enemy
+        //         // TODO: Apply lockTileDistance value
+        //         let neighboors = this.getNeighboors(singleEnemy.x, singleEnemy.y, false);
+        //         neighboors.forEach((singleNeighboor) => {
+        //             // Exclude WALL
+        //             if (singleNeighboor.type === TILE_TYPE.WALL) {
+        //                 return;
+        //             }
                     
-                    // Need a valid overlay
-                    let overlay = this.overlays.find(singleOverlay => singleOverlay.x === singleNeighboor.x && singleOverlay.y === singleNeighboor.y);
-                    if (!overlay) {
-                        return;
-                    }
+        //             // Need a valid overlay
+        //             let overlay = this.overlays.find(singleOverlay => singleOverlay.x === singleNeighboor.x && singleOverlay.y === singleNeighboor.y);
+        //             if (!overlay) {
+        //                 return;
+        //             }
 
-                    // Must not effect revealed tile
-                    if (overlay.overlayType === OVERLAY_TYPE.NONE) {
-                        return;
-                    }
+        //             // Must not effect revealed tile
+        //             if (overlay.overlayType === OVERLAY_TYPE.NONE) {
+        //                 return;
+        //             }
                     
-                    let effect = this.#scene.add.sprite(
-                        overlay.gameObject.x + overlay.gameObject.displayWidth / 2,
-                        overlay.gameObject.y + overlay.gameObject.displayHeight / 2,
-                        DUNGEON_ASSET_KEYS.TILE_STATUS,
-                        0,
-                    );
+        //             let effect = this.#scene.add.sprite(
+        //                 overlay.gameObject.x + overlay.gameObject.displayWidth / 2,
+        //                 overlay.gameObject.y + overlay.gameObject.displayHeight / 2,
+        //                 DUNGEON_ASSET_KEYS.TILE_STATUS,
+        //                 0,
+        //             );
                     
-                    this.#status.push(effect);
-                    this.#statusContainer.add(effect);
-                });
-            });
+        //             this.#status.push(effect);
+        //             this.#statusContainer.add(effect);
+        //         });
+        //     });
 
-        });
+        // });
     }
 
     /**
@@ -400,35 +323,36 @@ export class Map {
     exploreAt(x, y, callback) {
         let tilesToExplore = [];
 
-        // Add the main tile
-        let overlay = this.#overlays.find(singleOverlay => singleOverlay.x === x && singleOverlay.y === y);
-        tilesToExplore.push(overlay);
-
-        // Add adjacents tiles
-        let neighboors = this.getNeighboors(overlay.x, overlay.y);
-        neighboors.forEach((singleNeighboor) => {
-            let overlayNeighboor = this.#overlays.find(singleOverlayN => singleOverlayN.overlayType === OVERLAY_TYPE.FULL && singleOverlayN.x === singleNeighboor.x && singleOverlayN.y === singleNeighboor.y);
-            if (overlayNeighboor) {
-                tilesToExplore.push(overlayNeighboor);
-            }
-        });
+        let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
         
-        // Reveal all those tiles
-        if (tilesToExplore.length > 0) {
-            this.#revealTiles([...tilesToExplore], () => {
-                // Reveal all things on those tiles
-                this.#activateTiles(tilesToExplore, callback);
-            }); 
-            return;
+        // Add the main tile WITH overlay
+        if (tile.overlay) {
+            tilesToExplore.push(tile);
         }
 
+        // Add adjacents tiles WITH overlay
+        let neighboors = this.getNeighboors(tile.x, tile.y);
+        neighboors.forEach((singleNeighboor) => {
+            if (singleNeighboor.overlay) {
+                tilesToExplore.push(singleNeighboor);
+            }
+        });
+
         // Nothing to reveal ?
-        callback();
+        if (tilesToExplore.length === 0) {
+            callback();
+            return;
+        }
+        
+        // Reveal all those tiles
+        this.#revealTiles([...tilesToExplore], () => {
+            // Reveal all things on those tiles
+            this.#activateTiles(tilesToExplore, callback);
+        }); 
     }
 
     #generate() {
         this.#tiles = [];
-        this.#overlays = [];
 
         for (let y=0; y<this.#height; y++) {
             for (let x=0; x<this.#width; x++) {
@@ -440,72 +364,67 @@ export class Map {
             }
         }
 
-        this.#entities = [];
-
-        // Generate exit
         let emptyTiles = this.getEmptyTiles();
         // TODO: SHUFFLE
         //Phaser.Utils.Array.Shuffle(emptyTiles);
         //let tile = emptyTiles.shift();
 
-        let tile = emptyTiles[1];
 
+        // Generate exit
         // TODO: Allow to lock the EXIT. Must give a key somewhere (drop or chest)
         // TODO: Allow to seal the EXIT. Must defeat a specific enemy to lift it.
-        let exit = new Entity(tile.x, tile.y, ENTITY_TYPE.EXIT);
-        this.#entities.push(exit);
+
+        let tile = emptyTiles[1];
+        tile.addItem(new TileItem(TILE_ITEM_TYPE.EXIT));
+
+        // let exit = new Entity(tile.x, tile.y, ENTITY_TYPE.EXIT);
+        // this.#entities.push(exit);
 
         // Generate ennemies
-
         // TODO: Never spawn enemy adjacent to the EXIT (use getNeighboors to remove tiles)
-        this.#enemies = [];
+        let enemyDetails = DataUtils.getEnemyDetails(this.#scene, 'skeleton');
 
         tile = emptyTiles[8];
+        tile.addEnemy(enemyDetails);
 
-        let enemyDetails = DataUtils.getEnemyDetails(this.#scene, 'skeleton');
-        let enemy = new Unit(tile.x, tile.y, enemyDetails);
-        this.#enemies.push(enemy);
 
         tile = emptyTiles[2];
-         enemy = new Unit(tile.x, tile.y, enemyDetails);
-        this.#enemies.push(enemy);
+        tile.addEnemy(enemyDetails);;
 
-        // Generate chest
-        this.#status = [];
+        // TODO: Generate chest
+        // TODO: Generate item
     }
 
     /**
-     * @param {Overlay[]} overlays 
+     * @param {Tile[]} tiles 
      * @param {() => void} [callback]
      */
-    #revealTiles(overlays, callback) {
-        let singleOverlay = overlays.shift();
-        singleOverlay.reveal({
-            callback: () => {
-                if (overlays.length > 0) {
-                    this.#revealTiles(overlays, callback);
-                } else {
-                    callback();
-                }
+    #revealTiles(tiles, callback) {
+        let singleTile = tiles.shift();
+        singleTile.reveal(() => {
+            if (tiles.length > 0) {
+                this.#revealTiles(tiles, callback);
+            } else {
+                callback();
             }
         });
     }
 
     /**
-     * @param {Overlay[]} overlays 
+     * @param {Tile[]} tiles 
      * @param {() => void} [callback ]
      */
-    #activateTiles(overlays, callback) {
-        overlays.forEach((singleOverlay) => {
+    #activateTiles(tiles, callback) {
+        tiles.forEach((singleTile) => {
             // An enemy is on the tile ?
-            let enemy = this.#enemies.find(singleEnemy => singleEnemy.x === singleOverlay.x && singleEnemy.y === singleOverlay.y);
-            if (enemy) {
-                enemy.animate();
+            if (singleTile.enemy) {
+                singleTile.enemy.animate();
 
                 // Animate an appear effect
+                // TODO: Add effect in Tile instead
                 let effect = this.#scene.add.sprite(
-                    enemy.animatedGameObject.x + enemy.animatedGameObject.displayWidth / 2,
-                    enemy.animatedGameObject.y + enemy.animatedGameObject.displayHeight / 2 - enemy.animatedGameObject.displayHeight,
+                    singleTile.container.x + singleTile.enemy.gameObject.displayWidth / 2,
+                    singleTile.container.y + singleTile.enemy.gameObject.displayHeight / 2 - singleTile.enemy.gameObject.displayHeight,
                     DUNGEON_ASSET_KEYS.EFFECTS_LARGE
                 );
                 this.#container.add(effect);
@@ -519,8 +438,8 @@ export class Map {
         });
 
         this.#scene.time.delayedCall(500, () => {
-            this.refreshTileStatus();
-
+            // this.refreshTileStatus();
+            
             if (callback) {
                 callback();
             }
