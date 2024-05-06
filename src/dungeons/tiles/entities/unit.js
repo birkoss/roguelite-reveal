@@ -78,12 +78,12 @@ export class TileUnit extends TileEntity {
      * @param {Phaser.Scene} scene 
      * @param {string} [assetKey='']
      * @param {number[]} [assetFrames]
-     * @returns {Phaser.GameObjects.Sprite}
+     * @returns {Phaser.GameObjects.Container}
      */
     createUnit(scene, assetKey, assetFrames) {
         this._gameObject = scene.add.sprite(
             0,
-            0,
+            -8,
             this.#unitDetails.assetKey,
             this.#unitDetails.assetFrames[0]
         ).setOrigin(0);
@@ -103,8 +103,10 @@ export class TileUnit extends TileEntity {
         });
 
         // TODO: Add shadow under the character
+        let shadow = new TileEntity();
+        shadow.create(scene, DUNGEON_ASSET_KEYS.WORLD, 2017);
 
-        return this._gameObject;
+        return scene.add.container(0, 0, [shadow.gameObject, this._gameObject]);
     }
 
     animate() {

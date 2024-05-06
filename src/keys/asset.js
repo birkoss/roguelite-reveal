@@ -2,6 +2,7 @@ export const DATA_ASSET_KEYS = Object.freeze({
     DUNGEON_THEMES: 'DUNGEON_THEMES',
     ENEMIES: 'ENEMIES',
     CHARACTERS: 'CHARACTERS',
+    ITEMS: 'ITEMS',
 });
 
 export const DUNGEON_ASSET_KEYS = Object.freeze({

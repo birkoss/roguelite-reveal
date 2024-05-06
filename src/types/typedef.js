@@ -41,6 +41,7 @@
  * @type {Object}
  * @property {string} id
  * @property {string} name
- * @property {string} assetKey
- * @property {number} assetFrame
+ * @property {string} [assetKey]
+ * @property {number} [assetFrame]
+ * @property {object} [modifier]
  */

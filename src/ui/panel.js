@@ -58,10 +58,11 @@ export class Panel {
         this.#container.add(this.#textName);
 
         this.#player = new TileUnit(dataDetails);
-        this.#player.createUnit(this.#scene);
-        this.#player.gameObject.setOrigin(0).setPosition(22, 54).setFlipX(true);
+        let container = this.#player.createUnit(this.#scene);
+        container.setPosition(22, 54);
+        this.#player.gameObject.setFlipX(true);
         this.#player.animate();
-        this.#container.add(this.#player.gameObject);
+        this.#container.add(container);
 
         // for (let i=0; i<20; i++) {
         //     console.log(this.#player.level, this.#player.xpToNext);

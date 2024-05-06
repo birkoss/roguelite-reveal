@@ -85,8 +85,15 @@ export class Map {
             }
             
             if (singleTile.item) {
-                // TODO: Dynamic object and assets depending on the type (or ItemDetails)
-                singleTile.createItem(this.#scene, theme.exit.assetKey, theme.exit.assetFrame);
+                let assetKey = theme.exit.assetKey;
+                let assetFrame = theme.exit.assetFrame;
+
+                if (singleTile.item.type === TILE_ITEM_TYPE.CONSUMABLE) {
+                    assetKey = singleTile.item.itemDetails.assetKey;
+                    assetFrame = singleTile.item.itemDetails.assetFrame;
+                }
+
+                singleTile.createItem(this.#scene, assetKey, assetFrame);
             }
 
             // TODO: assetFrame dynamic from the theme
@@ -383,8 +390,12 @@ export class Map {
             tile.addEnemy(enemyDetails);
         }
 
-        // TODO: Generate chest
         // TODO: Generate item
+        let itemDetails = DataUtils.getItemDetails(this.#scene, 'minor_hp_potion');
+        tile = emptyTiles.shift();
+        tile.addItem(new TileItem(TILE_ITEM_TYPE.CONSUMABLE, itemDetails));
+
+        // TODO: Generate chest
     }
 
     /**

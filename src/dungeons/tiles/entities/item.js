@@ -1,3 +1,4 @@
+import { TILE_SIZE } from "../../../config.js";
 import { DUNGEON_ASSET_KEYS } from "../../../keys/asset.js";
 import Phaser from "../../../lib/phaser.js";
 
@@ -7,6 +8,7 @@ import { TileEntity } from "./entity.js";
 /** @enum {TileItemType} */
 export const TILE_ITEM_TYPE = Object.freeze({
     EXIT: 'EXIT',
+    CONSUMABLE: 'CONSUMABLE',
 });
 
 export class TileItem extends TileEntity {
@@ -22,9 +24,8 @@ export class TileItem extends TileEntity {
     constructor(type, itemDetails) {
         super();
 
-
         this.#type = type;
-        this.#itemDetails = this.#itemDetails;
+        this.#itemDetails = itemDetails;
     }
 
     /** @type {ItemDetails} */
@@ -34,19 +35,5 @@ export class TileItem extends TileEntity {
     /** @type {TileItemType} */
     get type() {
         return this.#type;
-    }
-
-    /**
-     * @param {Phaser.Scene} scene 
-     */
-    createItem(scene) {
-        this._gameObject = scene.add.sprite(
-            0,
-            0,
-            this.#itemDetails.assetKey,
-            this.#itemDetails.assetFrame
-        ).setOrigin(0);
-
-        return this._gameObject;
     }
 }

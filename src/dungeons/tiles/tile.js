@@ -5,6 +5,7 @@ import { TileEntity } from "./entities/entity.js";
 import { TileOverlay } from "./entities/overlay.js";
 import { TileUnit } from "./entities/unit.js";
 import { TileItem } from "./entities/item.js";
+import { DUNGEON_ASSET_KEYS } from "../../keys/asset.js";
 
 /** @typedef {keyof typeof TILE_TYPE} TileType */
 /** @enum {TileType} */
@@ -94,8 +95,8 @@ export class Tile {
         this.#container.add(this.#background.gameObject);
 
         if (this.#enemy) {
-            this.#enemy.createUnit(scene);
-            this.#container.add(this.#enemy.gameObject);
+            let container = this.#enemy.createUnit(scene);
+            this.#container.add(container);
         }
 
         return this.#container;
@@ -112,6 +113,8 @@ export class Tile {
         this.#overlay = new TileOverlay();
         this.#overlay.create(scene, assetKey, assetFrame);
         this.#container.add(this.#overlay.gameObject);
+
+        this.#overlay.gameObject.setAlpha(0);
 
         return this.#overlay;
     }
@@ -138,6 +141,10 @@ export class Tile {
     createItem(scene, assetKey, assetFrame) {
         this.#item.create(scene, assetKey, assetFrame);
         this.#container.add(this.#item.gameObject);
+
+        // Center the item on the tile
+        this.#item.gameObject.x = (this.#background.gameObject.displayWidth - this.#item.gameObject.displayWidth) / 2;
+        this.#item.gameObject.y = (this.#background.gameObject.displayHeight - this.#item.gameObject.displayHeight) / 2;
     }
 
     /**

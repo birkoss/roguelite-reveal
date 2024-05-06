@@ -35,4 +35,15 @@ export class DataUtils {
 
         return data.find((unit) => unit.id === enemyId);
     }
+
+    /**
+     * @param {Phaser.Scene} scene 
+     * @param {string} itemId  
+     */
+    static getItemDetails(scene, itemId) {
+        /** @type {ItemDetails[]} */
+        const data = scene.cache.json.get(DATA_ASSET_KEYS.ITEMS);
+
+        return data.find((item) => item.id === itemId);
+    }
 }

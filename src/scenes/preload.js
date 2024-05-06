@@ -59,6 +59,10 @@ export class PreloadScene extends Phaser.Scene {
             DATA_ASSET_KEYS.CHARACTERS,
             'assets/data/characters.json'
         );
+        this.load.json(
+            DATA_ASSET_KEYS.ITEMS,
+            'assets/data/items.json'
+        );
     }
 
     create() {

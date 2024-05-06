@@ -1,0 +1,11 @@
+[
+    {
+        "id": "exit",
+        "name": "Exit"
+    },{
+        "id": "minor_hp_potion",
+        "name": "Minor HP Potion",
+        "assetKey": "ITEMS",
+        "assetFrame": 2
+    }
+]
