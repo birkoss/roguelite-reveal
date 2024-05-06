@@ -20,6 +20,7 @@
  * @type {Object}
  * @property {string} assetKey
  * @property {number[]} assetFrames
+ * @property {number[]} [alternateAssetFrames]
  */
 
 /** 

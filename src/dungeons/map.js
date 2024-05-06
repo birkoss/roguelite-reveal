@@ -71,6 +71,9 @@ export class Map {
                 let dungeonWallLayout = this.getTileLayout(singleTile.x, singleTile.y, TILE_TYPE.WALL);
                 if (dungeonWallLayout < theme.walls.assetFrames.length) {
                     assetFrame = theme.walls.assetFrames[dungeonWallLayout];
+                    if (theme.walls.alternateAssetFrames?.[dungeonWallLayout] && Phaser.Math.Between(1, 4) === 2) {
+                        assetFrame = theme.walls.alternateAssetFrames[dungeonWallLayout];
+                    }
                 }
             }
 
