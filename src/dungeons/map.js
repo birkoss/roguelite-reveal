@@ -208,7 +208,7 @@ export class Map {
      * @param {number} y 
      * @returns {boolean}
      */
-    canInterac(x, y) {
+    canInteracAt(x, y) {
         // Is this tile valid ?
         let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
         if (!tile) {
@@ -392,7 +392,7 @@ export class Map {
      * @param {number} y 
      * @param {() => void} [callback]
      */
-    revealTileAt(x, y, callback) {
+    exploreAt(x, y, callback) {
         let tilesToExplore = [];
 
         // Add the main tile

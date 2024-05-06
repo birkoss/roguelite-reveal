@@ -231,7 +231,7 @@ export class DungeonScene extends Phaser.Scene {
                 return;
             }
 
-            if (this.#map.canInterac(x, y)) {
+            if (this.#map.canInteracAt(x, y)) {
                 let entity = this.#map.entities.find(singleEntity => singleEntity.x === x && singleEntity.y === y);
                 if (entity.entityType === ENTITY_TYPE.EXIT) {
                     this.scene.start(SCENE_KEYS.DUNGEON_SCENE);
