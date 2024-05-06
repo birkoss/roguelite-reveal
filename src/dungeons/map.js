@@ -268,7 +268,11 @@ export class Map {
             if (singleTile.type === TILE_TYPE.WALL) {
                 return;
             }
-            // TODO: Also check for enemy
+
+            if (singleTile.enemy || singleTile.item) {
+                return;
+            }
+
             return singleTile;
         });
     }
@@ -278,52 +282,6 @@ export class Map {
      */
     getRevealedTiles() {
         return this.#tiles.filter(singleTile => !singleTile.overlay && !this.isBorder(singleTile.x, singleTile.y));
-    }
-
-    refreshTileStatus() {
-        // this.#statusContainer.getAll().forEach((singleSprite) => {
-        //     singleSprite.destroy();
-        // });
-        // this.#status = [];
-
-        // let revealedTiles = this.#overlays.filter(singleOverlay => singleOverlay.overlayType === OVERLAY_TYPE.NONE);
-        // revealedTiles.forEach((singleTile) => {
-        //     let enemies = this.#enemies.filter(singleEnemy => singleEnemy.isAlive && singleEnemy.x === singleTile.x && singleEnemy.y === singleTile.y);
-
-        //     enemies.forEach((singleEnemy) => {
-        //         // Block tiles surrounding the enemy
-        //         // TODO: Apply lockTileDistance value
-        //         let neighboors = this.getNeighboors(singleEnemy.x, singleEnemy.y, false);
-        //         neighboors.forEach((singleNeighboor) => {
-        //             // Exclude WALL
-        //             if (singleNeighboor.type === TILE_TYPE.WALL) {
-        //                 return;
-        //             }
-                    
-        //             // Need a valid overlay
-        //             let overlay = this.overlays.find(singleOverlay => singleOverlay.x === singleNeighboor.x && singleOverlay.y === singleNeighboor.y);
-        //             if (!overlay) {
-        //                 return;
-        //             }
-
-        //             // Must not effect revealed tile
-        //             if (overlay.overlayType === OVERLAY_TYPE.NONE) {
-        //                 return;
-        //             }
-                    
-        //             let effect = this.#scene.add.sprite(
-        //                 overlay.gameObject.x + overlay.gameObject.displayWidth / 2,
-        //                 overlay.gameObject.y + overlay.gameObject.displayHeight / 2,
-        //                 DUNGEON_ASSET_KEYS.TILE_STATUS,
-        //                 0,
-        //             );
-                    
-        //             this.#status.push(effect);
-        //             this.#statusContainer.add(effect);
-        //         });
-        //     });
-
-        // });
     }
 
     /**
@@ -444,8 +402,6 @@ export class Map {
         });
 
         this.#scene.time.delayedCall(500, () => {
-            // this.refreshTileStatus();
-            
             if (callback) {
                 callback();
             }

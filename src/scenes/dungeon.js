@@ -216,8 +216,6 @@ export class DungeonScene extends Phaser.Scene {
                         this.#panel.gainXp(xp);
                     }
 
-                    this.#map.refreshTileStatus();
-
                     this.#stateMachine.setState(MAIN_STATES.TURN_END);
                 });
                 effect.anims.play("attack", true);
