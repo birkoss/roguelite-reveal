@@ -7,6 +7,7 @@ export const DATA_ASSET_KEYS = Object.freeze({
 export const DUNGEON_ASSET_KEYS = Object.freeze({
     WORLD: 'WORLD',
     UNITS: 'UNITS',
+    ITEMS: 'ITEMS',
     EFFECTS_LARGE: 'EFFECTS_LARGE',
     EFFECTS_SMALL: 'EFFECTS_SMALL',
     TILE_STATUS: 'TILE_STATUS',

@@ -89,6 +89,7 @@ export class Map {
                 singleTile.createItem(this.#scene, theme.exit.assetKey, theme.exit.assetFrame);
             }
 
+            // TODO: assetFrame dynamic from the theme
             singleTile.createOverlay(this.#scene, theme.floor.assetKey, 2);
         });
     }
@@ -365,31 +366,22 @@ export class Map {
         }
 
         let emptyTiles = this.getEmptyTiles();
-        // TODO: SHUFFLE
-        //Phaser.Utils.Array.Shuffle(emptyTiles);
-        //let tile = emptyTiles.shift();
-
+        Phaser.Utils.Array.Shuffle(emptyTiles);
 
         // Generate exit
         // TODO: Allow to lock the EXIT. Must give a key somewhere (drop or chest)
         // TODO: Allow to seal the EXIT. Must defeat a specific enemy to lift it.
-
-        let tile = emptyTiles[1];
+        let tile = emptyTiles.shift();
         tile.addItem(new TileItem(TILE_ITEM_TYPE.EXIT));
 
-        // let exit = new Entity(tile.x, tile.y, ENTITY_TYPE.EXIT);
-        // this.#entities.push(exit);
 
         // Generate ennemies
         // TODO: Never spawn enemy adjacent to the EXIT (use getNeighboors to remove tiles)
-        let enemyDetails = DataUtils.getEnemyDetails(this.#scene, 'skeleton');
-
-        tile = emptyTiles[8];
-        tile.addEnemy(enemyDetails);
-
-
-        tile = emptyTiles[2];
-        tile.addEnemy(enemyDetails);;
+        for (let i=0; i<5; i++) {
+            let enemyDetails = DataUtils.getEnemyDetails(this.#scene, 'skeleton');
+            tile = emptyTiles.shift();
+            tile.addEnemy(enemyDetails);
+        }
 
         // TODO: Generate chest
         // TODO: Generate item
