@@ -125,7 +125,9 @@ export class TileUnit extends TileEntity {
 
         this.#attack = this.#calculateStat(this.#unitDetails.attack);
         this.#defense = this.#calculateStat(this.#unitDetails.defense);
-        this.#maxHp = this.#hp = this.#calculateStat(this.#unitDetails.hp);
+        let previousMaxHp = this.#maxHp;
+        this.#maxHp = this.#calculateStat(this.#unitDetails.hp);
+        this.#hp += (this.#maxHp - previousMaxHp);
 
         this.#xpToNext = this.#calculateXpToNext();
     }

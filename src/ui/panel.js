@@ -105,7 +105,7 @@ export class Panel {
      * @param {number} damage 
      */
     damagePlayer(damage) {
-        // this.#player.takeDamage(damage);
+        this.#player.takeDamage(damage);
         this.refresh();
     }
 
@@ -113,25 +113,25 @@ export class Panel {
      * @param {number} xp 
      */
     gainXp(xp) {
-        // this.#player.gainXp(xp);
+        this.#player.gainXp(xp);
         this.refresh();
 
-        // while (this.#player.xp >= this.#player.xpToNext) {
-        //     // TODO: Animation for levelling up
-        //     // - Callback to the scene if animation are long
-        //     this.player.levelUp();
+        while (this.#player.xp >= this.#player.xpToNext) {
+            // TODO: Animation for levelling up
+            // - Callback to the scene if animation are long
+            this.player.levelUp();
 
-        //     this.refresh();
-        // }
+            this.refresh();
+        }
     }
 
     refresh() {
-        // this.#textLevel.setText(`LV ${this.#player.level}`);
+        this.#textLevel.setText(`LV ${this.#player.level}`);
 
-        // this.#hpBar.setText(`${this.#player.hp}/${this.#player.maxHp}`);
-        // this.#hpBar.setWidthAnimated(this.#player.hp/this.#player.maxHp);
+        this.#hpBar.setText(`${this.#player.hp}/${this.#player.maxHp}`);
+        this.#hpBar.setWidthAnimated(this.#player.hp/this.#player.maxHp);
 
-        // this.#xpBar.setText(`${this.#player.xp}/${this.#player.xpToNext}`);
-        // this.#xpBar.setWidthAnimated(this.#player.xp/this.#player.xpToNext);
+        this.#xpBar.setText(`${this.#player.xp}/${this.#player.xpToNext}`);
+        this.#xpBar.setWidthAnimated(this.#player.xp/this.#player.xpToNext);
     }
 }
