@@ -45,5 +45,6 @@
  * @property {string} name
  * @property {string} [assetKey]
  * @property {number} [assetFrame]
- * @property {object} [modifier]
+ * @property {object} [modifiers]
+ * @property {number} [modifiers.hp]
  */

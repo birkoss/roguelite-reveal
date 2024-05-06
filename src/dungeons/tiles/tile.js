@@ -2,10 +2,8 @@ import Phaser from "../../lib/phaser.js";
 
 import { TILE_SIZE } from "../../config.js";
 import { TileEntity } from "./entities/entity.js";
-import { TileOverlay } from "./entities/overlay.js";
 import { TileUnit } from "./entities/unit.js";
 import { TileItem } from "./entities/item.js";
-import { DUNGEON_ASSET_KEYS } from "../../keys/asset.js";
 
 /** @typedef {keyof typeof TILE_TYPE} TileType */
 /** @enum {TileType} */
@@ -27,7 +25,7 @@ export class Tile {
 
     /** @type {TileEntity} */
     #background;
-    /** @type {TileOverlay} */
+    /** @type {TileEntity} */
     #overlay;
     /** @type {TileUnit} */
     #enemy;
@@ -62,7 +60,7 @@ export class Tile {
         return this.#container;
     }
 
-    /** @type {TileOverlay} */
+    /** @type {TileEntity} */
     get overlay() {
         return this.#overlay;
     }
@@ -107,14 +105,12 @@ export class Tile {
      * @param {Phaser.Scene} scene 
      * @param {string} assetKey 
      * @param {number} assetFrame 
-     * @returns {TileOverlay}
+     * @returns {TileEntity}
      */
     createOverlay(scene, assetKey, assetFrame) {
-        this.#overlay = new TileOverlay();
+        this.#overlay = new TileEntity();
         this.#overlay.create(scene, assetKey, assetFrame);
         this.#container.add(this.#overlay.gameObject);
-
-        this.#overlay.gameObject.setAlpha(0);
 
         return this.#overlay;
     }
@@ -151,9 +147,23 @@ export class Tile {
      * @param {() => void} [callback] 
      */
     reveal(callback) {
-        this.#overlay.reveal(() => {
+        this.#overlay.remove(() => {
             this.#overlay.gameObject.destroy();
             this.#overlay = undefined;
+
+            if (callback) {
+                callback();
+            }
+        });
+    }
+
+    /**
+     * @param {() => void} [callback] 
+     */
+    useItem(callback) {
+        this.#item.remove(() => {
+            this.#item.gameObject.destroy();
+            this.#item = undefined;
 
             if (callback) {
                 callback();

@@ -6,6 +6,9 @@
         "id": "minor_hp_potion",
         "name": "Minor HP Potion",
         "assetKey": "ITEMS",
-        "assetFrame": 2
+        "assetFrame": 2,
+        "modifiers": {
+            "hp": 10
+        }
     }
 ]

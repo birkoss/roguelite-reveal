@@ -352,8 +352,10 @@ export class Map {
 
         // TODO: Generate item
         let itemDetails = DataUtils.getItemDetails(this.#scene, 'minor_hp_potion');
-        tile = emptyTiles.shift();
-        tile.addItem(new TileItem(TILE_ITEM_TYPE.CONSUMABLE, itemDetails));
+        for (let i=0; i<10; i++) {
+            tile = emptyTiles.shift();
+            tile.addItem(new TileItem(TILE_ITEM_TYPE.CONSUMABLE, itemDetails));
+        }
 
         // TODO: Generate chest
     }

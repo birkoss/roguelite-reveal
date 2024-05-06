@@ -227,8 +227,15 @@ export class DungeonScene extends Phaser.Scene {
                 let tile = this.#map.tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
                 if (tile.item.type === TILE_ITEM_TYPE.EXIT) {
                     this.scene.start(SCENE_KEYS.DUNGEON_SCENE);
+                    return;
                 }
-                return;
+
+                if (tile.item.type === TILE_ITEM_TYPE.CONSUMABLE) {
+                    console.log(tile.item.itemDetails.modifiers.hp);
+
+                    tile.useItem();
+                    return;
+                }
             }
 
             if (this.#map.canRevealAt(x, y)) {
