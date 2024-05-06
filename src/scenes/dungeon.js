@@ -242,7 +242,7 @@ export class DungeonScene extends Phaser.Scene {
             if (this.#map.canRevealAt(x, y)) {
                 this.#stateMachine.setState(MAIN_STATES.WAITING_FOR_ACTION_FEEDBACK);
 
-                this.#map.revealTileAt(x, y, () => {
+                this.#map.exploreAt(x, y, () => {
                     this.#stateMachine.setState(MAIN_STATES.TURN_END);
                 });
 
