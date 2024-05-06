@@ -11,6 +11,15 @@ export const TILE_TYPE = Object.freeze({
     ENTITY: 'ENTITY',
 });
 
+/** @typedef {keyof typeof TILE_STATUS} TileStatus */
+/** @enum {TileStatus} */
+export const TILE_STATUS = Object.freeze({
+    NONE: 'NONE',
+    BLOCKED: 'BLOCKED',
+    PREVIEW: 'PREVIEW',
+    LOCKED: 'LOCKED',
+});
+
 export class Tile {
     /** @protected @type {number} */
     _x;
@@ -18,6 +27,8 @@ export class Tile {
     _y;
     /** @protected @type {TileType} */
     _type;
+    /** @protected @type {TileStatus} */
+    _status;
 
     /** @protected @type {Phaser.GameObjects.Image} */
     _gameObject;
@@ -31,6 +42,7 @@ export class Tile {
         this._x = x;
         this._y = y;
         this._type = type;
+        this._status = TILE_STATUS.NONE;
     }
 
     /** @type {number} */

@@ -246,6 +246,11 @@ export class Map {
             return false;
         }
 
+        // Already revealed ?
+        if (overlay.overlayType === OVERLAY_TYPE.NONE) {
+            return;
+        }
+
         // Must NOT have an effect at the same tile
         // TODO: Track using X, Y and not the Sprite position
         // TODO: Detect the status type to react differently
@@ -402,18 +407,23 @@ export class Map {
         // Add adjacents tiles
         let neighboors = this.getNeighboors(overlay.x, overlay.y);
         neighboors.forEach((singleNeighboor) => {
-            let overlayNeighboor = this.#overlays.find(singleOverlayN => singleOverlayN.x === singleNeighboor.x && singleOverlayN.y === singleNeighboor.y);
+            let overlayNeighboor = this.#overlays.find(singleOverlayN => singleOverlayN.overlayType === OVERLAY_TYPE.FULL && singleOverlayN.x === singleNeighboor.x && singleOverlayN.y === singleNeighboor.y);
             if (overlayNeighboor) {
                 tilesToExplore.push(overlayNeighboor);
             }
         });
         
         // Reveal all those tiles
-        // TODO: If a revealed tile is under protection from an enemy, exclude it and add status
-        this.#revealTiles(tilesToExplore, () => {
-            // Reveal all things on those tiles
-            this.#tileRevealed(x, y, callback);
-        }); 
+        if (tilesToExplore.length > 0) {
+            this.#revealTiles([...tilesToExplore], () => {
+                // Reveal all things on those tiles
+                this.#activateTiles(tilesToExplore, callback);
+            }); 
+            return;
+        }
+
+        // Nothing to reveal ?
+        callback();
     }
 
     #generate() {
@@ -481,37 +491,39 @@ export class Map {
         });
     }
 
-    #tileRevealed(x, y, callback) {
-        let overlay = this.#overlays.find(singleOverlay => singleOverlay.x === x && singleOverlay.y === y);
+    /**
+     * @param {Overlay[]} overlays 
+     * @param {() => void} [callback ]
+     */
+    #activateTiles(overlays, callback) {
+        overlays.forEach((singleOverlay) => {
+            // An enemy is on the tile ?
+            let enemy = this.#enemies.find(singleEnemy => singleEnemy.x === singleOverlay.x && singleEnemy.y === singleOverlay.y);
+            if (enemy) {
+                enemy.animate();
 
-        // An enemy is on the tile ?
-        let enemy = this.#enemies.find(singleEnemy => singleEnemy.x === overlay.x && singleEnemy.y === overlay.y);
-        if (enemy) {
-            enemy.animate();
+                // Animate an appear effect
+                let effect = this.#scene.add.sprite(
+                    enemy.animatedGameObject.x + enemy.animatedGameObject.displayWidth / 2,
+                    enemy.animatedGameObject.y + enemy.animatedGameObject.displayHeight / 2 - enemy.animatedGameObject.displayHeight,
+                    DUNGEON_ASSET_KEYS.EFFECTS_LARGE
+                );
+                this.#container.add(effect);
+                effect.on("animationcomplete", (tween, sprite, element) => {
+                    element.destroy();
+                });
+                effect.anims.play("appear", true);
 
-            // Animate an appear effect
-            let effect = this.#scene.add.sprite(
-                enemy.animatedGameObject.x + enemy.animatedGameObject.displayWidth / 2,
-                enemy.animatedGameObject.y + enemy.animatedGameObject.displayHeight / 2 - enemy.animatedGameObject.displayHeight,
-                DUNGEON_ASSET_KEYS.EFFECTS_LARGE
-            );
-            this.#container.add(effect);
-            effect.on("animationcomplete", (tween, sprite, element) => {
-                element.destroy();
+                return;
+            }
+        });
 
-                this.refreshTileStatus();
+        this.#scene.time.delayedCall(500, () => {
+            this.refreshTileStatus();
 
-                if (callback) {
-                    callback();
-                }
-            });
-            effect.anims.play("appear", true);
-
-            return;
-        }
-
-        if (callback) {
-            callback();
-        }
+            if (callback) {
+                callback();
+            }
+        });
     }
 }
