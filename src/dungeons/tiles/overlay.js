@@ -6,14 +6,10 @@ import { TILE_TYPE, Tile } from "./tile.js";
 /** @enum {OverlayType} */
 export const OVERLAY_TYPE = Object.freeze({
     NONE: 'NONE',
-    PARTIAL: 'PARTIAL',
     FULL: 'FULL',
 });
 
 export class Overlay extends Tile {
-    /** @type {Phaser.GameObjects.Rectangle} */
-    #background;
-
     /** @type {OverlayType} */
     #overlayType;
 
@@ -27,10 +23,6 @@ export class Overlay extends Tile {
         this.#overlayType = OVERLAY_TYPE.FULL;
     }
 
-    /** @type {Phaser.GameObjects.Rectangle} */
-    get background() {
-        return this.#background;
-    }
     /** @type {OverlayType} */
     get overlayType() {
         return this.#overlayType;
@@ -44,10 +36,6 @@ export class Overlay extends Tile {
      */
     create(scene, assetKey, assetFrame) {
         let gameObject = super.create(scene, assetKey, assetFrame);
-        gameObject.setAlpha(0.5);
-
-        this.#background = scene.add.rectangle(gameObject.x, gameObject.y, gameObject.displayWidth, gameObject.displayHeight, 0x000000);
-        this.#background.setOrigin(0);
 
         return gameObject;
     }
@@ -64,42 +52,27 @@ export class Overlay extends Tile {
 
         if (skipAnimation) {
             this._gameObject.setAlpha(0);
-            this.#background.setAlpha(0);
 
             if (options?.callback) {
                 options.callback();
             }
         }
 
+        this._gameObject.setOrigin(0.5);
+        this._gameObject.x += this._gameObject.displayWidth / 2;
+        this._gameObject.y += this._gameObject.displayHeight / 2;
+
         this._gameObject.scene.add.tween({
             targets: [
                 this._gameObject,
-                this.#background,
             ],
             alpha: 0,
-            duration: 200,
+            scaleY: 0,
+            scaleX: 0,
+            duration: 100,
             onComplete: () => {
                 if (options?.callback) {
                     options.callback();
-                }
-            }
-        });
-    }
-
-    /**
-     * @param {() => void} [callback]
-     */
-    preview(callback) {
-        this.#overlayType = OVERLAY_TYPE.PARTIAL;
-
-        this._gameObject.scene.add.tween({
-            targets: this._gameObject,
-            alpha: 1,
-            ease: Phaser.Math.Easing.Sine.Out,
-            duration: 100,
-            onComplete: () => {
-                if (callback) {
-                    callback();
                 }
             }
         });

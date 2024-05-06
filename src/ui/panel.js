@@ -63,10 +63,10 @@ export class Panel {
         this.#player.animate();
         this.#container.add(this.#player.animatedGameObject);
 
-        // for (let i=0; i<20; i++) {
-        //     console.log(this.#player);
-        //     this.#player.levelUp();
-        // }
+        for (let i=0; i<20; i++) {
+            console.log(this.#player.level, this.#player.xpToNext);
+            this.#player.levelUp();
+        }
 
         this.#textLevel = this.#scene.add.text(366, 20, `LV ${this.#player.level}`).setOrigin(1, 0);
         this.#container.add(this.#textLevel);

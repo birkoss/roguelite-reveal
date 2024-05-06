@@ -9,8 +9,8 @@ const game = new Phaser.Game({
     pixelArt: true,
     scale: {
         parent: 'game-container',
-        width: window.innerWidth,
-        height: window.innerHeight,
+        width: Math.min(window.innerWidth, 896),
+        height: Math.min(window.innerHeight, 414),
     },
     backgroundColor: '#000000',
 });

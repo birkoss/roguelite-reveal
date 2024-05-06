@@ -162,6 +162,6 @@ export class Unit extends Entity {
     
 
     #calculateXpToNext() {
-        return Math.floor((0.04 * Math.pow(this.#level, 3)) + (0.8 * Math.pow(this.#level, 2)) + (2 * this.#level));
+        return Math.round((0.04 * Math.pow(this.#level, 3)) + (0.8 * Math.pow(this.#level, 2)) + (2 * this.#level));
     }
 }

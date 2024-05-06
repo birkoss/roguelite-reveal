@@ -131,7 +131,6 @@ export class Map {
             this.#overlays.push(overlay);
 
             let overlayGameObject = overlay.create(this.#scene, theme.floor.assetKey, 2);
-            this.#overlayContainer.add(overlay.background);
             this.#overlayContainer.add(overlayGameObject);
         });
 
@@ -210,34 +209,27 @@ export class Map {
      * @returns {boolean}
      */
     canInterac(x, y) {
-    // Is this tile valid ?
-    let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
-    if (!tile) {
-        return false;
+        // Is this tile valid ?
+        let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
+        if (!tile) {
+            return false;
+        }
+
+        // Is this overlay revealed ?
+        let overlay = this.#overlays.find(singleOverlay => singleOverlay.overlayType === OVERLAY_TYPE.NONE && singleOverlay.x === x && singleOverlay.y === y);
+        if (!overlay) {
+            return false;
+        }
+
+        // Is an entity present ?
+        let entity = this.#entities.find(singleEntity => singleEntity.x === overlay.x && singleEntity.y === overlay.y);
+        if (!entity) {
+            return false;
+        }
+
+        return true;
     }
 
-    // Is this overlay revealed ?
-    let overlay = this.#overlays.find(singleOverlay => singleOverlay.overlayType === OVERLAY_TYPE.NONE && singleOverlay.x === x && singleOverlay.y === y);
-    if (!overlay) {
-        return false;
-    }
-
-    // Is an entity present ?
-    let entity = this.#entities.find(singleEntity => singleEntity.x === overlay.x && singleEntity.y === overlay.y);
-    if (!entity) {
-        return false;
-    }
-
-    return true;
-}
-    /**
-     * @param {number} x 
-     * @param {number} y 
-     * @returns {boolean}
-     */
-    canPreviewAt(x, y) {
-        return false;
-    }
     /**
      * @param {number} x 
      * @param {number} y 
@@ -251,11 +243,6 @@ export class Map {
 
         let overlay = this.#overlays.find(singleOverlay => singleOverlay.x === x && singleOverlay.y === y);
         if (!overlay) {
-            return false;
-        }
-
-        // Can only REVEAL PARTIALLY overlay
-        if (overlay.overlayType !== OVERLAY_TYPE.PARTIAL) {
             return false;
         }
 
@@ -354,42 +341,6 @@ export class Map {
         });
     }
 
-    /**
-     * @param {number} x 
-     * @param {number} y 
-     * @param {() => void} [callback]
-     */
-    previewTileAt(x, y, callback) {
-        let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
-        if (!tile) {
-            if (callback) {
-                callback();
-            }
-
-            return;
-        }
-
-        let overlay = this.#overlays.find(singleOverlay => singleOverlay.x === x && singleOverlay.y === y);
-        if (!overlay) {
-            if (callback) {
-                callback();
-            }
-
-            return;
-        }
-
-        // Can only preview FULL overlay
-        if (overlay.overlayType !== OVERLAY_TYPE.FULL) {
-            if (callback) {
-                callback();
-            }
-
-            return;
-        }
-
-        overlay.preview(callback);
-    }
-
     refreshTileStatus() {
         this.#statusContainer.getAll().forEach((singleSprite) => {
             singleSprite.destroy();
@@ -442,29 +393,26 @@ export class Map {
      * @param {() => void} [callback]
      */
     revealTileAt(x, y, callback) {
+        let overlays = [];
+
         let overlay = this.#overlays.find(singleOverlay => singleOverlay.x === x && singleOverlay.y === y);
+
+        overlays.push(overlay);
 
         // Reveal adjacent tiles first is any
         let neighboors = this.getNeighboors(overlay.x, overlay.y);
         if (neighboors.length > 0) {
-            this.#previewTiles(neighboors, () => {
-                // Reveal the tile when it's done
-                overlay.reveal({
-                    callback: () => {
-                        this.#tileRevealed(x, y, callback);
-                    }
-                });
-            }); 
-
-            return;
+            neighboors.forEach((singleNeighboor) => {
+                let overlayNeighboor = this.#overlays.find(singleOverlayN => singleOverlayN.x === singleNeighboor.x && singleOverlayN.y === singleNeighboor.y);
+                if (overlayNeighboor) {
+                    overlays.push(overlayNeighboor);
+                }
+            });
         }
 
-        // Reveal the tile right now when no neighboor 
-        overlay.reveal({
-            callback: () => {
-                this.#tileRevealed(x, y, callback);
-            }
-        });
+        this.#revealTiles(overlays, () => {
+            this.#tileRevealed(x, y, callback);
+        }); 
     }
 
     #generate() {
@@ -516,16 +464,18 @@ export class Map {
     }
 
     /**
-     * @param {Tile[]} tiles 
+     * @param {Overlay[]} overlays 
      * @param {() => void} [callback]
      */
-    #previewTiles(tiles, callback) {
-        let singleTile = tiles.shift();
-        this.previewTileAt(singleTile.x, singleTile.y, () => {
-            if (tiles.length > 0) {
-                this.#previewTiles(tiles, callback);
-            } else {
-                callback();
+    #revealTiles(overlays, callback) {
+        let singleOverlay = overlays.shift();
+        singleOverlay.reveal({
+            callback: () => {
+                if (overlays.length > 0) {
+                    this.#revealTiles(overlays, callback);
+                } else {
+                    callback();
+                }
             }
         });
     }
