@@ -128,8 +128,8 @@ export class Map {
             return false;
         }
 
-        // Is this enemy alive ?
-        if (!tile.enemy) {
+        // An alive enemy must be there
+        if (!tile.enemy || !tile.enemy.isAlive) {
             return false;
         }
 
