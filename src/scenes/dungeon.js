@@ -10,6 +10,7 @@ import { Panel } from "../ui/panel.js";
 import { TileUnit } from "../dungeons/tiles/entities/unit.js";
 import { TILE_ITEM_TYPE } from "../dungeons/tiles/entities/item.js";
 import { OverlayText } from "../ui/overlay-text.js";
+import { TILE_STATUS_TYPE } from "../dungeons/tiles/entities/status.js";
 
 const MAIN_STATES = Object.freeze({
     CREATE_DUNGEON: 'CREATE_DUNGEON',
@@ -266,6 +267,13 @@ export class DungeonScene extends Phaser.Scene {
 
             if (this.#map.canInteracAt(x, y)) {
                 let tile = this.#map.tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
+
+                // Can't use a LOCKED item
+                if (tile.status && tile.status.type === TILE_STATUS_TYPE.LOCKED) {
+                    this.cameras.main.shake(200);
+                    return;
+                }
+
                 if (tile.item.type === TILE_ITEM_TYPE.EXIT) {
                     this.scene.start(SCENE_KEYS.DUNGEON_SCENE);
                     return;
@@ -289,6 +297,14 @@ export class DungeonScene extends Phaser.Scene {
             }
 
             if (this.#map.canRevealAt(x, y)) {
+                let tile = this.#map.tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
+
+                // Can't reveal a LOCKED tile
+                if (tile.status && tile.status.type === TILE_STATUS_TYPE.LOCKED) {
+                    this.cameras.main.shake(200);
+                    return;
+                }
+
                 this.#stateMachine.setState(MAIN_STATES.WAITING_FOR_ACTION_FEEDBACK);
 
                 this.#map.exploreAt(x, y, () => {

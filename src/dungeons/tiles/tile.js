@@ -5,6 +5,7 @@ import { TileEntity } from "./entities/entity.js";
 import { TileUnit } from "./entities/unit.js";
 import { TileItem } from "./entities/item.js";
 import { UI_ASSET_KEYS } from "../../keys/asset.js";
+import { TILE_STATUS_TYPE, TileStatus } from "./entities/status.js";
 
 /** @typedef {keyof typeof TILE_TYPE} TileType */
 /** @enum {TileType} */
@@ -36,6 +37,8 @@ export class Tile {
     #enemy;
     /** @type {TileItem} */
     #item;
+    /** @type {TileStatus} */
+    #status;
 
     /**
      * @param {number} x 
@@ -76,6 +79,10 @@ export class Tile {
     /** @type {TileItem} */
     get item() {
         return this.#item;
+    }
+    /** @type {TileStatus} */
+    get status() {
+        return this.#status;
     }
 
     /**
@@ -145,6 +152,7 @@ export class Tile {
         let container = this.#enemy.createUnit(scene);
         if (!SKIP_OVERLAYS) {
             this.#enemy.gameObject.setAlpha(0);
+            this.#enemy.shadow.gameObject.setAlpha(0);
         }
         this.#container.add(container);
     }
@@ -170,15 +178,19 @@ export class Tile {
     }
 
     /**
+     * @param {TileStatus} status 
+     */
+    addStatus(status) {
+        this.#status = status;
+    }
+    /**
      * @param {Phaser.Scene} scene 
      * @param {string} assetKey 
      * @param {number} assetFrame 
      */
     createStatus(scene, assetKey, assetFrame) {
-        console.log(assetKey);
-        let status = scene.add.image(0, 0, assetKey, assetFrame);
-        status.setOrigin(0);
-        this.#container.add(status);
+        let tile = this.#status.create(scene, assetKey, assetFrame);
+        this.#container.add(tile);
     }
 
     /**
@@ -191,6 +203,7 @@ export class Tile {
 
             if (this.#enemy) {
                 this.#enemy.gameObject.setAlpha(1);
+                this.#enemy.shadow.gameObject.setAlpha(1);
             }
 
             if (callback) {

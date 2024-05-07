@@ -76,6 +76,10 @@ export class TileUnit extends TileEntity {
     get xpToNext() {
         return this.#xpToNext;
     }
+    /** @type {TileEntity} */
+    get shadow() {
+        return this.#shadow;
+    }
 
     /**
      * @param {Phaser.Scene} scene 

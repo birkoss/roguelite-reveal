@@ -5,6 +5,7 @@ import { DataUtils } from "../utils/data.js";
 import { TILE_TYPE, Tile } from "./tiles/tile.js";
 import { TILE_ITEM_TYPE, TileItem } from "./tiles/entities/item.js";
 import { SKIP_OVERLAYS } from "../config.js";
+import { TILE_STATUS_TYPE, TileStatus } from "./tiles/entities/status.js";
 
 export class Map {
     /** @type {Phaser.Scene} */
@@ -107,14 +108,14 @@ export class Map {
                 singleTile.createItem(this.#scene, assetKey, assetFrame);
             }
 
+            if (!SKIP_OVERLAYS) {
+                singleTile.createOverlay(this.#scene, theme.hidden.assetKey, theme.hidden.assetFrame);
+            }
+
             singleTile.createSeletion(this.#scene);
 
             if (singleTile.enemy) {
                 singleTile.createEnemy(this.#scene);
-            }
-
-            if (!SKIP_OVERLAYS) {
-                singleTile.createOverlay(this.#scene, theme.hidden.assetKey, theme.hidden.assetFrame);
             }
         });
     }
@@ -306,10 +307,10 @@ export class Map {
             tilesToExplore.push(tile);
         }
 
-        // Add adjacents tiles WITH overlay
+        // Add adjacents tiles WITH overlay, WITHOUT status OR WITHOUT locked status
         let neighboors = this.getNeighboors(tile.x, tile.y);
         neighboors.forEach((singleNeighboor) => {
-            if (singleNeighboor.overlay) {
+            if (singleNeighboor.overlay && (!singleNeighboor.status || (singleNeighboor.status && singleNeighboor.status.type !== TILE_STATUS_TYPE.LOCKED))) {
                 tilesToExplore.push(singleNeighboor);
             }
         });
@@ -361,14 +362,15 @@ export class Map {
         // TODO: Allow to lock the EXIT. Must give a key somewhere (drop or chest)
         // TODO: Allow to seal the EXIT. Must defeat a specific enemy to lift it.
         let tile = emptyTiles.shift();
+        tile = this.#tiles.find(singleTile => singleTile.x === 1 && singleTile.y === 1);
         tile.addItem(new TileItem(TILE_ITEM_TYPE.EXIT));
 
 
         // Generate ennemies
-        // TODO: Never spawn enemy adjacent to the EXIT (use getNeighboors to remove tiles)
         for (let i=0; i<1; i++) {
             let enemyDetails = DataUtils.getEnemyDetails(this.#scene, (i==0 ? 'imp' : 'skeleton'));
             tile = emptyTiles.shift();
+            tile = this.#tiles.find(singleTile => singleTile.x === 2 && singleTile.y === 1);
             tile.addEnemy(enemyDetails);
         }
 
@@ -376,6 +378,7 @@ export class Map {
         let itemDetails = DataUtils.getItemDetails(this.#scene, 'minor_hp_potion');
         for (let i=0; i<1; i++) {
             tile = emptyTiles.shift();
+            tile = this.#tiles.find(singleTile => singleTile.x === 2 && singleTile.y === 2);
             tile.addItem(new TileItem(TILE_ITEM_TYPE.CONSUMABLE, itemDetails));
         }
 
@@ -424,7 +427,16 @@ export class Map {
             if (singleTile.enemy) {
                 singleTile.enemy.animate();
 
+                // TODO: Disable surrounding tile
+                let neighboors = this.getNeighboors(singleTile.x, singleTile.y);
+                neighboors.forEach((singleNeighboor) => {
+                    if (singleNeighboor.item) {
+                        this.changeTileStatus(singleNeighboor, TILE_STATUS_TYPE.LOCKED);
+                    }
+                });
+
                 // Animate an appear effect
+                // TODO: Add Status on top tile instead (and roll back to the new status)
                 let effect = this.#scene.add.sprite(
                     singleTile.container.x + singleTile.enemy.gameObject.displayWidth / 2,
                     singleTile.container.y + singleTile.enemy.gameObject.displayHeight / 2 - singleTile.enemy.gameObject.displayHeight,
@@ -445,5 +457,14 @@ export class Map {
                 callback();
             }
         });
+    }
+
+    /**
+     * @param {Tile} tile 
+     * @param {TILE_STATUS_TYPE} newStatus 
+     */
+    changeTileStatus(tile, newStatus) {
+        tile.addStatus(new TileStatus(newStatus));
+        tile.createStatus(this.#scene, DUNGEON_ASSET_KEYS.TILE_STATUS, 0);
     }
 }
