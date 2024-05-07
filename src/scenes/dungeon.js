@@ -389,6 +389,8 @@ export class DungeonScene extends Phaser.Scene {
     #goDeeper() {
         console.log("oh yeah!");
 
+        //this.#map.generate(this.#dungeonTheme);
+
         this.#map.tiles.forEach((singleTile) => {
         });
         // Remove all overlay

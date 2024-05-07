@@ -152,8 +152,12 @@ export class Tile {
     }
     removeEnemy() {
         if (this.#enemy) {
-            this.#enemy.shadow.gameObject.destroy();
-            this.#enemy.gameObject.destroy();
+            if (this.#enemy.shadow && this.#enemy.shadow.gameObject) {
+                this.#enemy.shadow.gameObject.destroy();
+            }
+            if (this.#enemy.gameObject) {
+                this.#enemy.gameObject.destroy();
+            }
             this.#enemy = undefined;
         }
     }
@@ -247,7 +251,9 @@ export class Tile {
     }
     removeItem() {
         if (this.#item) {
-            this.#item.gameObject.destroy();
+            if (this.#item.gameObject) {
+                this.#item.gameObject.destroy();
+            }
             this.#item = undefined;
         }
     }
