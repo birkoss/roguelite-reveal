@@ -27,7 +27,7 @@ export class Tile {
 
     /** @type {TileEntity} */
     #background;
-    /** @type {Phaser.GameObjects.Sprite} */
+    /** @type {TileEntity} */
     #shadow;
     /** @type {Phaser.GameObjects.Sprite} */
     #selection;
@@ -72,6 +72,14 @@ export class Tile {
     get overlay() {
         return this.#overlay;
     }
+    /** @type {TileEntity} */
+    get background() {
+        return this.#background;
+    }
+    /** @type {TileEntity} */
+    get shadow() {
+        return this.#shadow;
+    }
     /** @type {TileUnit} */
     get enemy() {
         return this.#enemy;
@@ -112,6 +120,9 @@ export class Tile {
     createOverlay(scene, assetKey, assetFrame) {
         this.#overlay = new TileEntity();
         this.#overlay.create(scene, assetKey, assetFrame);
+        this.#overlay.gameObject.x += this.#overlay.gameObject.width/2;
+        this.#overlay.gameObject.y += this.#overlay.gameObject.height/2;
+        this.#overlay.gameObject.setOrigin(0.5);
         this.#container.add(this.#overlay.gameObject);
 
         return this.#overlay;
@@ -128,11 +139,17 @@ export class Tile {
      */
     createEnemy(scene) {
         let container = this.#enemy.createUnit(scene);
-        if (!SKIP_OVERLAYS) {
-            this.#enemy.gameObject.setAlpha(0);
-            this.#enemy.shadow.gameObject.setAlpha(0);
-        }
+        this.#enemy.gameObject.x += this.#enemy.gameObject.width/2;
+        this.#enemy.gameObject.y += this.#enemy.gameObject.height/2;
+        this.#enemy.gameObject.setOrigin(0.5);
         this.#container.add(container);
+    }
+    removeEnemy() {
+        if (this.#enemy) {
+            this.#enemy.shadow.gameObject.destroy();
+            this.#enemy.gameObject.destroy();
+            this.#enemy = undefined;
+        }
     }
 
     /**
@@ -141,9 +158,18 @@ export class Tile {
      * @param {number} assetFrame 
      */
     createShadow(scene, assetKey, assetFrame) {
-        this.#shadow = scene.add.sprite(0, 0, assetKey, assetFrame);
-        this.#shadow.setOrigin(0).setAlpha(0);
-        this.#container.add(this.#shadow);
+        this.#shadow = new TileEntity();
+        this.#shadow.create(scene, assetKey, assetFrame);
+        this.#shadow.gameObject.x += this.#shadow.gameObject.width/2;
+        this.#shadow.gameObject.y += this.#shadow.gameObject.height/2;
+        this.#shadow.gameObject.setOrigin(0.5);
+        this.#container.add(this.#shadow.gameObject);
+    }
+    removeShadow() {
+        if (this.#shadow) {
+            this.#shadow.gameObject.destroy();
+            this.#shadow = undefined;
+        }
     }
 
     /**
@@ -176,11 +202,17 @@ export class Tile {
             this.#overlay.gameObject.destroy();
             this.#overlay = undefined;
 
-            if (this.#enemy) {
-                this.#enemy.gameObject.setAlpha(1);
-                this.#enemy.shadow.gameObject.setAlpha(1);
+            if (callback) {
+                callback();
             }
+        });
+    }
 
+    /**
+     * @param {() => void} [callback] 
+     */
+    show(callback) {
+        this.#overlay.show(() => {
             if (callback) {
                 callback();
             }
@@ -206,17 +238,6 @@ export class Tile {
         }
     }
 
-    showShadow() {
-        if (this.#shadow) {
-            this.#shadow.setAlpha(1);
-        }
-    }
-    hideShadow() {
-        if (this.#shadow) {
-            this.#shadow.setAlpha(0);
-        }
-    }
-
     /**
      * @param {TileItem} item 
      */
@@ -225,28 +246,36 @@ export class Tile {
     }
     /**
      * @param {Phaser.Scene} scene 
-     * @param {string} assetKey 
-     * @param {number} assetFrame 
      */
-    createItem(scene, assetKey, assetFrame) {
-        this.#item.create(scene, assetKey, assetFrame);
+    createItem(scene) {
+        this.#item.create(scene, this.#item.itemDetails.assetKey, this.#item.itemDetails.assetFrame);
+
+        this.#item.gameObject.x += this.#item.gameObject.width/2;
+        this.#item.gameObject.y += this.#item.gameObject.height/2;
+        this.#item.gameObject.setOrigin(0.5);
+
         this.#container.add(this.#item.gameObject);
 
         // Center the item on the tile
-        this.#item.gameObject.x = (this.#background.gameObject.displayWidth - this.#item.gameObject.displayWidth) / 2;
-        this.#item.gameObject.y = (this.#background.gameObject.displayHeight - this.#item.gameObject.displayHeight) / 2;
+        this.#item.gameObject.x += (this.#background.gameObject.displayWidth - this.#item.gameObject.displayWidth) / 2;
+        this.#item.gameObject.y += (this.#background.gameObject.displayHeight - this.#item.gameObject.displayHeight) / 2;
     }
     /**
      * @param {() => void} [callback] 
      */
     useItem(callback) {
         this.#item.remove(() => {
-            this.#item.gameObject.destroy();
-            this.#item = undefined;
+            this.removeItem();
 
             if (callback) {
                 callback();
             }
         });
+    }
+    removeItem() {
+        if (this.#item) {
+            this.#item.gameObject.destroy();
+            this.#item = undefined;
+        }
     }
 }

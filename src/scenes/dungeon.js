@@ -14,6 +14,7 @@ import { TILE_STATUS_TYPE } from "../dungeons/tiles/entities/status.js";
 
 const MAIN_STATES = Object.freeze({
     CREATE_DUNGEON: 'CREATE_DUNGEON',
+    GENERATE_DUNGEON: 'GENERATE_DUNGEON',
     TURN_START: 'TURN_START',
     WAITING_FOR_PLAYER_ACTION: 'WAITING_FOR_PLAYER_ACTION',
     WAITING_FOR_ACTION_FEEDBACK: 'WAITING_FOR_ACTION_FEEDBACK',
@@ -63,6 +64,7 @@ export class DungeonScene extends Phaser.Scene {
     #createMap() {
         this.#map = new Map(this, 10, 8);
 
+        // Create the WALL and FLOOR
         this.#map.create(this.#dungeonTheme);
 
         this.#map.container.setPosition(this.scale.width - this.#map.container.getBounds().width, 0);
@@ -92,6 +94,17 @@ export class DungeonScene extends Phaser.Scene {
 
                 this.#createMap();
                 this.#createAnimations();
+
+                this.time.delayedCall(500, () => {
+                    this.#stateMachine.setState(MAIN_STATES.GENERATE_DUNGEON);
+                });
+            },
+        });
+
+        this.#stateMachine.addState({
+            name: MAIN_STATES.GENERATE_DUNGEON,
+            onEnter: () => {
+                this.#map.generate(this.#dungeonTheme);
 
                 this.time.delayedCall(500, () => {
                     this.#stateMachine.setState(MAIN_STATES.TURN_START);
@@ -378,7 +391,8 @@ export class DungeonScene extends Phaser.Scene {
 
         this.#map.tiles.forEach((singleTile) => {
         });
-
+        // Remove all overlay
+        // Wait 1000ms
         // Put overlay back on each tile
         // Make a "false" tile switching for 1-2 tiles
         // Generate map again (with level+1)

@@ -25,11 +25,69 @@ export class TileEntity {
     /**
      * @param {() => void} [callback]
      */
-    remove(callback) {
-        this._gameObject.setOrigin(0.5);
-        this._gameObject.x += this._gameObject.displayWidth / 2;
-        this._gameObject.y += this._gameObject.displayHeight / 2;
+    show(callback) {
+        this._gameObject.setScale(0);
+        this._gameObject.setAlpha(0);
 
+        this._gameObject.scene.add.tween({
+            targets: [
+                this._gameObject,
+            ],
+            alpha: 1,
+            scaleY: 1,
+            scaleX: 1,
+            duration: 100,
+            onComplete: () => {
+                if (callback) {
+                    callback();
+                }
+            }
+        });
+    }
+
+    /**
+     * @param {() => void} [callback]
+     */
+    fadeIn(callback) {
+        this._gameObject.setAlpha(0);
+
+        this._gameObject.scene.add.tween({
+            targets: [
+                this._gameObject,
+            ],
+            alpha: 1,
+            duration: 150,
+            onComplete: () => {
+                if (callback) {
+                    callback();
+                }
+            }
+        });
+    }
+    /**
+     * @param {() => void} [callback]
+     */
+    fadeOut(callback) {
+        this._gameObject.setAlpha(1);
+
+        this._gameObject.scene.add.tween({
+            targets: [
+                this._gameObject,
+            ],
+            alpha: 0,
+            duration: 150,
+            onComplete: () => {
+                if (callback) {
+                    callback();
+                }
+            }
+        });
+    }
+
+    /**
+     * @param {() => void} [callback]
+     */
+    remove(callback) {
         this._gameObject.scene.add.tween({
             targets: [
                 this._gameObject,

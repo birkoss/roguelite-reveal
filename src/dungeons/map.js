@@ -14,6 +14,8 @@ export class Map {
     #width;
     /** @type {number} */
     #height;
+    /** @type {DungeonTheme} */
+    #theme;
 
     /** @type {Tile[]} */
     #tiles;
@@ -33,7 +35,7 @@ export class Map {
 
         this.#container = scene.add.container(0, 0);
 
-        this.#generate();
+        this.#createTiles();
     }
 
     /** @type {number} */
@@ -57,17 +59,12 @@ export class Map {
      * @param {DungeonTheme} theme 
      */
     create(theme) {
-        // Create tiles
+        this.#theme = theme;
+
         this.tiles.forEach((singleTile) => {
             let assetKey = theme.floor.assetKey;
             let assetFrame = theme.floor.assetFrames[0];
-            // Dynamic floor depending on the frame
-            if (theme.floor.assetFrames.length > 1) {
-                if (Phaser.Math.Between(1, 4) === 3) {
-                    assetFrame = theme.floor.assetFrames[ Phaser.Math.Between(1, theme.floor.assetFrames.length - 1) ];
-                }
-            }
-
+            
             if (singleTile.type === TILE_TYPE.WALL) {
                 assetKey = theme.walls.assetKey;
                 assetFrame = 0;
@@ -87,31 +84,92 @@ export class Map {
 
             let tileContainer = singleTile.create(this.#scene, assetKey, assetFrame);
             this.#container.add(tileContainer);
-   
-            // Nothing more to do with wall
+        });
+    }
+    /**
+     * @param {DungeonTheme} theme 
+     */
+    generate(theme) {
+        // Make sure each FLOOR have an overlay and show the overlay
+        this.tiles.forEach((singleTile) => {
             if (singleTile.type === TILE_TYPE.WALL) {
                 return;
             }
 
-            // Create tile shadow
-            singleTile.createShadow(this.#scene, theme.shadow.assetKey, theme.shadow.assetFrame);
-            
-            if (singleTile.item) {
-                let assetKey = theme.exit.assetKey;
-                let assetFrame = theme.exit.assetFrame;
-
-                if (singleTile.item.type === TILE_ITEM_TYPE.CONSUMABLE) {
-                    assetKey = singleTile.item.itemDetails.assetKey;
-                    assetFrame = singleTile.item.itemDetails.assetFrame;
-                }
-
-                singleTile.createItem(this.#scene, assetKey, assetFrame);
-            }
-
             if (!SKIP_OVERLAYS) {
                 singleTile.createOverlay(this.#scene, theme.hidden.assetKey, theme.hidden.assetFrame);
+                singleTile.show();
+            }
+        });
+
+        // Randomize floor tile
+        this.tiles.forEach((singleTile) => {
+            if (singleTile.type === TILE_TYPE.WALL) {
+                return;
             }
 
+            // Dynamic floor depending on the theme
+            if (theme.floor.assetFrames.length > 1) {
+                if (Phaser.Math.Between(1, 4) === 3) {
+                    singleTile.background.gameObject.setFrame(theme.floor.assetFrames[Phaser.Math.Between(1, theme.floor.assetFrames.length - 1)]);
+                }
+            }
+        });
+
+        // Delete previous enemy, item, status, shadow
+        this.tiles.forEach((singleTile) => {
+            singleTile.removeStatus();
+            singleTile.removeShadow();
+            singleTile.removeItem();
+            singleTile.removeEnemy();
+        });
+
+        let emptyTiles = this.getEmptyTiles();
+        Phaser.Utils.Array.Shuffle(emptyTiles);
+
+        // Add exit
+        let itemDetails = DataUtils.getItemDetails(this.#scene, 'exit');
+        itemDetails.assetKey = theme.exit.assetKey;
+        itemDetails.assetFrame = theme.exit.assetFrame;
+
+        let tile = emptyTiles.shift();
+        tile = this.#tiles.find(singleTile => singleTile.x === 1 && singleTile.y === 1);
+        tile.addItem(new TileItem(TILE_ITEM_TYPE.EXIT, itemDetails));
+
+        // Add enemies
+        for (let i=0; i<1; i++) {
+            let enemyDetails = DataUtils.getEnemyDetails(this.#scene, (i==0 ? 'imp' : 'skeleton'));
+            tile = emptyTiles.shift();
+            tile = this.#tiles.find(singleTile => singleTile.x === 3 && singleTile.y === 1);
+            tile.addEnemy(enemyDetails);
+        }
+
+        // Add items
+        itemDetails = DataUtils.getItemDetails(this.#scene, 'minor_hp_potion');
+        for (let i=0; i<1; i++) {
+            tile = emptyTiles.shift();
+            tile = this.#tiles.find(singleTile => singleTile.x === 2 && singleTile.y === 2);
+            tile.addItem(new TileItem(TILE_ITEM_TYPE.CONSUMABLE, itemDetails));
+        }
+
+        // Add chest
+
+        return;
+
+        // Generate ennemies
+        for (let i=0; i<1; i++) {
+            let enemyDetails = DataUtils.getEnemyDetails(this.#scene, (i==0 ? 'imp' : 'skeleton'));
+            tile = emptyTiles.shift();
+            tile = this.#tiles.find(singleTile => singleTile.x === 3 && singleTile.y === 1);
+            tile.addEnemy(enemyDetails);
+        }
+
+
+
+        // TODO: Generate chest
+
+        // Create tiles
+        this.tiles.forEach((singleTile) => {
             singleTile.createSeletion(this.#scene);
 
             if (singleTile.enemy) {
@@ -342,7 +400,7 @@ export class Map {
         tile.select();
     }
 
-    #generate() {
+    #createTiles() {
         this.#tiles = [];
 
         for (let y=0; y<this.#height; y++) {
@@ -354,32 +412,6 @@ export class Map {
                 this.#tiles.push(tile);
             }
         }
-
-        let emptyTiles = this.getEmptyTiles();
-        Phaser.Utils.Array.Shuffle(emptyTiles);
-
-        // Generate exit
-        let tile = emptyTiles.shift();
-        tile = this.#tiles.find(singleTile => singleTile.x === 1 && singleTile.y === 1);
-        tile.addItem(new TileItem(TILE_ITEM_TYPE.EXIT));
-
-        // Generate ennemies
-        for (let i=0; i<1; i++) {
-            let enemyDetails = DataUtils.getEnemyDetails(this.#scene, (i==0 ? 'imp' : 'skeleton'));
-            tile = emptyTiles.shift();
-            tile = this.#tiles.find(singleTile => singleTile.x === 3 && singleTile.y === 1);
-            tile.addEnemy(enemyDetails);
-        }
-
-        // Generate item
-        let itemDetails = DataUtils.getItemDetails(this.#scene, 'minor_hp_potion');
-        for (let i=0; i<1; i++) {
-            tile = emptyTiles.shift();
-            tile = this.#tiles.find(singleTile => singleTile.x === 2 && singleTile.y === 2);
-            tile.addItem(new TileItem(TILE_ITEM_TYPE.CONSUMABLE, itemDetails));
-        }
-
-        // TODO: Generate chest
     }
 
     /**
@@ -388,23 +420,41 @@ export class Map {
      */
     #revealTiles(tiles, callback) {
         let singleTile = tiles.shift();
-        singleTile.reveal(() => {
-            // Add SHADOW on this TILE if below a WALL or an OVERLAY
-            let tileTopNeighboor = this.#tiles.find(singleTopTile => singleTopTile.x === singleTile.x && singleTopTile.y === singleTile.y - 1);
-            if (tileTopNeighboor.type === TILE_TYPE.WALL || tileTopNeighboor.overlay) {
-                singleTile.showShadow();
+
+        // Add SHADOW on this TILE if below a WALL or an OVERLAY
+        let tileTopNeighboor = this.#tiles.find(singleTopTile => singleTopTile.x === singleTile.x && singleTopTile.y === singleTile.y - 1);
+        if (tileTopNeighboor.type === TILE_TYPE.WALL || tileTopNeighboor.overlay) {
+            singleTile.createShadow(this.#scene, this.#theme.shadow.assetKey, this.#theme.shadow.assetFrame);
+            singleTile.shadow.fadeIn();
+        }
+
+        // Remove SHADOW from neighboors
+        let neighboors = this.getNeighboors(singleTile.x, singleTile.y);
+        neighboors.forEach((singleNeighboor) => {
+            if (!singleNeighboor.shadow) {
+                return;
             }
 
-            // Remove shadow from neighboors
-            let neighboors = this.getNeighboors(singleTile.x, singleTile.y);
-            neighboors.forEach((singleNeighboor) => {
-                let tileTopNeighboor = this.#tiles.find(singleTopTile => singleTopTile.x === singleNeighboor.x && singleTopTile.y === singleNeighboor.y - 1);
+            let tileTopNeighboor = this.#tiles.find(singleTopTile => singleTopTile.x === singleNeighboor.x && singleTopTile.y === singleNeighboor.y - 1);
+            if (!tileTopNeighboor) {
+                return;
+            }
 
-                if (tileTopNeighboor && tileTopNeighboor.type === TILE_TYPE.FLOOR && !tileTopNeighboor.overlay) {
-                    singleNeighboor.hideShadow();
-                }
+            if (tileTopNeighboor.type !== TILE_TYPE.FLOOR) {
+                return;
+            }
+
+            if (tileTopNeighboor.overlay && tileTopNeighboor !== singleTile) {
+                return;
+            }
+
+            singleNeighboor.shadow.fadeOut(() => {
+                singleNeighboor.removeShadow();
             });
+        });
 
+        // Reveal the TILE
+        singleTile.reveal(() => {
             // Continue revealing tiles
             if (tiles.length > 0) {
                 this.#revealTiles(tiles, callback);
@@ -419,9 +469,15 @@ export class Map {
      * @param {() => void} [callback ]
      */
     #activateTiles(tiles, callback) {
+        // TODO: Call this RIGHT AFTER a tile is revealed, not after all are revealed!
         tiles.forEach((singleTile) => {
             // An enemy is on the tile ?
             if (singleTile.enemy) {
+                singleTile.createEnemy(this.#scene);
+                singleTile.enemy.shadow.gameObject.setAlpha(0);
+                singleTile.enemy.show(() => {
+                    singleTile.enemy.shadow.show(); 
+                });
                 singleTile.enemy.animate();
 
                 // Disable surrounding tile
@@ -435,8 +491,8 @@ export class Map {
                 // Animate an appear effect
                 // TODO: Add Status on top tile instead (and roll back to the previous status)
                 let effect = this.#scene.add.sprite(
-                    singleTile.container.x + singleTile.enemy.gameObject.displayWidth / 2,
-                    singleTile.container.y + singleTile.enemy.gameObject.displayHeight / 2 - singleTile.enemy.gameObject.displayHeight,
+                    singleTile.container.x + singleTile.container.getBounds().width / 2,
+                    singleTile.container.y - singleTile.container.getBounds().height / 2,
                     DUNGEON_ASSET_KEYS.EFFECTS_LARGE
                 );
                 this.#container.add(effect);
@@ -446,6 +502,13 @@ export class Map {
                 effect.anims.play("appear", true);
 
                 return;
+            }
+
+            if (singleTile.item) {
+                console.log(singleTile.item);
+                singleTile.createItem(this.#scene);
+                
+                singleTile.item.show();
             }
         });
 
