@@ -16,33 +16,10 @@ export class TileEntity {
      * @returns {Phaser.GameObjects.Sprite}
      */
     create(scene, assetKey, assetFrame) {
-        this._gameObject = scene.add.sprite(0, 0, assetKey, assetFrame).setOrigin(0);
-        this._gameObject.setOrigin(0);
-
+        this._gameObject = scene.add.sprite(0, 0, assetKey, assetFrame).setOrigin(0.5);
+        this._gameObject.x = this._gameObject.width / 2;
+        this._gameObject.y = this._gameObject.height / 2;
         return this._gameObject;
-    }
-
-    /**
-     * @param {() => void} [callback]
-     */
-    show(callback) {
-        this._gameObject.setScale(0);
-        this._gameObject.setAlpha(0);
-
-        this._gameObject.scene.add.tween({
-            targets: [
-                this._gameObject,
-            ],
-            alpha: 1,
-            scaleY: 1,
-            scaleX: 1,
-            duration: 100,
-            onComplete: () => {
-                if (callback) {
-                    callback();
-                }
-            }
-        });
     }
 
     /**
@@ -87,7 +64,29 @@ export class TileEntity {
     /**
      * @param {() => void} [callback]
      */
-    remove(callback) {
+    scaleIn(callback) {
+        this._gameObject.setScale(0);
+        this._gameObject.setAlpha(0);
+
+        this._gameObject.scene.add.tween({
+            targets: [
+                this._gameObject,
+            ],
+            alpha: 1,
+            scaleY: 1,
+            scaleX: 1,
+            duration: 100,
+            onComplete: () => {
+                if (callback) {
+                    callback();
+                }
+            }
+        });
+    }
+    /**
+     * @param {() => void} [callback]
+     */
+    scaleOut(callback) {
         this._gameObject.scene.add.tween({
             targets: [
                 this._gameObject,
