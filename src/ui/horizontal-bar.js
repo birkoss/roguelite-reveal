@@ -68,7 +68,7 @@ export class HorizontalBar {
         this.#scene.tweens.add({
             targets: this.#middleGameObject,
             displayWidth: width,
-            duration: options?.duration || 1000,
+            duration: options?.duration || 800,
             ease: Phaser.Math.Easing.Sine.Out,
             onUpdate: () => {
                 this.#rightGameObject.setX(this.#middleGameObject.x + this.#middleGameObject.displayWidth);
