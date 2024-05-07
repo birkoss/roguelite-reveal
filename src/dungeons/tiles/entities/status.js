@@ -1,5 +1,3 @@
-import Phaser from "../../../lib/phaser.js";
-
 import { TileEntity } from "./entity.js";
 
 /** @typedef {keyof typeof TILE_STATUS_TYPE} TileStatusType */
