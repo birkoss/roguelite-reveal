@@ -225,6 +225,8 @@ export class DungeonScene extends Phaser.Scene {
 
                     // Dead enemy ? Give XP !
                     if (!tile.enemy.isAlive) {
+                        this.#map.validateStatus();
+                        
                         let xp = tile.enemy.xpToNext;
                         this.#updatePlayerXp(xp, () => {
                             console.log("Updating Player XP ...");

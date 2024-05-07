@@ -467,4 +467,32 @@ export class Map {
         tile.addStatus(new TileStatus(newStatus));
         tile.createStatus(this.#scene, DUNGEON_ASSET_KEYS.TILE_STATUS, 0);
     }
+
+    validateStatus() {
+        this.#tiles.forEach((singleTile) => {
+            if (!singleTile.status) {
+                return;
+            }
+
+            if (singleTile.status.type === TILE_STATUS_TYPE.LOCKED) {
+                // Validate that at least ONE enemy is around
+                let neighboors = this.getNeighboors(singleTile.x, singleTile.y);
+                let aliveEnemies = neighboors.filter((singleNeighboor) => {
+                    // Only check revealed tile
+                    if (singleNeighboor.overlay) {
+                        return;
+                    }
+                    // Must have an alive enemy
+                    if (!singleNeighboor.enemy || !singleNeighboor.enemy.isAlive) {
+                        return;
+                    }
+                    return true;
+                });
+
+                if (aliveEnemies.length === 0) {
+                    singleTile.removeStatus();
+                }
+            }
+        });
+    }
 }

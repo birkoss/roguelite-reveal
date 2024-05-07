@@ -123,28 +123,6 @@ export class Tile {
     addEnemy(unitDetails) {
         this.#enemy = new TileUnit(unitDetails);
     }
-
-    /**
-     * @param {TileItem} item 
-     */
-    addItem(item) {
-        this.#item = item;
-    }
-
-    /**
-     * @param {Phaser.Scene} scene 
-     * @param {string} assetKey 
-     * @param {number} assetFrame 
-     */
-    createItem(scene, assetKey, assetFrame) {
-        this.#item.create(scene, assetKey, assetFrame);
-        this.#container.add(this.#item.gameObject);
-
-        // Center the item on the tile
-        this.#item.gameObject.x = (this.#background.gameObject.displayWidth - this.#item.gameObject.displayWidth) / 2;
-        this.#item.gameObject.y = (this.#background.gameObject.displayHeight - this.#item.gameObject.displayHeight) / 2;
-    }
-
     /**
      * @param {Phaser.Scene} scene 
      */
@@ -169,15 +147,6 @@ export class Tile {
     }
 
     /**
-     * @param {Phaser.Scene} scene 
-     */
-    createSeletion(scene) {
-        this.#selection = scene.add.sprite(0, 0, UI_ASSET_KEYS.SELECTED_TILE);
-        this.#selection.setAlpha(0).setOrigin(0);
-        this.#container.add(this.#selection);
-    }
-
-    /**
      * @param {TileStatus} status 
      */
     addStatus(status) {
@@ -191,6 +160,12 @@ export class Tile {
     createStatus(scene, assetKey, assetFrame) {
         let tile = this.#status.create(scene, assetKey, assetFrame);
         this.#container.add(tile);
+    }
+    removeStatus() {
+        if (this.#status) {
+            this.#status.gameObject.destroy();
+            this.#status = undefined;
+        }
     }
 
     /**
@@ -212,12 +187,19 @@ export class Tile {
         });
     }
 
+    /**
+     * @param {Phaser.Scene} scene 
+     */
+    createSeletion(scene) {
+        this.#selection = scene.add.sprite(0, 0, UI_ASSET_KEYS.SELECTED_TILE);
+        this.#selection.setAlpha(0).setOrigin(0);
+        this.#container.add(this.#selection);
+    }
     select() {
         if (this.#selection) {
             this.#selection.setAlpha(1);
         }
     }
-
     unselect() {
         if (this.#selection) {
             this.#selection.setAlpha(0);
@@ -235,6 +217,25 @@ export class Tile {
         }
     }
 
+    /**
+     * @param {TileItem} item 
+     */
+    addItem(item) {
+        this.#item = item;
+    }
+    /**
+     * @param {Phaser.Scene} scene 
+     * @param {string} assetKey 
+     * @param {number} assetFrame 
+     */
+    createItem(scene, assetKey, assetFrame) {
+        this.#item.create(scene, assetKey, assetFrame);
+        this.#container.add(this.#item.gameObject);
+
+        // Center the item on the tile
+        this.#item.gameObject.x = (this.#background.gameObject.displayWidth - this.#item.gameObject.displayWidth) / 2;
+        this.#item.gameObject.y = (this.#background.gameObject.displayHeight - this.#item.gameObject.displayHeight) / 2;
+    }
     /**
      * @param {() => void} [callback] 
      */
