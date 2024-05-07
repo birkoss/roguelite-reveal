@@ -120,9 +120,6 @@ export class Tile {
     createOverlay(scene, assetKey, assetFrame) {
         this.#overlay = new TileEntity();
         this.#overlay.create(scene, assetKey, assetFrame);
-        this.#overlay.gameObject.x += this.#overlay.gameObject.width/2;
-        this.#overlay.gameObject.y += this.#overlay.gameObject.height/2;
-        this.#overlay.gameObject.setOrigin(0.5);
         this.#container.add(this.#overlay.gameObject);
 
         return this.#overlay;
@@ -139,9 +136,6 @@ export class Tile {
      */
     createEnemy(scene) {
         let container = this.#enemy.createUnit(scene);
-        this.#enemy.gameObject.x += this.#enemy.gameObject.width/2;
-        this.#enemy.gameObject.y += this.#enemy.gameObject.height/2;
-        this.#enemy.gameObject.setOrigin(0.5);
         this.#container.add(container);
     }
     removeEnemy() {
@@ -160,9 +154,6 @@ export class Tile {
     createShadow(scene, assetKey, assetFrame) {
         this.#shadow = new TileEntity();
         this.#shadow.create(scene, assetKey, assetFrame);
-        this.#shadow.gameObject.x += this.#shadow.gameObject.width/2;
-        this.#shadow.gameObject.y += this.#shadow.gameObject.height/2;
-        this.#shadow.gameObject.setOrigin(0.5);
         this.#container.add(this.#shadow.gameObject);
     }
     removeShadow() {
@@ -198,7 +189,7 @@ export class Tile {
      * @param {() => void} [callback] 
      */
     reveal(callback) {
-        this.#overlay.remove(() => {
+        this.#overlay.scaleOut(() => {
             this.#overlay.gameObject.destroy();
             this.#overlay = undefined;
 
@@ -212,7 +203,7 @@ export class Tile {
      * @param {() => void} [callback] 
      */
     show(callback) {
-        this.#overlay.show(() => {
+        this.#overlay.scaleIn(() => {
             if (callback) {
                 callback();
             }
@@ -250,10 +241,6 @@ export class Tile {
     createItem(scene) {
         this.#item.create(scene, this.#item.itemDetails.assetKey, this.#item.itemDetails.assetFrame);
 
-        this.#item.gameObject.x += this.#item.gameObject.width/2;
-        this.#item.gameObject.y += this.#item.gameObject.height/2;
-        this.#item.gameObject.setOrigin(0.5);
-
         this.#container.add(this.#item.gameObject);
 
         // Center the item on the tile
@@ -264,7 +251,7 @@ export class Tile {
      * @param {() => void} [callback] 
      */
     useItem(callback) {
-        this.#item.remove(() => {
+        this.#item.scaleOut(() => {
             this.removeItem();
 
             if (callback) {

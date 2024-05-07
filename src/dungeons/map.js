@@ -380,10 +380,7 @@ export class Map {
         }
         
         // Reveal all those tiles
-        this.#revealTiles([...tilesToExplore], () => {
-            // Reveal all things on those tiles
-            this.#activateTiles(tilesToExplore, callback);
-        }); 
+        this.#revealTiles(tilesToExplore, callback);
     }
 
     /**
@@ -455,68 +452,63 @@ export class Map {
 
         // Reveal the TILE
         singleTile.reveal(() => {
-            // Continue revealing tiles
-            if (tiles.length > 0) {
-                this.#revealTiles(tiles, callback);
-            } else {
-                callback();
-            }
+            this.#activateTile(singleTile, () => {
+                // Continue revealing tiles
+                if (tiles.length > 0) {
+                    this.#revealTiles(tiles, callback);
+                } else {
+                    callback();
+                }
+            });
         });
     }
 
     /**
-     * @param {Tile[]} tiles 
+     * @param {Tile} tile 
      * @param {() => void} [callback ]
      */
-    #activateTiles(tiles, callback) {
-        // TODO: Call this RIGHT AFTER a tile is revealed, not after all are revealed!
-        tiles.forEach((singleTile) => {
-            // An enemy is on the tile ?
-            if (singleTile.enemy) {
-                singleTile.createEnemy(this.#scene);
-                singleTile.enemy.shadow.gameObject.setAlpha(0);
-                singleTile.enemy.show(() => {
-                    singleTile.enemy.shadow.show(); 
-                });
-                singleTile.enemy.animate();
+    #activateTile(tile, callback) {
+        // An enemy is on the tile ?
+        if (tile.enemy) {
+            tile.createEnemy(this.#scene);
+            tile.enemy.shadow.gameObject.setAlpha(0);
+            tile.enemy.scaleIn(() => {
+                tile.enemy.shadow.scaleIn(); 
+            });
+            tile.enemy.animate();
 
-                // Disable surrounding tile
-                let neighboors = this.getNeighboors(singleTile.x, singleTile.y);
-                neighboors.forEach((singleNeighboor) => {
-                    if (singleNeighboor.item) {
-                        this.changeTileStatus(singleNeighboor, TILE_STATUS_TYPE.LOCKED);
-                    }
-                });
+            // Disable surrounding tile
+            let neighboors = this.getNeighboors(tile.x, tile.y);
+            neighboors.forEach((singleNeighboor) => {
+                if (singleNeighboor.item) {
+                    this.changeTileStatus(singleNeighboor, TILE_STATUS_TYPE.LOCKED);
+                }
+            });
 
-                // Animate an appear effect
-                // TODO: Add Status on top tile instead (and roll back to the previous status)
-                let effect = this.#scene.add.sprite(
-                    singleTile.container.x + singleTile.container.getBounds().width / 2,
-                    singleTile.container.y - singleTile.container.getBounds().height / 2,
-                    DUNGEON_ASSET_KEYS.EFFECTS_LARGE
-                );
-                this.#container.add(effect);
-                effect.on("animationcomplete", (tween, sprite, element) => {
-                    element.destroy();
-                });
-                effect.anims.play("appear", true);
+            // Animate an appear effect
+            // TODO: Add Status on top tile instead (and roll back to the previous status)
+            let effect = this.#scene.add.sprite(
+                tile.container.x + tile.container.getBounds().width / 2,
+                tile.container.y - tile.container.getBounds().height / 2,
+                DUNGEON_ASSET_KEYS.EFFECTS_LARGE
+            );
+            this.#container.add(effect);
+            effect.on("animationcomplete", (tween, sprite, element) => {
+                element.destroy();
+            });
+            effect.anims.play("appear", true);
+        }
 
-                return;
-            }
+        if (tile.item) {
+            console.log(tile.item);
+            tile.createItem(this.#scene);
+            
+            tile.item.scaleIn();
+        }
 
-            if (singleTile.item) {
-                console.log(singleTile.item);
-                singleTile.createItem(this.#scene);
-                
-                singleTile.item.show();
-            }
-        });
-
-        this.#scene.time.delayedCall(500, () => {
-            if (callback) {
-                callback();
-            }
-        });
+        if (callback) {
+            callback();
+        }
     }
 
     /**

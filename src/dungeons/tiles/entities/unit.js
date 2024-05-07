@@ -114,9 +114,6 @@ export class TileUnit extends TileEntity {
         this.#shadow = new TileEntity();
         if (this.#unitDetails.shadow) {
             this.#shadow.create(scene, this.#unitDetails.shadow.assetKey, this.#unitDetails.shadow.assetFrame);
-            this.#shadow.gameObject.x += this.#shadow.gameObject.width/2;
-            this.#shadow.gameObject.y += this.#shadow.gameObject.height/2;
-            this.#shadow.gameObject.setOrigin(0.5);
             unitTiles.push(this.#shadow.gameObject);
         }
 
@@ -163,7 +160,7 @@ export class TileUnit extends TileEntity {
 
             this._gameObject.y = 0;
             if (this.#shadow) {
-                this.#shadow.remove();
+                this.#shadow.scaleOut();
             }
         }
     }
