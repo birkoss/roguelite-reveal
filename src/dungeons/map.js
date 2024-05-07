@@ -366,7 +366,6 @@ export class Map {
      * @param {number} y 
      */
     selectTileAt(x, y) {
-        console.log("selectTileAt", x, "x", y);
         let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
         
         // Select the current tile
@@ -479,9 +478,7 @@ export class Map {
         }
 
         if (tile.item) {
-            console.log(tile.item);
             tile.createItem(this.#scene);
-            
             tile.item.scaleIn();
         }
 
