@@ -155,6 +155,10 @@ export class Tile {
         this.#shadow = new TileEntity();
         this.#shadow.create(scene, assetKey, assetFrame);
         this.#container.add(this.#shadow.gameObject);
+
+        if (this.#selection) {
+            this.#container.moveAbove(this.#selection, this.#shadow.gameObject);
+        }
     }
     removeShadow() {
         if (this.#shadow) {
@@ -215,8 +219,14 @@ export class Tile {
      */
     createSeletion(scene) {
         this.#selection = scene.add.sprite(0, 0, UI_ASSET_KEYS.SELECTED_TILE);
-        this.#selection.setAlpha(0).setOrigin(0);
+        this.#selection.setOrigin(0);
         this.#container.add(this.#selection);
+    }
+    removeSelection() {
+        if (this.#selection) {
+            this.#selection.destroy();
+            this.#selection = undefined;
+        }
     }
     select() {
         if (this.#selection) {

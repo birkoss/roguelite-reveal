@@ -389,13 +389,14 @@ export class Map {
      * @param {number} y 
      */
     selectTileAt(x, y) {
+        console.log("selectTileAt", x, "x", y);
         let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
         
         // Select the current tile
         this.#tiles.forEach((singleTile) => {
-            singleTile.unselect();
+            singleTile.removeSelection();
         });
-        tile.select();
+        tile.createSeletion(this.#scene);
     }
 
     #createTiles() {
