@@ -61,7 +61,7 @@ export class Map {
             let assetKey = theme.floor.assetKey;
             let assetFrame = theme.floor.assetFrame;
 
-            if (singleTile.type == TILE_TYPE.WALL) {
+            if (singleTile.type === TILE_TYPE.WALL) {
                 assetKey = theme.walls.assetKey;
                 assetFrame = 0;
                 // Get the first frame, should always be the default wall
@@ -80,12 +80,16 @@ export class Map {
 
             let tileContainer = singleTile.create(this.#scene, assetKey, assetFrame);
             this.#container.add(tileContainer);
-        });
-
-        // Create Overlays
-        this.tiles.forEach((singleTile) => {
-            if (this.isBorder(singleTile.x, singleTile.y)) {
+   
+            // Nothing more to do with wall
+            if (singleTile.type === TILE_TYPE.WALL) {
                 return;
+            }
+
+            // Create tile shadow
+            let upTile = this.#tiles.find(singleUpTile => singleUpTile.y === singleTile.y -1 && singleUpTile.x === singleTile.x);
+            if (upTile && upTile.type === TILE_TYPE.WALL) {
+                singleTile.createShadow(this.#scene, theme.shadow.assetKey, theme.shadow.assetFrame);
             }
             
             if (singleTile.item) {
@@ -98,6 +102,10 @@ export class Map {
                 }
 
                 singleTile.createItem(this.#scene, assetKey, assetFrame);
+            }
+
+            if (singleTile.enemy) {
+                singleTile.createEnemy(this.#scene);
             }
 
             if (!SKIP_OVERLAYS) {

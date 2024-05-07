@@ -10,6 +10,10 @@
             "assetKey": "WORLD",
             "assetFrame": 8
         },
+        "shadow": {
+            "assetKey": "WORLD",
+            "assetFrame": 2009
+        },
         "hidden": {
             "assetKey": "WORLD",
             "assetFrame": 2

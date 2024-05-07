@@ -1,6 +1,6 @@
 import Phaser from "../../lib/phaser.js";
 
-import { TILE_SIZE } from "../../config.js";
+import { SKIP_OVERLAYS, TILE_SIZE } from "../../config.js";
 import { TileEntity } from "./entities/entity.js";
 import { TileUnit } from "./entities/unit.js";
 import { TileItem } from "./entities/item.js";
@@ -83,20 +83,9 @@ export class Tile {
         this.#container = scene.add.container(this.x * TILE_SIZE, this.y * TILE_SIZE);
 
         // Create the tile background (wall or floor)
-        // TODO: Replace this shadow depending on the layout
-        // if (this.x === 1 && this.y === 1) {
-        //     let shadow = scene.add.sprite(this.x * 48, this.y * 48, assetKey, 2009);
-        //     shadow.setOrigin(0);
-        // }
         this.#background = new TileEntity();
         this.#background.create(scene, assetKey, assetFrame);
         this.#container.add(this.#background.gameObject);
-
-        if (this.#enemy) {
-            let container = this.#enemy.createUnit(scene);
-            this.#enemy.gameObject.setAlpha(0);
-            this.#container.add(container);
-        }
 
         return this.#container;
     }
@@ -142,6 +131,28 @@ export class Tile {
         // Center the item on the tile
         this.#item.gameObject.x = (this.#background.gameObject.displayWidth - this.#item.gameObject.displayWidth) / 2;
         this.#item.gameObject.y = (this.#background.gameObject.displayHeight - this.#item.gameObject.displayHeight) / 2;
+    }
+
+    /**
+     * @param {Phaser.Scene} scene 
+     */
+    createEnemy(scene) {
+        let container = this.#enemy.createUnit(scene);
+        if (!SKIP_OVERLAYS) {
+            this.#enemy.gameObject.setAlpha(0);
+        }
+        this.#container.add(container);
+    }
+
+    /**
+     * @param {Phaser.Scene} scene 
+     * @param {string} assetKey 
+     * @param {number} assetFrame 
+     */
+    createShadow(scene, assetKey, assetFrame) {
+        let shadow = scene.add.sprite(0, 0, assetKey, assetFrame);
+        shadow.setOrigin(0);
+        this.#container.add(shadow);
     }
 
     /**

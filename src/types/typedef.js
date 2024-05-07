@@ -6,6 +6,7 @@
  * @property {AssetSingleFrame} floor
  * @property {AssetSingleFrame} exit
  * @property {AssetSingleFrame} hidden
+ * @property {AssetSingleFrame} shadow
  * @property {AssetMultipleFrames} walls
  */
 
