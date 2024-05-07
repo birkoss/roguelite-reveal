@@ -99,7 +99,7 @@ export class Map {
 
             if (!SKIP_OVERLAYS) {
                 singleTile.createOverlay(this.#scene, theme.hidden.assetKey, theme.hidden.assetFrame);
-                singleTile.show();
+                singleTile.overlay.scaleIn();
             }
         });
 
@@ -135,14 +135,14 @@ export class Map {
 
         let tile = emptyTiles.shift();
         tile = this.#tiles.find(singleTile => singleTile.x === 1 && singleTile.y === 1);
-        tile.addItem(new TileItem(TILE_ITEM_TYPE.EXIT, itemDetails));
+        tile.setItem(new TileItem(TILE_ITEM_TYPE.EXIT, itemDetails));
 
         // Add enemies
         for (let i=0; i<1; i++) {
             let enemyDetails = DataUtils.getEnemyDetails(this.#scene, (i==0 ? 'imp' : 'skeleton'));
             tile = emptyTiles.shift();
-            tile = this.#tiles.find(singleTile => singleTile.x === 3 && singleTile.y === 1);
-            tile.addEnemy(enemyDetails);
+            tile = this.#tiles.find(singleTile => singleTile.x === 2 && singleTile.y === 1);
+            tile.setEnemy(enemyDetails);
         }
 
         // Add items
@@ -150,33 +150,10 @@ export class Map {
         for (let i=0; i<1; i++) {
             tile = emptyTiles.shift();
             tile = this.#tiles.find(singleTile => singleTile.x === 2 && singleTile.y === 2);
-            tile.addItem(new TileItem(TILE_ITEM_TYPE.CONSUMABLE, itemDetails));
+            tile.setItem(new TileItem(TILE_ITEM_TYPE.CONSUMABLE, itemDetails));
         }
 
-        // Add chest
-
-        return;
-
-        // Generate ennemies
-        for (let i=0; i<1; i++) {
-            let enemyDetails = DataUtils.getEnemyDetails(this.#scene, (i==0 ? 'imp' : 'skeleton'));
-            tile = emptyTiles.shift();
-            tile = this.#tiles.find(singleTile => singleTile.x === 3 && singleTile.y === 1);
-            tile.addEnemy(enemyDetails);
-        }
-
-
-
-        // TODO: Generate chest
-
-        // Create tiles
-        this.tiles.forEach((singleTile) => {
-            singleTile.createSeletion(this.#scene);
-
-            if (singleTile.enemy) {
-                singleTile.createEnemy(this.#scene);
-            }
-        });
+        // TODO: Add chest
     }
 
     /**
@@ -452,8 +429,8 @@ export class Map {
             });
         });
 
-        // Reveal the TILE
-        singleTile.reveal(() => {
+        // Reveal the OVERLAY
+        singleTile.removeOverlay(() => {
             this.#activateTile(singleTile, () => {
                 // Continue revealing tiles
                 if (tiles.length > 0) {
@@ -518,8 +495,9 @@ export class Map {
      * @param {TILE_STATUS_TYPE} newStatus 
      */
     changeTileStatus(tile, newStatus) {
-        tile.addStatus(new TileStatus(newStatus));
+        tile.setStatus(new TileStatus(newStatus));
         tile.createStatus(this.#scene, DUNGEON_ASSET_KEYS.TILE_STATUS, 0);
+        tile.status.fadeIn();
     }
 
     validateStatus() {

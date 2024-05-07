@@ -1,10 +1,10 @@
 import Phaser from "../../lib/phaser.js";
 
-import { SKIP_OVERLAYS, TILE_SIZE } from "../../config.js";
+import { TILE_SIZE } from "../../config.js";
+import { UI_ASSET_KEYS } from "../../keys/asset.js";
 import { TileEntity } from "./entities/entity.js";
 import { TileUnit } from "./entities/unit.js";
 import { TileItem } from "./entities/item.js";
-import { UI_ASSET_KEYS } from "../../keys/asset.js";
 import { TileStatus } from "./entities/status.js";
 
 /** @typedef {keyof typeof TILE_TYPE} TileType */
@@ -121,14 +121,26 @@ export class Tile {
         this.#overlay = new TileEntity();
         this.#overlay.create(scene, assetKey, assetFrame);
         this.#container.add(this.#overlay.gameObject);
-
         return this.#overlay;
+    }
+    /**
+     * @param {() => void} [callback] 
+     */
+    removeOverlay(callback) {
+        this.#overlay.scaleOut(() => {
+            this.#overlay.gameObject.destroy();
+            this.#overlay = undefined;
+
+            if (callback) {
+                callback();
+            }
+        });
     }
 
     /**
      * @param {UnitDetails} unitDetails 
      */
-    addEnemy(unitDetails) {
+    setEnemy(unitDetails) {
         this.#enemy = new TileUnit(unitDetails);
     }
     /**
@@ -170,7 +182,7 @@ export class Tile {
     /**
      * @param {TileStatus} status 
      */
-    addStatus(status) {
+    setStatus(status) {
         this.#status = status;
     }
     /**
@@ -190,31 +202,6 @@ export class Tile {
     }
 
     /**
-     * @param {() => void} [callback] 
-     */
-    reveal(callback) {
-        this.#overlay.scaleOut(() => {
-            this.#overlay.gameObject.destroy();
-            this.#overlay = undefined;
-
-            if (callback) {
-                callback();
-            }
-        });
-    }
-
-    /**
-     * @param {() => void} [callback] 
-     */
-    show(callback) {
-        this.#overlay.scaleIn(() => {
-            if (callback) {
-                callback();
-            }
-        });
-    }
-
-    /**
      * @param {Phaser.Scene} scene 
      */
     createSeletion(scene) {
@@ -228,21 +215,11 @@ export class Tile {
             this.#selection = undefined;
         }
     }
-    select() {
-        if (this.#selection) {
-            this.#selection.setAlpha(1);
-        }
-    }
-    unselect() {
-        if (this.#selection) {
-            this.#selection.setAlpha(0);
-        }
-    }
 
     /**
      * @param {TileItem} item 
      */
-    addItem(item) {
+    setItem(item) {
         this.#item = item;
     }
     /**
@@ -250,7 +227,6 @@ export class Tile {
      */
     createItem(scene) {
         this.#item.create(scene, this.#item.itemDetails.assetKey, this.#item.itemDetails.assetFrame);
-
         this.#container.add(this.#item.gameObject);
 
         // Center the item on the tile
