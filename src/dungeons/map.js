@@ -59,7 +59,13 @@ export class Map {
         // Create tiles
         this.tiles.forEach((singleTile) => {
             let assetKey = theme.floor.assetKey;
-            let assetFrame = theme.floor.assetFrame;
+            let assetFrame = theme.floor.assetFrames[0];
+            // Dynamic floor depending on the frame
+            if (theme.floor.assetFrames.length > 1) {
+                if (Phaser.Math.Between(1, 4) === 3) {
+                    assetFrame = theme.floor.assetFrames[ Phaser.Math.Between(1, theme.floor.assetFrames.length - 1) ];
+                }
+            }
 
             if (singleTile.type === TILE_TYPE.WALL) {
                 assetKey = theme.walls.assetKey;
