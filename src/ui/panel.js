@@ -103,10 +103,10 @@ export class Panel {
     }
 
     /**
-     * @param {number} damage 
+     * @param {number} amount 
      */
-    damagePlayer(damage) {
-        this.#player.takeDamage(damage);
+    updatePlayerHp(amount) {
+        this.#player.updateHp(amount);
         this.refresh();
     }
 
@@ -140,7 +140,6 @@ export class Panel {
      * @returns {Coordinate}
      */
     getHpBarCenterPosition() {
-        console.log (this.#hpBar.container.getBounds().height);
         return {
             x: this.#hpBar.container.x + this.#hpBar.container.getBounds().width / 2,
             y: this.#hpBar.container.y,

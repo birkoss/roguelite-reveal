@@ -144,10 +144,10 @@ export class TileUnit extends TileEntity {
     }
 
     /**
-     * @param {number} damage 
+     * @param {number} amount 
      */
-    takeDamage(damage) {
-        this.#hp = Math.max(0, this.#hp - damage);
+    updateHp(amount) {
+        this.#hp = Math.min(this.#maxHp, Math.max(0, this.#hp + amount));
 
         if (!this.isAlive) {
             this._gameObject.anims.stop();

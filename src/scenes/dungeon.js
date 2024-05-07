@@ -150,8 +150,8 @@ export class DungeonScene extends Phaser.Scene {
                     this.cameras.main.shake(200);
                     this.cameras.main.flash(200, 255, 0, 0);
                     
-                    this.#changeHpValue(-totalDamage, () => {
-                        this.#panel.damagePlayer(totalDamage);
+                    this.#updatePlayerHp(-totalDamage, () => {
+                        this.#panel.updatePlayerHp(-totalDamage);
                         this.#stateMachine.setState(MAIN_STATES.TURN_START);
                     });
                 });
@@ -220,7 +220,7 @@ export class DungeonScene extends Phaser.Scene {
 
                     let dmg = this.#calculateDamage(this.#panel.player, tile.enemy);
 
-                    tile.enemy.takeDamage(dmg);
+                    tile.enemy.updateHp(-dmg);
                     if (!tile.enemy.isAlive) {
                         let xp = tile.enemy.xpToNext;
                         this.#panel.gainXp(xp);
@@ -243,13 +243,16 @@ export class DungeonScene extends Phaser.Scene {
                 if (tile.item.type === TILE_ITEM_TYPE.CONSUMABLE) {
                     this.#stateMachine.setState(MAIN_STATES.WAITING_FOR_ACTION_FEEDBACK);
 
-                    // TODO: Apply modifiers
-                    console.log(tile.item.itemDetails.modifiers.hp);
-                    this.#changeHpValue(tile.item.itemDetails.modifiers.hp, () => {
+                    // Remove the Item
+                    tile.useItem();
+
+                    // Apply HP modifier
+                    let amountHp = tile.item.itemDetails.modifiers.hp;
+                    this.#updatePlayerHp(amountHp, () => {
+                        this.#panel.updatePlayerHp(amountHp);
                         this.#stateMachine.setState(MAIN_STATES.TURN_END);
                     });
 
-                    tile.useItem();
                     return;
                 }
             }
@@ -286,7 +289,11 @@ export class DungeonScene extends Phaser.Scene {
         return dmg;
     }
 
-    #changeHpValue(amount, callback) {
+    /**
+     * @param {number} amount 
+     * @param {() => void} callback 
+     */
+    #updatePlayerHp(amount, callback) {
         let destinationObject = this.#panel.getHpBarCenterPosition();
         let destinationX = destinationObject.x + this.#panel.container.x;
         let destinationY = destinationObject.y + this.#panel.container.y;
