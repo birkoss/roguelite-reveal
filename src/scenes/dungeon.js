@@ -221,9 +221,40 @@ export class DungeonScene extends Phaser.Scene {
                     let dmg = this.#calculateDamage(this.#panel.player, tile.enemy);
 
                     tile.enemy.updateHp(-dmg);
+
+                    // Dead enemy ? Give XP !
                     if (!tile.enemy.isAlive) {
                         let xp = tile.enemy.xpToNext;
-                        this.#panel.gainXp(xp);
+                        this.#updatePlayerXp(xp, () => {
+                            console.log("Updating Player XP ...");
+                            this.#panel.gainXp(xp, () => {
+                                // No Level Up!
+                                if (this.#panel.player.xp < this.#panel.player.xpToNext) {
+                                    this.#stateMachine.setState(MAIN_STATES.TURN_END);
+                                    return ;
+                                }
+
+                                // Level Up!
+                                if (this.#panel.player.xp >= this.#panel.player.xpToNext) {
+                                    this.#updatePlayerLevel(() => {
+                                        this.#panel.resetXp(() => {
+                                            // TODO: Manage multiple level up one by one
+                                            while (this.#panel.player.xp >= this.#panel.player.xpToNext) {
+                                                this.#panel.player.levelUp();
+                                            }
+                                            this.#panel.refresh();
+    
+                                            this.#stateMachine.setState(MAIN_STATES.TURN_END);
+                                        });
+                                    });
+
+                                    return;
+                                }
+                            });
+
+                        });
+
+                        return;
                     }
 
                     this.#stateMachine.setState(MAIN_STATES.TURN_END);
@@ -299,5 +330,28 @@ export class DungeonScene extends Phaser.Scene {
         let destinationY = destinationObject.y + this.#panel.container.y;
 
         this.#overlayText.setText(`${amount} HP`, destinationX, destinationY, callback);
+    }
+
+    /**
+     * @param {number} amount 
+     * @param {() => void} callback 
+     */
+    #updatePlayerXp(amount, callback) {
+        let destinationObject = this.#panel.getXpBarCenterPosition();
+        let destinationX = destinationObject.x + this.#panel.container.x;
+        let destinationY = destinationObject.y + this.#panel.container.y;
+
+        this.#overlayText.setText(`${amount} XP`, destinationX, destinationY, callback);
+    }
+
+    /**
+     * @param {() => void} callback 
+     */
+    #updatePlayerLevel(callback) {
+        let destinationObject = this.#panel.getLevelCenterPosition();
+        let destinationX = destinationObject.x + this.#panel.container.x;
+        let destinationY = destinationObject.y + this.#panel.container.y;
+
+        this.#overlayText.setText('Level Up', destinationX, destinationY, callback);
     }
 }

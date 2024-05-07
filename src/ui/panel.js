@@ -112,18 +112,11 @@ export class Panel {
 
     /**
      * @param {number} xp 
+     * @param {() => void} [callback]
      */
-    gainXp(xp) {
+    gainXp(xp, callback) {
         this.#player.gainXp(xp);
-        this.refresh();
-
-        while (this.#player.xp >= this.#player.xpToNext) {
-            // TODO: Animation for levelling up
-            // - Callback to the scene if animation are long
-            this.player.levelUp();
-
-            this.refresh();
-        }
+        this.refreshXp(callback);
     }
 
     refresh() {
@@ -132,8 +125,31 @@ export class Panel {
         this.#hpBar.setText(`${this.#player.hp}/${this.#player.maxHp}`);
         this.#hpBar.setWidthAnimated(this.#player.hp/this.#player.maxHp);
 
+        this.refreshXp();
+    }
+
+    /**
+     * @param {() => void} [callback]
+     */
+    refreshXp(callback) {
         this.#xpBar.setText(`${this.#player.xp}/${this.#player.xpToNext}`);
-        this.#xpBar.setWidthAnimated(this.#player.xp/this.#player.xpToNext);
+        if (this.#player.xp === 0) {
+
+        }
+        this.#xpBar.setWidthAnimated(this.#player.xp/this.#player.xpToNext, {
+            duration: this.#player.xp === 0 ? 1 : 1000,
+            callback: callback,
+        });
+    }
+    /**
+     * @param {() => void} [callback]
+     */
+    resetXp(callback) {
+        this.#xpBar.setText("");
+        this.#xpBar.setWidthAnimated(0, {
+            duration: 1,
+            callback: callback,
+        });
     }
 
     /**
@@ -143,6 +159,24 @@ export class Panel {
         return {
             x: this.#hpBar.container.x + this.#hpBar.container.getBounds().width / 2,
             y: this.#hpBar.container.y,
+        };
+    }
+    /**
+     * @returns {Coordinate}
+     */
+    getXpBarCenterPosition() {
+        return {
+            x: this.#xpBar.container.x + this.#xpBar.container.getBounds().width / 2,
+            y: this.#xpBar.container.y,
+        };
+    }
+    /**
+     * @returns {Coordinate}
+     */
+    getLevelCenterPosition() {
+        return {
+            x: this.#textLevel.x + this.#textLevel.width / 2,
+            y: this.#textLevel.y + this.#textLevel.height / 2,
         };
     }
 }

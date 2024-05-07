@@ -302,6 +302,8 @@ export class Map {
     exploreAt(x, y, callback) {
         let tilesToExplore = [];
 
+        // TODO: Add tile shadow when the tile upfront is NOT revealed
+
         let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
 
         // Add the main tile WITH overlay

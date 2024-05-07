@@ -47,7 +47,7 @@ export class OverlayText {
             targets: this.#text,
             scaleX: 1,
             scaleY: 1,
-            duration: 1200,
+            duration: 1000,
             ease: Phaser.Math.Easing.Bounce.Out,
             onComplete: () => {
                 this.#scene.add.tween({

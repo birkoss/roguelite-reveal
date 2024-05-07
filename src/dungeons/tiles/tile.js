@@ -162,7 +162,6 @@ export class Tile {
      * @param {Phaser.Scene} scene 
      */
     createSeletion(scene) {
-        console.log("CS...");
         this.#selection = scene.add.sprite(0, 0, UI_ASSET_KEYS.SELECTED_TILE);
         this.#selection.setAlpha(0).setOrigin(0);
         this.#container.add(this.#selection);
