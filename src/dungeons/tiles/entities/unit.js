@@ -82,24 +82,14 @@ export class TileUnit extends TileEntity {
 
     /**
      * @param {Phaser.Scene} scene 
-     * @param {string} [assetKey='']
-     * @param {number[]} [assetFrames]
      * @returns {Phaser.GameObjects.Container}
      */
-    createUnit(scene, assetKey, assetFrames) {
-        this._gameObject = scene.add.sprite(
-            0,
-            -8,
-            this.#unitDetails.assetKey,
-            this.#unitDetails.assetFrames[0]
-        ).setOrigin(0);
+    createUnit(scene) {
+        this._gameObject = scene.add.sprite(0, -8, this.#unitDetails.assetKey, this.#unitDetails.assetFrames[0]).setOrigin(0);
 
-        let frames = this._gameObject.anims.generateFrameNumbers(
-            this.#unitDetails.assetKey, 
-            {
-                frames: this.#unitDetails.assetFrames
-            }
-        );
+        let frames = this._gameObject.anims.generateFrameNumbers(this.#unitDetails.assetKey, {
+            frames: this.#unitDetails.assetFrames
+        });
 
         this._gameObject.anims.create({
             key: 'idle',
@@ -133,16 +123,16 @@ export class TileUnit extends TileEntity {
     }
 
     levelUp() {
-        this.#xp = Math.max(0, this.#xp - this.#xpToNext);
-
         this.#level++;
 
         this.#attack = this.#calculateStat(this.#unitDetails.attack);
         this.#defense = this.#calculateStat(this.#unitDetails.defense);
+        
         let previousMaxHp = this.#maxHp;
         this.#maxHp = this.#calculateStat(this.#unitDetails.hp);
         this.#hp += (this.#maxHp - previousMaxHp);
 
+        this.#xp = Math.max(0, this.#xp - this.#xpToNext);
         this.#xpToNext = this.#calculateXpToNext();
     }
 
@@ -154,6 +144,7 @@ export class TileUnit extends TileEntity {
 
         if (!this.isAlive) {
             this._gameObject.anims.stop();
+
             // Change the unit texture and frame
             this._gameObject.setTexture(this.#unitDetails.death.assetKey);
             this._gameObject.setFrame(this.#unitDetails.death.assetFrame);
@@ -172,15 +163,6 @@ export class TileUnit extends TileEntity {
     #calculateStat(base) {
         let mod = 0.42; // (0.42 -> 0.5)
         return Math.floor(base + ((base * mod) * (this.#level - 1)));
-    }
-
-    /**
-     * @param {number} base 
-     * @returns {number}
-     */
-    #calculateHealth(base) {
-        let mod = 0.47; // (0.47 -> 0.53)
-        return Math.floor( (this.#level + 120) / 100 * Math.floor(base * mod * (this.#level + 1)));
     }
 
     #calculateXpToNext() {

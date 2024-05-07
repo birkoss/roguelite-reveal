@@ -86,6 +86,7 @@ export class Map {
             this.#container.add(tileContainer);
         });
     }
+
     /**
      * @param {DungeonTheme} theme 
      */
