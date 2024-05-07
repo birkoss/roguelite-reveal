@@ -9,6 +9,7 @@ import { DUNGEON_ASSET_KEYS } from "../keys/asset.js";
 import { Panel } from "../ui/panel.js";
 import { TileUnit } from "../dungeons/tiles/entities/unit.js";
 import { TILE_ITEM_TYPE } from "../dungeons/tiles/entities/item.js";
+import { OverlayText } from "../ui/overlay-text.js";
 
 const MAIN_STATES = Object.freeze({
     CREATE_DUNGEON: 'CREATE_DUNGEON',
@@ -24,6 +25,9 @@ export class DungeonScene extends Phaser.Scene {
 
     /** @type {Panel} */
     #panel;
+
+    /** @type {OverlayText} */
+    #overlayText;
 
     /** @type {DungeonTheme} */
     #dungeonTheme;
@@ -45,6 +49,8 @@ export class DungeonScene extends Phaser.Scene {
 
         this.#createStateMachine();
         this.#stateMachine.setState(MAIN_STATES.CREATE_DUNGEON);
+
+        this.#overlayText = new OverlayText(this, this.#map.container.x + this.#map.container.getBounds().width / 2, this.#map.container.y + this.#map.container.getBounds().height / 2);
     }
 
     update() {
@@ -141,11 +147,13 @@ export class DungeonScene extends Phaser.Scene {
                 // Wait a bit and damage the player
                 this.time.delayedCall(500, () => {
                     // TODO: Add a PASSIVE that allow the player to survive a deadly attack ONCE per X (level, move, etc.)
-                    this.#panel.damagePlayer(totalDamage);
                     this.cameras.main.shake(200);
                     this.cameras.main.flash(200, 255, 0, 0);
                     
-                    this.#stateMachine.setState(MAIN_STATES.TURN_START);
+                    this.#changeHpValue(-totalDamage, () => {
+                        this.#panel.damagePlayer(totalDamage);
+                        this.#stateMachine.setState(MAIN_STATES.TURN_START);
+                    });
                 });
             },
         });
@@ -233,8 +241,13 @@ export class DungeonScene extends Phaser.Scene {
                 }
 
                 if (tile.item.type === TILE_ITEM_TYPE.CONSUMABLE) {
+                    this.#stateMachine.setState(MAIN_STATES.WAITING_FOR_ACTION_FEEDBACK);
+
                     // TODO: Apply modifiers
                     console.log(tile.item.itemDetails.modifiers.hp);
+                    this.#changeHpValue(tile.item.itemDetails.modifiers.hp, () => {
+                        this.#stateMachine.setState(MAIN_STATES.TURN_END);
+                    });
 
                     tile.useItem();
                     return;
@@ -271,5 +284,13 @@ export class DungeonScene extends Phaser.Scene {
         console.log("===", dmg);
 
         return dmg;
+    }
+
+    #changeHpValue(amount, callback) {
+        let destinationObject = this.#panel.getHpBarCenterPosition();
+        let destinationX = destinationObject.x + this.#panel.container.x;
+        let destinationY = destinationObject.y + this.#panel.container.y;
+
+        this.#overlayText.setText(`${amount} HP`, destinationX, destinationY, callback);
     }
 }

@@ -51,3 +51,10 @@
  * @property {object} [modifiers]
  * @property {number} [modifiers.hp]
  */
+
+/** 
+ * @typedef Coordinate
+ * @type {Object}
+ * @property {number} x
+ * @property {number} y
+ */

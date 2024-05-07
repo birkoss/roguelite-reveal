@@ -135,4 +135,15 @@ export class Panel {
         this.#xpBar.setText(`${this.#player.xp}/${this.#player.xpToNext}`);
         this.#xpBar.setWidthAnimated(this.#player.xp/this.#player.xpToNext);
     }
+
+    /**
+     * @returns {Coordinate}
+     */
+    getHpBarCenterPosition() {
+        console.log (this.#hpBar.container.getBounds().height);
+        return {
+            x: this.#hpBar.container.x + this.#hpBar.container.getBounds().width / 2,
+            y: this.#hpBar.container.y,
+        };
+    }
 }
