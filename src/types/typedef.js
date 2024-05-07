@@ -3,21 +3,21 @@
  * @type {Object}
  * @property {string} id
  * @property {string} name
- * @property {DungeonSingleFrame} floor
- * @property {DungeonSingleFrame} exit
- * @property {DungeonSingleFrame} hidden
- * @property {DungeonMultipleFrames} walls
+ * @property {AssetSingleFrame} floor
+ * @property {AssetSingleFrame} exit
+ * @property {AssetSingleFrame} hidden
+ * @property {AssetMultipleFrames} walls
  */
 
 /** 
- * @typedef DungeonSingleFrame
+ * @typedef AssetSingleFrame
  * @type {Object}
  * @property {string} assetKey
  * @property {number} assetFrame
  */
 
 /** 
- * @typedef DungeonMultipleFrames
+ * @typedef AssetMultipleFrames
  * @type {Object}
  * @property {string} assetKey
  * @property {number[]} assetFrames
@@ -35,6 +35,8 @@
  * @property {number} level
  * @property {string} assetKey
  * @property {number[]} assetFrames
+ * @property {AssetSingleFrame} [death]
+ * @property {AssetSingleFrame} [shadow]
  * @property {number} tileLockDistance
  */
 

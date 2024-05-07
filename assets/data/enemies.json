@@ -10,6 +10,14 @@
             290,
             308
         ],
+        "death": {
+            "assetKey": "WORLD",
+            "assetFrame": 37
+        },
+        "shadow": {
+            "assetKey": "WORLD",
+            "assetFrame": 2017
+        },
         "tileLockDistance": 1
     }
 ]

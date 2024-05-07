@@ -1,6 +1,6 @@
-import { DUNGEON_ASSET_KEYS } from "../../../keys/asset.js";
 import Phaser from "../../../lib/phaser.js";
 
+import { DUNGEON_ASSET_KEYS } from "../../../keys/asset.js";
 import { TileEntity } from "./entity.js";
 
 export class TileUnit extends TileEntity {
@@ -105,11 +105,17 @@ export class TileUnit extends TileEntity {
             repeat: -1,
         });
 
+        let unitTiles = [];
+
         // Add shadow under the Unit
         this.#shadow = new TileEntity();
-        this.#shadow.create(scene, DUNGEON_ASSET_KEYS.WORLD, 2017);
+        if (this.#unitDetails.shadow) {
+            this.#shadow.create(scene, this.#unitDetails.shadow.assetKey, this.#unitDetails.shadow.assetFrame);
+            unitTiles.push(this.#shadow.gameObject);
+        }
 
-        return scene.add.container(0, 0, [this.#shadow.gameObject, this._gameObject]);
+        unitTiles.push(this._gameObject);
+        return scene.add.container(0, 0, unitTiles);
     }
 
     animate() {
@@ -145,12 +151,14 @@ export class TileUnit extends TileEntity {
 
         if (!this.isAlive) {
             this._gameObject.anims.stop();
-            // TODO: Depending on Unit Data
-            // TODO: Randomize the death frame
-            this._gameObject.setTexture(DUNGEON_ASSET_KEYS.WORLD);
+            // Change the unit texture and frame
+            this._gameObject.setTexture(this.#unitDetails.death.assetKey);
+            this._gameObject.setFrame(this.#unitDetails.death.assetFrame);
+
             this._gameObject.y = 0;
-            this._gameObject.setFrame(89);
-            this.#shadow.remove();
+            if (this.#shadow) {
+                this.#shadow.remove();
+            }
         }
     }
 
