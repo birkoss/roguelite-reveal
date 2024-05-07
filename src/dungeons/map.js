@@ -1,6 +1,6 @@
 import Phaser from "../lib/phaser.js";
 
-import { DUNGEON_ASSET_KEYS, UI_ASSET_KEYS } from "../keys/asset.js";
+import { DUNGEON_ASSET_KEYS } from "../keys/asset.js";
 import { DataUtils } from "../utils/data.js";
 import { TILE_TYPE, Tile } from "./tiles/tile.js";
 import { TILE_ITEM_TYPE, TileItem } from "./tiles/entities/item.js";
@@ -93,10 +93,7 @@ export class Map {
             }
 
             // Create tile shadow
-            let upTile = this.#tiles.find(singleUpTile => singleUpTile.y === singleTile.y -1 && singleUpTile.x === singleTile.x);
-            if (upTile && upTile.type === TILE_TYPE.WALL) {
-                singleTile.createShadow(this.#scene, theme.shadow.assetKey, theme.shadow.assetFrame);
-            }
+            singleTile.createShadow(this.#scene, theme.shadow.assetKey, theme.shadow.assetFrame);
             
             if (singleTile.item) {
                 let assetKey = theme.exit.assetKey;
@@ -241,7 +238,7 @@ export class Map {
     /**
      * @param {number} x 
      * @param {number} y 
-     * @param {boolean} [includeAdjacent = false] 
+     * @param {boolean} [includeAdjacent=false] 
      * @returns {Tile[]}
      */
     getNeighboors(x, y, includeAdjacent) {
@@ -302,8 +299,6 @@ export class Map {
     exploreAt(x, y, callback) {
         let tilesToExplore = [];
 
-        // TODO: Add tile shadow when the tile upfront is NOT revealed
-
         let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
 
         // Add the main tile WITH overlay
@@ -337,7 +332,6 @@ export class Map {
      * @param {number} y 
      */
     selectTileAt(x, y) {
-        console.log('selectTileAt');
         let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
         
         // Select the current tile
@@ -372,7 +366,7 @@ export class Map {
 
         // Generate ennemies
         // TODO: Never spawn enemy adjacent to the EXIT (use getNeighboors to remove tiles)
-        for (let i=0; i<5; i++) {
+        for (let i=0; i<1; i++) {
             let enemyDetails = DataUtils.getEnemyDetails(this.#scene, (i==0 ? 'imp' : 'skeleton'));
             tile = emptyTiles.shift();
             tile.addEnemy(enemyDetails);
@@ -380,7 +374,7 @@ export class Map {
 
         // TODO: Generate item
         let itemDetails = DataUtils.getItemDetails(this.#scene, 'minor_hp_potion');
-        for (let i=0; i<10; i++) {
+        for (let i=0; i<1; i++) {
             tile = emptyTiles.shift();
             tile.addItem(new TileItem(TILE_ITEM_TYPE.CONSUMABLE, itemDetails));
         }
@@ -395,6 +389,23 @@ export class Map {
     #revealTiles(tiles, callback) {
         let singleTile = tiles.shift();
         singleTile.reveal(() => {
+            // Add SHADOW on this TILE if below a WALL or an OVERLAY
+            let tileTopNeighboor = this.#tiles.find(singleTopTile => singleTopTile.x === singleTile.x && singleTopTile.y === singleTile.y - 1);
+            if (tileTopNeighboor.type === TILE_TYPE.WALL || tileTopNeighboor.overlay) {
+                singleTile.showShadow();
+            }
+
+            // Remove shadow from neighboors
+            let neighboors = this.getNeighboors(singleTile.x, singleTile.y);
+            neighboors.forEach((singleNeighboor) => {
+                let tileTopNeighboor = this.#tiles.find(singleTopTile => singleTopTile.x === singleNeighboor.x && singleTopTile.y === singleNeighboor.y - 1);
+
+                if (tileTopNeighboor && tileTopNeighboor.type === TILE_TYPE.FLOOR && !tileTopNeighboor.overlay) {
+                    singleNeighboor.hideShadow();
+                }
+            });
+
+            // Continue revealing tiles
             if (tiles.length > 0) {
                 this.#revealTiles(tiles, callback);
             } else {

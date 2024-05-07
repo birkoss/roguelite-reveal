@@ -27,6 +27,8 @@ export class Tile {
     /** @type {TileEntity} */
     #background;
     /** @type {Phaser.GameObjects.Sprite} */
+    #shadow;
+    /** @type {Phaser.GameObjects.Sprite} */
     #selection;
     /** @type {TileEntity} */
     #overlay;
@@ -153,9 +155,9 @@ export class Tile {
      * @param {number} assetFrame 
      */
     createShadow(scene, assetKey, assetFrame) {
-        let shadow = scene.add.sprite(0, 0, assetKey, assetFrame);
-        shadow.setOrigin(0);
-        this.#container.add(shadow);
+        this.#shadow = scene.add.sprite(0, 0, assetKey, assetFrame);
+        this.#shadow.setOrigin(0).setAlpha(0);
+        this.#container.add(this.#shadow);
     }
 
     /**
@@ -206,6 +208,17 @@ export class Tile {
     unselect() {
         if (this.#selection) {
             this.#selection.setAlpha(0);
+        }
+    }
+
+    showShadow() {
+        if (this.#shadow) {
+            this.#shadow.setAlpha(1);
+        }
+    }
+    hideShadow() {
+        if (this.#shadow) {
+            this.#shadow.setAlpha(0);
         }
     }
 
