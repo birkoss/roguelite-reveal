@@ -16,6 +16,7 @@ export const DUNGEON_ASSET_KEYS = Object.freeze({
 });
 
 export const UI_ASSET_KEYS = Object.freeze({
+    SELECTED_TILE: 'SELECTED_TILE',
     HORIZONTAL_BARS: 'HORIZONTAL_BARS',
     PANEL: 'PANEL',
     BUTTON_SKILLS: 'BUTTON_SKILLS',

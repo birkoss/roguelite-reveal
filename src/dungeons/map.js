@@ -1,6 +1,6 @@
 import Phaser from "../lib/phaser.js";
 
-import { DUNGEON_ASSET_KEYS } from "../keys/asset.js";
+import { DUNGEON_ASSET_KEYS, UI_ASSET_KEYS } from "../keys/asset.js";
 import { DataUtils } from "../utils/data.js";
 import { TILE_TYPE, Tile } from "./tiles/tile.js";
 import { TILE_ITEM_TYPE, TileItem } from "./tiles/entities/item.js";
@@ -109,6 +109,8 @@ export class Map {
 
                 singleTile.createItem(this.#scene, assetKey, assetFrame);
             }
+
+            singleTile.createSeletion(this.#scene);
 
             if (singleTile.enemy) {
                 singleTile.createEnemy(this.#scene);
@@ -301,7 +303,7 @@ export class Map {
         let tilesToExplore = [];
 
         let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
-        
+
         // Add the main tile WITH overlay
         if (tile.overlay) {
             tilesToExplore.push(tile);
@@ -326,6 +328,21 @@ export class Map {
             // Reveal all things on those tiles
             this.#activateTiles(tilesToExplore, callback);
         }); 
+    }
+
+    /**
+     * @param {number} x 
+     * @param {number} y 
+     */
+    selectTileAt(x, y) {
+        console.log('selectTileAt');
+        let tile = this.#tiles.find(singleTile => singleTile.x === x && singleTile.y === y);
+        
+        // Select the current tile
+        this.#tiles.forEach((singleTile) => {
+            singleTile.unselect();
+        });
+        tile.select();
     }
 
     #generate() {
@@ -354,7 +371,7 @@ export class Map {
         // Generate ennemies
         // TODO: Never spawn enemy adjacent to the EXIT (use getNeighboors to remove tiles)
         for (let i=0; i<5; i++) {
-            let enemyDetails = DataUtils.getEnemyDetails(this.#scene, 'skeleton');
+            let enemyDetails = DataUtils.getEnemyDetails(this.#scene, (i==0 ? 'imp' : 'skeleton'));
             tile = emptyTiles.shift();
             tile.addEnemy(enemyDetails);
         }
@@ -395,7 +412,6 @@ export class Map {
                 singleTile.enemy.animate();
 
                 // Animate an appear effect
-                // TODO: Add effect in Tile instead
                 let effect = this.#scene.add.sprite(
                     singleTile.container.x + singleTile.enemy.gameObject.displayWidth / 2,
                     singleTile.container.y + singleTile.enemy.gameObject.displayHeight / 2 - singleTile.enemy.gameObject.displayHeight,

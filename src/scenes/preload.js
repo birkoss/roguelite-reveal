@@ -13,6 +13,7 @@ export class PreloadScene extends Phaser.Scene {
 
     preload() {
         this.load.image(UI_ASSET_KEYS.PANEL, 'assets/images/panel.png');
+        this.load.image(UI_ASSET_KEYS.SELECTED_TILE, 'assets/images/selected-tile.png');
 
         this.load.spritesheet(DUNGEON_ASSET_KEYS.WORLD, 'assets/tilesets/world.png', {
             frameWidth: TILE_SIZE,

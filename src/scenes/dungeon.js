@@ -192,6 +192,8 @@ export class DungeonScene extends Phaser.Scene {
     #selectTile(x, y) {
         if (this.#stateMachine.currentStateName === MAIN_STATES.WAITING_FOR_PLAYER_ACTION) {
 
+            this.#map.selectTileAt(x, y);
+
             if (this.#map.canAttackAt(x, y)) {
                 this.#stateMachine.setState(MAIN_STATES.WAITING_FOR_ACTION_FEEDBACK);
 

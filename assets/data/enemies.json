@@ -19,5 +19,26 @@
             "assetFrame": 2017
         },
         "tileLockDistance": 1
+    },
+    {
+        "id": "imp",
+        "name": "Imp",
+        "hp": 10,
+        "attack": 10,
+        "defense": 3,
+        "assetKey": "UNITS",
+        "assetFrames": [
+            341,
+            359
+        ],
+        "death": {
+            "assetKey": "WORLD",
+            "assetFrame": 89
+        },
+        "shadow": {
+            "assetKey": "WORLD",
+            "assetFrame": 2017
+        },
+        "tileLockDistance": 1
     }
 ]

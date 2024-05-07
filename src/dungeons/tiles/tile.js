@@ -4,6 +4,7 @@ import { SKIP_OVERLAYS, TILE_SIZE } from "../../config.js";
 import { TileEntity } from "./entities/entity.js";
 import { TileUnit } from "./entities/unit.js";
 import { TileItem } from "./entities/item.js";
+import { UI_ASSET_KEYS } from "../../keys/asset.js";
 
 /** @typedef {keyof typeof TILE_TYPE} TileType */
 /** @enum {TileType} */
@@ -25,6 +26,8 @@ export class Tile {
 
     /** @type {TileEntity} */
     #background;
+    /** @type {Phaser.GameObjects.Sprite} */
+    #selection;
     /** @type {TileEntity} */
     #overlay;
     /** @type {TileUnit} */
@@ -156,6 +159,28 @@ export class Tile {
     }
 
     /**
+     * @param {Phaser.Scene} scene 
+     */
+    createSeletion(scene) {
+        console.log("CS...");
+        this.#selection = scene.add.sprite(0, 0, UI_ASSET_KEYS.SELECTED_TILE);
+        this.#selection.setAlpha(0).setOrigin(0);
+        this.#container.add(this.#selection);
+    }
+
+    /**
+     * @param {Phaser.Scene} scene 
+     * @param {string} assetKey 
+     * @param {number} assetFrame 
+     */
+    createStatus(scene, assetKey, assetFrame) {
+        console.log(assetKey);
+        let status = scene.add.image(0, 0, assetKey, assetFrame);
+        status.setOrigin(0);
+        this.#container.add(status);
+    }
+
+    /**
      * @param {() => void} [callback] 
      */
     reveal(callback) {
@@ -171,6 +196,18 @@ export class Tile {
                 callback();
             }
         });
+    }
+
+    select() {
+        if (this.#selection) {
+            this.#selection.setAlpha(1);
+        }
+    }
+
+    unselect() {
+        if (this.#selection) {
+            this.#selection.setAlpha(0);
+        }
     }
 
     /**
