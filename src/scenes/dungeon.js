@@ -226,7 +226,7 @@ export class DungeonScene extends Phaser.Scene {
                     // Dead enemy ? Give XP !
                     if (!tile.enemy.isAlive) {
                         this.#map.validateStatus();
-                        
+
                         let xp = tile.enemy.xpToNext;
                         this.#updatePlayerXp(xp, () => {
                             console.log("Updating Player XP ...");
@@ -277,7 +277,7 @@ export class DungeonScene extends Phaser.Scene {
                 }
 
                 if (tile.item.type === TILE_ITEM_TYPE.EXIT) {
-                    this.scene.start(SCENE_KEYS.DUNGEON_SCENE);
+                    this.#goDeeper();
                     return;
                 }
 
@@ -371,5 +371,18 @@ export class DungeonScene extends Phaser.Scene {
         let destinationY = destinationObject.y + this.#panel.container.y;
 
         this.#overlayText.setText('Level Up', destinationX, destinationY, callback);
+    }
+
+    #goDeeper() {
+        console.log("oh yeah!");
+
+        this.#map.tiles.forEach((singleTile) => {
+        });
+
+        // Put overlay back on each tile
+        // Make a "false" tile switching for 1-2 tiles
+        // Generate map again (with level+1)
+        // Show the player that it can interac again!
+        //  - Maybe a test overlay with "Explore"
     }
 }

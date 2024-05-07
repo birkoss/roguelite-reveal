@@ -359,18 +359,15 @@ export class Map {
         Phaser.Utils.Array.Shuffle(emptyTiles);
 
         // Generate exit
-        // TODO: Allow to lock the EXIT. Must give a key somewhere (drop or chest)
-        // TODO: Allow to seal the EXIT. Must defeat a specific enemy to lift it.
         let tile = emptyTiles.shift();
         tile = this.#tiles.find(singleTile => singleTile.x === 1 && singleTile.y === 1);
         tile.addItem(new TileItem(TILE_ITEM_TYPE.EXIT));
-
 
         // Generate ennemies
         for (let i=0; i<1; i++) {
             let enemyDetails = DataUtils.getEnemyDetails(this.#scene, (i==0 ? 'imp' : 'skeleton'));
             tile = emptyTiles.shift();
-            tile = this.#tiles.find(singleTile => singleTile.x === 2 && singleTile.y === 1);
+            tile = this.#tiles.find(singleTile => singleTile.x === 3 && singleTile.y === 1);
             tile.addEnemy(enemyDetails);
         }
 
