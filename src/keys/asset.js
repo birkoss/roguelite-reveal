@@ -21,4 +21,3 @@ export const UI_ASSET_KEYS = Object.freeze({
     PANEL: 'PANEL',
     BUTTON_SKILLS: 'BUTTON_SKILLS',
 });
-

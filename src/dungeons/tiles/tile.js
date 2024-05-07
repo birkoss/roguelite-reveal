@@ -5,7 +5,7 @@ import { TileEntity } from "./entities/entity.js";
 import { TileUnit } from "./entities/unit.js";
 import { TileItem } from "./entities/item.js";
 import { UI_ASSET_KEYS } from "../../keys/asset.js";
-import { TILE_STATUS_TYPE, TileStatus } from "./entities/status.js";
+import { TileStatus } from "./entities/status.js";
 
 /** @typedef {keyof typeof TILE_TYPE} TileType */
 /** @enum {TileType} */

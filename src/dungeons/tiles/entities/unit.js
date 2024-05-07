@@ -1,6 +1,5 @@
 import Phaser from "../../../lib/phaser.js";
 
-import { DUNGEON_ASSET_KEYS } from "../../../keys/asset.js";
 import { TileEntity } from "./entity.js";
 
 export class TileUnit extends TileEntity {

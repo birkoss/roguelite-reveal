@@ -374,7 +374,7 @@ export class Map {
             tile.addEnemy(enemyDetails);
         }
 
-        // TODO: Generate item
+        // Generate item
         let itemDetails = DataUtils.getItemDetails(this.#scene, 'minor_hp_potion');
         for (let i=0; i<1; i++) {
             tile = emptyTiles.shift();
@@ -427,7 +427,7 @@ export class Map {
             if (singleTile.enemy) {
                 singleTile.enemy.animate();
 
-                // TODO: Disable surrounding tile
+                // Disable surrounding tile
                 let neighboors = this.getNeighboors(singleTile.x, singleTile.y);
                 neighboors.forEach((singleNeighboor) => {
                     if (singleNeighboor.item) {
@@ -436,7 +436,7 @@ export class Map {
                 });
 
                 // Animate an appear effect
-                // TODO: Add Status on top tile instead (and roll back to the new status)
+                // TODO: Add Status on top tile instead (and roll back to the previous status)
                 let effect = this.#scene.add.sprite(
                     singleTile.container.x + singleTile.enemy.gameObject.displayWidth / 2,
                     singleTile.container.y + singleTile.enemy.gameObject.displayHeight / 2 - singleTile.enemy.gameObject.displayHeight,

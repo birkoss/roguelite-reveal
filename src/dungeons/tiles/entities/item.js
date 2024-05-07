@@ -1,5 +1,3 @@
-import { TILE_SIZE } from "../../../config.js";
-import { DUNGEON_ASSET_KEYS } from "../../../keys/asset.js";
 import Phaser from "../../../lib/phaser.js";
 
 import { TileEntity } from "./entity.js";
