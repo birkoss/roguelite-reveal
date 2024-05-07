@@ -7,6 +7,9 @@ export class TileUnit extends TileEntity {
     /** @type {UnitDetails} */
     #unitDetails;
 
+    /** @type {TileEntity} */
+    #shadow;
+
     /** @type {number} */
     #hp;
     /** @type {number} */
@@ -103,10 +106,10 @@ export class TileUnit extends TileEntity {
         });
 
         // Add shadow under the Unit
-        let shadow = new TileEntity();
-        shadow.create(scene, DUNGEON_ASSET_KEYS.WORLD, 2017);
+        this.#shadow = new TileEntity();
+        this.#shadow.create(scene, DUNGEON_ASSET_KEYS.WORLD, 2017);
 
-        return scene.add.container(0, 0, [shadow.gameObject, this._gameObject]);
+        return scene.add.container(0, 0, [this.#shadow.gameObject, this._gameObject]);
     }
 
     animate() {
@@ -145,7 +148,9 @@ export class TileUnit extends TileEntity {
             // TODO: Depending on Unit Data
             // TODO: Randomize the death frame
             this._gameObject.setTexture(DUNGEON_ASSET_KEYS.WORLD);
+            this._gameObject.y = 0;
             this._gameObject.setFrame(89);
+            this.#shadow.remove();
         }
     }
 

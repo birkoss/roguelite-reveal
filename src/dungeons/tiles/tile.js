@@ -94,6 +94,7 @@ export class Tile {
 
         if (this.#enemy) {
             let container = this.#enemy.createUnit(scene);
+            this.#enemy.gameObject.setAlpha(0);
             this.#container.add(container);
         }
 
@@ -150,6 +151,10 @@ export class Tile {
         this.#overlay.remove(() => {
             this.#overlay.gameObject.destroy();
             this.#overlay = undefined;
+
+            if (this.#enemy) {
+                this.#enemy.gameObject.setAlpha(1);
+            }
 
             if (callback) {
                 callback();

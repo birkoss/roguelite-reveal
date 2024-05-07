@@ -231,6 +231,7 @@ export class DungeonScene extends Phaser.Scene {
                 }
 
                 if (tile.item.type === TILE_ITEM_TYPE.CONSUMABLE) {
+                    // TODO: Apply modifiers
                     console.log(tile.item.itemDetails.modifiers.hp);
 
                     tile.useItem();

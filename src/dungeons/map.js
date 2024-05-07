@@ -4,6 +4,7 @@ import { DUNGEON_ASSET_KEYS } from "../keys/asset.js";
 import { DataUtils } from "../utils/data.js";
 import { TILE_TYPE, Tile } from "./tiles/tile.js";
 import { TILE_ITEM_TYPE, TileItem } from "./tiles/entities/item.js";
+import { SKIP_OVERLAYS } from "../config.js";
 
 export class Map {
     /** @type {Phaser.Scene} */
@@ -99,7 +100,9 @@ export class Map {
                 singleTile.createItem(this.#scene, assetKey, assetFrame);
             }
 
-            singleTile.createOverlay(this.#scene, theme.hidden.assetKey, theme.hidden.assetFrame);
+            if (!SKIP_OVERLAYS) {
+                singleTile.createOverlay(this.#scene, theme.hidden.assetKey, theme.hidden.assetFrame);
+            }
         });
     }
 
@@ -184,14 +187,6 @@ export class Map {
         if (!tile.overlay) {
             return false;
         }
-
-        // Must NOT have an effect at the same tile
-        // TODO: Track using X, Y and not the Sprite position
-        // TODO: Detect the status type to react differently
-        // let sprite = this.#status.find(singleStatus => singleStatus.x === tile.overlay.gameObject.x + tile.overlay.gameObject.displayWidth/2 && singleStatus.y === tile.overlay.gameObject.y + tile.overlay.gameObject.displayHeight / 2);
-        // if (sprite) {
-        //     return false;
-        // }
 
         return true;
     }
