@@ -391,8 +391,8 @@ export class Map {
             singleTile.removeOverlay(() => {
                 // TODO: Clean this, should arrive faster
                 this.validateShadow(singleTile);
+                this.#activateTile(singleTile);
             });
-            this.#activateTile(singleTile);
         });
 
         if (callback) {
@@ -481,7 +481,7 @@ export class Map {
 
         // Reveal the OVERLAY
         singleTile.removeOverlay(() => {
-            this.#activateTile(singleTile, () => {
+            this.#activateTile(singleTile, true, () => {
                 // Continue revealing tiles
                 if (tiles.length > 0) {
                     this.#revealTiles(tiles, callback);
@@ -494,9 +494,10 @@ export class Map {
 
     /**
      * @param {Tile} tile 
+     * @param {boolean} [changeTileStatus=false] 
      * @param {() => void} [callback ]
      */
-    #activateTile(tile, callback) {
+    #activateTile(tile, changeTileStatus, callback) {
         // An enemy is on the tile ?
         if (tile.enemy) {
             tile.createEnemy(this.#scene);
@@ -507,12 +508,14 @@ export class Map {
             tile.enemy.animate();
 
             // Disable surrounding tile
-            let neighboors = this.getNeighboors(tile.x, tile.y);
-            neighboors.forEach((singleNeighboor) => {
-                if (singleNeighboor.item) {
-                    this.changeTileStatus(singleNeighboor, TILE_STATUS_TYPE.LOCKED);
-                }
-            });
+            if (changeTileStatus) {
+                let neighboors = this.getNeighboors(tile.x, tile.y);
+                neighboors.forEach((singleNeighboor) => {
+                    if (singleNeighboor.item) {
+                        this.changeTileStatus(singleNeighboor, TILE_STATUS_TYPE.LOCKED);
+                    }
+                });
+            }
 
             // Animate an appear effect
             // TODO: Add Status on top tile instead (and roll back to the previous status)

@@ -33,7 +33,7 @@ export class TileEntity {
                 this._gameObject,
             ],
             alpha: 1,
-            duration: 150,
+            duration: 100,
             onComplete: () => {
                 if (callback) {
                     callback();
@@ -52,7 +52,7 @@ export class TileEntity {
                 this._gameObject,
             ],
             alpha: 0,
-            duration: 150,
+            duration: 100,
             onComplete: () => {
                 if (callback) {
                     callback();

@@ -178,7 +178,6 @@ export class DungeonScene extends Phaser.Scene {
             name: MAIN_STATES.LEVEL_CLEARED,
             onEnter: () => {
                 this.#map.revealAllTiles(() => {
-                    // TODO: Fix shadow OVER enemy
                     this.time.delayedCall(1200, () => {
                         this.#map.hideAllTiles(() => {
                             let floorTiles = this.#map.tiles.filter(singleTile => singleTile.type === TILE_TYPE.FLOOR);
