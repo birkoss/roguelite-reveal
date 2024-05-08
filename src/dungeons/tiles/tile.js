@@ -110,6 +110,13 @@ export class Tile {
         return this.#container;
     }
 
+    removeAll() {
+        this.removeStatus();
+        this.removeShadow();
+        this.removeItem();
+        this.removeEnemy();
+    }
+
     /**
      * 
      * @param {Phaser.Scene} scene 
@@ -174,6 +181,10 @@ export class Tile {
 
         if (this.#selection) {
             this.#container.moveAbove(this.#selection, this.#shadow.gameObject);
+        }
+        if (this.#enemy && this.#enemy.gameObject) {
+            // TODO: FIX
+            // this.#container.moveAbove(this.#enemy.gameObject, this.#shadow.gameObject);
         }
     }
     removeShadow() {

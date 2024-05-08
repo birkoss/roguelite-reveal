@@ -11,6 +11,7 @@ import { TileUnit } from "../dungeons/tiles/entities/unit.js";
 import { TILE_ITEM_TYPE } from "../dungeons/tiles/entities/item.js";
 import { OverlayText } from "../ui/overlay-text.js";
 import { TILE_STATUS_TYPE } from "../dungeons/tiles/entities/status.js";
+import { TILE_TYPE } from "../dungeons/tiles/tile.js";
 
 const MAIN_STATES = Object.freeze({
     CREATE_DUNGEON: 'CREATE_DUNGEON',
@@ -19,6 +20,7 @@ const MAIN_STATES = Object.freeze({
     WAITING_FOR_PLAYER_ACTION: 'WAITING_FOR_PLAYER_ACTION',
     WAITING_FOR_ACTION_FEEDBACK: 'WAITING_FOR_ACTION_FEEDBACK',
     TURN_END: 'TURN_END',
+    LEVEL_CLEARED: 'LEVEL_CLEARED',
 });
 
 export class DungeonScene extends Phaser.Scene {
@@ -171,6 +173,34 @@ export class DungeonScene extends Phaser.Scene {
                 });
             },
         });
+
+        this.#stateMachine.addState({
+            name: MAIN_STATES.LEVEL_CLEARED,
+            onEnter: () => {
+                this.#map.revealAllTiles(() => {
+                    // TODO: Fix shadow OVER enemy
+                    this.time.delayedCall(1200, () => {
+                        this.#map.hideAllTiles(() => {
+                            let floorTiles = this.#map.tiles.filter(singleTile => singleTile.type === TILE_TYPE.FLOOR);
+                            Phaser.Utils.Array.Shuffle(floorTiles);
+        
+                            let swapTiles = [];
+                            for (let i=0; i<15; i++) {
+                                swapTiles.push({
+                                    tile1: floorTiles.shift(),
+                                    tile2: floorTiles.shift(),
+                                });
+                            }
+        
+                            this.#mapSwapTiles(swapTiles, () => {
+                                this.#map.fixTilesDepth();
+                                this.#stateMachine.setState(MAIN_STATES.GENERATE_DUNGEON);
+                            });
+                        });
+                    });
+                });
+            },
+        });
     }
 
     #createAnimations() {
@@ -290,7 +320,7 @@ export class DungeonScene extends Phaser.Scene {
                 }
 
                 if (tile.item.type === TILE_ITEM_TYPE.EXIT) {
-                    this.#goDeeper();
+                    this.#stateMachine.setState(MAIN_STATES.LEVEL_CLEARED);
                     return;
                 }
 
@@ -386,19 +416,17 @@ export class DungeonScene extends Phaser.Scene {
         this.#overlayText.setText('Level Up', destinationX, destinationY, callback);
     }
 
-    #goDeeper() {
-        console.log("oh yeah!");
+    #mapSwapTiles(swapTiles, callback) {
+        const {tile1, tile2} = swapTiles.shift();
 
-        //this.#map.generate(this.#dungeonTheme);
-
-        this.#map.tiles.forEach((singleTile) => {
+        this.#map.swapTiles(tile1, tile2, () => {
+            if (swapTiles.length === 0) {
+                if (callback) {
+                    callback();
+                }
+            } else {
+                this.#mapSwapTiles(swapTiles, callback);
+            }
         });
-        // Remove all overlay
-        // Wait 1000ms
-        // Put overlay back on each tile
-        // Make a "false" tile switching for 1-2 tiles
-        // Generate map again (with level+1)
-        // Show the player that it can interac again!
-        //  - Maybe a test overlay with "Explore"
     }
 }
