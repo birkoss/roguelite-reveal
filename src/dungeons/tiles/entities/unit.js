@@ -6,6 +6,8 @@ export class TileUnit extends TileEntity {
     /** @type {UnitDetails} */
     #unitDetails;
 
+    /** @type {Phaser.GameObjects.Container} */
+    #container;
     /** @type {TileEntity} */
     #shadow;
 
@@ -98,17 +100,17 @@ export class TileUnit extends TileEntity {
             repeat: -1,
         });
 
-        let unitTiles = [];
+        this.#container = scene.add.container(0, 0,);
 
         // Add shadow under the Unit
         this.#shadow = new TileEntity();
         if (this.#unitDetails.shadow) {
             this.#shadow.create(scene, this.#unitDetails.shadow.assetKey, this.#unitDetails.shadow.assetFrame);
-            unitTiles.push(this.#shadow.gameObject);
+            this.#container.add(this.#shadow.gameObject);
         }
 
-        unitTiles.push(this._gameObject);
-        return scene.add.container(0, 0, unitTiles);
+        this.#container.add(this._gameObject);
+        return scene.add.container(0, 0, this.#container);
     }
 
     animate() {

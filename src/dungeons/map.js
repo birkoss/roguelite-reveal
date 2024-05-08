@@ -140,9 +140,9 @@ export class Map {
 
         // Add items
         itemDetails = DataUtils.getItemDetails(this.#scene, 'minor_hp_potion');
-        for (let i=0; i<3; i++) {
+        for (let i=0; i<1; i++) {
             tile = emptyTiles.shift();
-            // tile = this.#tiles.find(singleTile => singleTile.x === 2 && singleTile.y === 2);
+            tile = this.#tiles.find(singleTile => singleTile.x === 2 && singleTile.y === 2);
             tile.setItem(new TileItem(TILE_ITEM_TYPE.CONSUMABLE, itemDetails));
         }
 
@@ -340,7 +340,7 @@ export class Map {
         let neighboors = this.getNeighboors(tile.x, tile.y);
         neighboors.forEach((singleNeighboor) => {
             if (singleNeighboor.overlay && (!singleNeighboor.status || (singleNeighboor.status && singleNeighboor.status.type !== TILE_STATUS_TYPE.LOCKED))) {
-                tilesToExplore.push(singleNeighboor);
+               tilesToExplore.push(singleNeighboor);
             }
         });
 
@@ -387,11 +387,12 @@ export class Map {
      */
     revealAllTiles(callback) {
         let tiles = this.tiles.filter(singleTile => singleTile.overlay);
+
+        this.preRevealTiles(tiles);
+
         tiles.forEach((singleTile) => {
             singleTile.removeOverlay(() => {
-                // TODO: Clean this, should arrive faster
-                this.validateShadow(singleTile);
-                this.#activateTile(singleTile);
+                this.#postRevealTile(singleTile);
             });
         });
 
@@ -475,21 +476,25 @@ export class Map {
      * @param {() => void} [callback]
      */
     #revealTiles(tiles, callback) {
-        let singleTile = tiles.shift();
+        this.preRevealTiles(tiles);
 
-        this.validateShadow(singleTile);
+        // Create with [callback]
 
-        // Reveal the OVERLAY
-        singleTile.removeOverlay(() => {
-            this.#activateTile(singleTile, true, () => {
-                // Continue revealing tiles
-                if (tiles.length > 0) {
-                    this.#revealTiles(tiles, callback);
-                } else {
-                    callback();
-                }
+        tiles.forEach((singleTile) => {
+            // Reveal the OVERLAY
+            singleTile.removeOverlay(() => {
+                // add event
+                this.#postRevealTile(singleTile, true, () => {
+                   // callback = function callback 
+                        
+                });
             });
         });
+
+        this.#scene.time.delayedCall(1000, () => {
+            callback();
+        });
+
     }
 
     /**
@@ -497,13 +502,13 @@ export class Map {
      * @param {boolean} [changeTileStatus=false] 
      * @param {() => void} [callback ]
      */
-    #activateTile(tile, changeTileStatus, callback) {
+    #postRevealTile(tile, changeTileStatus, callback) {
         // An enemy is on the tile ?
         if (tile.enemy) {
             tile.createEnemy(this.#scene);
             tile.enemy.shadow.gameObject.setAlpha(0);
-            tile.enemy.scaleIn(() => {
-                tile.enemy.shadow.scaleIn(); 
+            tile.enemy.fadeIn(() => {
+                tile.enemy.shadow.fadeIn(); 
             });
             tile.enemy.animate();
 
@@ -531,11 +536,6 @@ export class Map {
             effect.anims.play("appear", true);
         }
 
-        if (tile.item) {
-            tile.createItem(this.#scene);
-            tile.item.scaleIn();
-        }
-
         if (callback) {
             callback();
         }
@@ -549,6 +549,52 @@ export class Map {
         tile.setStatus(new TileStatus(newStatus));
         tile.createStatus(this.#scene, DUNGEON_ASSET_KEYS.TILE_STATUS, 0);
         tile.status.fadeIn();
+    }
+
+    /**
+     * @param {Tile[]} [revealingTiles] 
+     */
+    preRevealTiles(revealingTiles) {
+        // Shadow
+        this.#tiles.forEach((singleTile) => {
+            if (singleTile.type === TILE_TYPE.WALL) {
+                return;
+            }
+
+            // Still have an overlay and is not in the revealing tiles..
+            if (singleTile.overlay && !revealingTiles.find((singleRevealingTile) => singleRevealingTile.x === singleTile.x && singleRevealingTile.y === singleTile.y)) {
+                return;
+            }
+
+            let needShadow = false;
+
+            // Check if the top neighboor is NOT in the revealingTiles
+            let tileTopNeighboor = this.#tiles.find(singleTopTile => singleTopTile.x === singleTile.x && singleTopTile.y === singleTile.y - 1);
+            // A shadow below a wall
+            if (tileTopNeighboor.type === TILE_TYPE.WALL) {
+                needShadow = true;
+            }
+            // Need a shadow below a FLOOR with an OVERLAY
+            if (tileTopNeighboor.type === TILE_TYPE.FLOOR && tileTopNeighboor.overlay && !revealingTiles.find(singleTopTile => singleTopTile.x === singleTile.x && singleTopTile.y === singleTile.y - 1)) {
+                needShadow = true;
+            }
+
+            if (needShadow && !singleTile.shadow) {
+                singleTile.createShadow(this.#scene, this.#theme.shadow.assetKey, this.#theme.shadow.assetFrame);
+                return;
+            }
+            if (!needShadow && singleTile.shadow) {
+                singleTile.shadow.fadeOut(() => {
+                    singleTile.removeShadow();
+                });
+            }
+        });
+
+        revealingTiles.forEach((singleTile) => {
+            if (singleTile.item) {
+                singleTile.createItem(this.#scene);
+            }
+        });
     }
 
     validateStatus() {
@@ -576,43 +622,6 @@ export class Map {
                     singleTile.removeStatus();
                 }
             }
-        });
-    }
-
-    /**
-     * @param {Tile} tile 
-     */
-    validateShadow(tile) {
-        // Add SHADOW on this TILE if below a WALL or an OVERLAY
-        let tileTopNeighboor = this.#tiles.find(singleTopTile => singleTopTile.x === tile.x && singleTopTile.y === tile.y - 1);
-        if (tileTopNeighboor.type === TILE_TYPE.WALL || tileTopNeighboor.overlay) {
-            tile.createShadow(this.#scene, this.#theme.shadow.assetKey, this.#theme.shadow.assetFrame);
-            tile.shadow.fadeIn();
-        }
-
-        // Remove SHADOW from neighboors
-        let neighboors = this.getNeighboors(tile.x, tile.y);
-        neighboors.forEach((singleNeighboor) => {
-            if (!singleNeighboor.shadow) {
-                return;
-            }
-
-            let tileTopNeighboor = this.#tiles.find(singleTopTile => singleTopTile.x === singleNeighboor.x && singleTopTile.y === singleNeighboor.y - 1);
-            if (!tileTopNeighboor) {
-                return;
-            }
-
-            if (tileTopNeighboor.type !== TILE_TYPE.FLOOR) {
-                return;
-            }
-
-            if (tileTopNeighboor.overlay && tileTopNeighboor !== tile) {
-                return;
-            }
-
-            singleNeighboor.shadow.fadeOut(() => {
-                singleNeighboor.removeShadow();
-            });
         });
     }
 

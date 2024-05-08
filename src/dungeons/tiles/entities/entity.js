@@ -33,7 +33,8 @@ export class TileEntity {
                 this._gameObject,
             ],
             alpha: 1,
-            duration: 100,
+            duration: 500,
+            ease: Phaser.Math.Easing.Cubic.Out,
             onComplete: () => {
                 if (callback) {
                     callback();
@@ -52,7 +53,7 @@ export class TileEntity {
                 this._gameObject,
             ],
             alpha: 0,
-            duration: 100,
+            duration: 500,
             onComplete: () => {
                 if (callback) {
                     callback();
@@ -75,7 +76,8 @@ export class TileEntity {
             alpha: 1,
             scaleY: 1,
             scaleX: 1,
-            duration: 100,
+            duration: 500,
+            ease: Phaser.Math.Easing.Bounce.Out,
             onComplete: () => {
                 if (callback) {
                     callback();
@@ -91,10 +93,11 @@ export class TileEntity {
             targets: [
                 this._gameObject,
             ],
-            alpha: 0,
+            // alpha: 0,
             scaleY: 0,
             scaleX: 0,
-            duration: 100,
+            duration: 500,
+            ease: Phaser.Math.Easing.Bounce.In,
             onComplete: () => {
                 if (callback) {
                     callback();

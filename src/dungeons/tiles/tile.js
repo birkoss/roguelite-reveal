@@ -186,6 +186,9 @@ export class Tile {
         if (this.#selection) {
             this.#container.moveAbove(this.#selection, this.#shadow.gameObject);
         }
+        if (this.#overlay) {
+            this.#container.moveAbove(this.#overlay.gameObject, this.#shadow.gameObject);
+        }
     }
     removeShadow() {
         if (this.#shadow) {
@@ -247,6 +250,10 @@ export class Tile {
         // Center the item on the tile
         this.#item.gameObject.x += (this.#background.gameObject.displayWidth - this.#item.gameObject.displayWidth) / 2;
         this.#item.gameObject.y += (this.#background.gameObject.displayHeight - this.#item.gameObject.displayHeight) / 2;
+
+        if (this.#overlay) {
+            this.#container.moveAbove(this.#overlay.gameObject, this.#item.gameObject);
+        }
     }
     /**
      * @param {() => void} [callback] 
