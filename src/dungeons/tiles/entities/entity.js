@@ -44,8 +44,9 @@ export class TileEntity {
     }
     /**
      * @param {() => void} [callback]
+     * @param {number} [duration]
      */
-    fadeOut(callback) {
+    fadeOut(callback, duration) {
         this._gameObject.setAlpha(1);
 
         this._gameObject.scene.add.tween({
@@ -53,7 +54,7 @@ export class TileEntity {
                 this._gameObject,
             ],
             alpha: 0,
-            duration: 500,
+            duration: duration || 500,
             onComplete: () => {
                 if (callback) {
                     callback();
@@ -87,8 +88,9 @@ export class TileEntity {
     }
     /**
      * @param {() => void} [callback]
+     * @param {number} [duration]
      */
-    scaleOut(callback) {
+    scaleOut(callback, duration) {
         this._gameObject.scene.add.tween({
             targets: [
                 this._gameObject,
@@ -96,7 +98,7 @@ export class TileEntity {
             // alpha: 0,
             scaleY: 0,
             scaleX: 0,
-            duration: 500,
+            duration: duration || 500,
             ease: Phaser.Math.Easing.Bounce.In,
             onComplete: () => {
                 if (callback) {

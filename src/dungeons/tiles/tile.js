@@ -141,7 +141,7 @@ export class Tile {
             if (callback) {
                 callback();
             }
-        });
+        }, 200);
     }
 
     /**

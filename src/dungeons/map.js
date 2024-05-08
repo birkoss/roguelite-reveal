@@ -586,7 +586,7 @@ export class Map {
             if (!needShadow && singleTile.shadow) {
                 singleTile.shadow.fadeOut(() => {
                     singleTile.removeShadow();
-                });
+                }, 200);
             }
         });
 
