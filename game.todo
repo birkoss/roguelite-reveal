@@ -10,9 +10,13 @@
 [ ] - Map/Generate Coin
 [ ] - Global Stats for Money
 
+[ ] - Add danger/trap on floor (only when activated on click)
 [ ] - Add skills
+[ ] - Add Skill Sonar (Show an ! over each item/enemy on the map, cooldown X turn)
 [ ] - Add passives
 [ ] - Add Blind Passive (reduce explore to 1 tile for X turn)
+[ ] - Add Burn Passive (Take X damage every end step for X turn)
+[ ] - Add Poison Passive (Take more damage for every tile revealed)
 
 [ ] - Show title screen
 [ ] - Show player selection screen
