@@ -123,7 +123,6 @@ export class TileUnit extends TileEntity {
     }
 
     levelUp() {
-        console.log("level up");
         this.#level++;
 
         this.#attack = this.#calculateStat(this.#unitDetails.attack);
