@@ -478,20 +478,18 @@ export class Map {
     #revealTiles(tiles, callback) {
         this.preRevealTiles(tiles);
 
-        // Create with [callback]
-
         tiles.forEach((singleTile) => {
-            // Reveal the OVERLAY
             singleTile.removeOverlay(() => {
-                // add event
                 this.#postRevealTile(singleTile, true, () => {
                    // callback = function callback 
-                        
+                   console.log("...");
                 });
             });
         });
 
-        this.#scene.time.delayedCall(1000, () => {
+        // TODO: Fix this
+        this.#scene.time.delayedCall(250, () => {
+            console.log("TIME...");
             callback();
         });
 
@@ -506,9 +504,24 @@ export class Map {
         // An enemy is on the tile ?
         if (tile.enemy) {
             tile.createEnemy(this.#scene);
+            console.log("ENEMY CREATED...");
             tile.enemy.shadow.gameObject.setAlpha(0);
             tile.enemy.fadeIn(() => {
                 tile.enemy.shadow.fadeIn(); 
+                console.log("enemy fade in...");
+
+                // Animate an appear effect
+                // TODO: Add Status on top tile instead (and roll back to the previous status)
+                let effect = this.#scene.add.sprite(
+                    tile.container.x + tile.container.getBounds().width / 2,
+                    tile.container.y - tile.container.getBounds().height / 2,
+                    DUNGEON_ASSET_KEYS.EFFECTS_LARGE
+                );
+                this.#container.add(effect);
+                effect.on("animationcomplete", (tween, sprite, element) => {
+                    element.destroy();
+                });
+                effect.anims.play("appear", true);
             });
             tile.enemy.animate();
 
@@ -521,19 +534,6 @@ export class Map {
                     }
                 });
             }
-
-            // Animate an appear effect
-            // TODO: Add Status on top tile instead (and roll back to the previous status)
-            let effect = this.#scene.add.sprite(
-                tile.container.x + tile.container.getBounds().width / 2,
-                tile.container.y - tile.container.getBounds().height / 2,
-                DUNGEON_ASSET_KEYS.EFFECTS_LARGE
-            );
-            this.#container.add(effect);
-            effect.on("animationcomplete", (tween, sprite, element) => {
-                element.destroy();
-            });
-            effect.anims.play("appear", true);
         }
 
         if (callback) {
