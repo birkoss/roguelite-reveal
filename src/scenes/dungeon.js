@@ -21,6 +21,7 @@ const MAIN_STATES = Object.freeze({
     WAITING_FOR_ACTION_FEEDBACK: 'WAITING_FOR_ACTION_FEEDBACK',
     TURN_END: 'TURN_END',
     LEVEL_CLEARED: 'LEVEL_CLEARED',
+    GAME_OVER: 'GAME_OVER',
 });
 
 export class DungeonScene extends Phaser.Scene {
@@ -97,7 +98,7 @@ export class DungeonScene extends Phaser.Scene {
                 this.#createMap();
                 this.#createAnimations();
 
-                this.time.delayedCall(500, () => {
+                this.time.delayedCall(300, () => {
                     this.#stateMachine.setState(MAIN_STATES.GENERATE_DUNGEON);
                 });
             },
@@ -168,6 +169,13 @@ export class DungeonScene extends Phaser.Scene {
                     
                     this.#updatePlayerHp(-totalDamage, () => {
                         this.#panel.updatePlayerHp(-totalDamage);
+
+                        // Dead Player!
+                        if (!this.#panel.player.isAlive) {
+                            this.#stateMachine.setState(MAIN_STATES.GAME_OVER);
+                            return;
+                        }
+
                         this.#stateMachine.setState(MAIN_STATES.TURN_START);
                     });
                 });
@@ -196,6 +204,17 @@ export class DungeonScene extends Phaser.Scene {
                                 this.#stateMachine.setState(MAIN_STATES.GENERATE_DUNGEON);
                             });
                         });
+                    });
+                });
+            },
+        });
+
+        this.#stateMachine.addState({
+            name: MAIN_STATES.GAME_OVER,
+            onEnter: () => {
+                this.#overlayText.setText("GAME OVER", () => {
+                    this.time.delayedCall(1000, () => {
+                        this.scene.start(SCENE_KEYS.DUNGEON_SCENE);
                     });
                 });
             },
