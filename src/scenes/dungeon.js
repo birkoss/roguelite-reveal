@@ -108,7 +108,7 @@ export class DungeonScene extends Phaser.Scene {
             onEnter: () => {
                 this.#map.generate(this.#dungeonTheme);
 
-                this.time.delayedCall(500, () => {
+                this.#overlayText.setText("Find the exit!", () => {
                     this.#stateMachine.setState(MAIN_STATES.TURN_START);
                 });
             },
@@ -389,7 +389,7 @@ export class DungeonScene extends Phaser.Scene {
         let destinationX = destinationObject.x + this.#panel.container.x;
         let destinationY = destinationObject.y + this.#panel.container.y;
 
-        this.#overlayText.setText(`${amount} HP`, destinationX, destinationY, callback);
+        this.#overlayText.setText(`${amount} HP`, callback, destinationX, destinationY);
     }
 
     /**
@@ -401,7 +401,7 @@ export class DungeonScene extends Phaser.Scene {
         let destinationX = destinationObject.x + this.#panel.container.x;
         let destinationY = destinationObject.y + this.#panel.container.y;
 
-        this.#overlayText.setText(`${amount} XP`, destinationX, destinationY, callback);
+        this.#overlayText.setText(`${amount} XP`, callback, destinationX, destinationY);
     }
 
     /**
@@ -412,7 +412,7 @@ export class DungeonScene extends Phaser.Scene {
         let destinationX = destinationObject.x + this.#panel.container.x;
         let destinationY = destinationObject.y + this.#panel.container.y;
 
-        this.#overlayText.setText('Level Up', destinationX, destinationY, callback);
+        this.#overlayText.setText('Level Up', callback, destinationX, destinationY);
     }
 
     #mapSwapTiles(swapTiles, callback) {

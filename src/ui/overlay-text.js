@@ -36,12 +36,26 @@ export class OverlayText {
 
     /**
      * @param {string} text
-     * @param {number} destinationX
-     * @param {number} destinationY
      * @param {() => void} [callback]
+     * @param {number} [destinationX]
+     * @param {number} [destinationY]
      */
-    setText(text, destinationX, destinationY, callback) {
+    setText(text, callback, destinationX, destinationY) {
         this.#text.setPosition(0, 0).setAlpha(1).setText(text);
+
+        let animData = {
+            scaleX: 0,
+            scaleY: 0,
+        };
+
+        if (destinationX && destinationY) {
+            animData = {
+                x: destinationX - this.#container.x,
+                y: destinationY - this.#container.y,
+                scaleX: 0.3,
+                scaleY: 0.3,
+            }
+        }
 
         this.#scene.add.tween({
             targets: this.#text,
@@ -52,10 +66,7 @@ export class OverlayText {
             onComplete: () => {
                 this.#scene.add.tween({
                     targets: this.#text,
-                    x: destinationX - this.#container.x,
-                    y: destinationY - this.#container.y,
-                    scaleX: 0.3,
-                    scaleY: 0.3,
+                    ...animData,
                     duration: 400,
                     ease: Phaser.Math.Easing.Expo.In,
                     onComplete: () => {
