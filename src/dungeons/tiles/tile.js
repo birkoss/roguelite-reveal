@@ -146,9 +146,13 @@ export class Tile {
 
     /**
      * @param {UnitDetails} unitDetails 
+     * @param {number} level 
      */
-    setEnemy(unitDetails) {
+    setEnemy(unitDetails, level) {
         this.#enemy = new TileUnit(unitDetails);
+        for (let i=1; i<level; i++) {
+            this.#enemy.levelUp();
+        }
     }
     /**
      * @param {Phaser.Scene} scene 

@@ -135,7 +135,7 @@ export class Map {
             let enemyDetails = DataUtils.getEnemyDetails(this.#scene, (i==0 ? 'imp' : 'skeleton'));
             // tile = emptyTiles.shift();
             tile = this.#tiles.find(singleTile => singleTile.x === 2 && singleTile.y === 1);
-            tile.setEnemy(enemyDetails);
+            tile.setEnemy(enemyDetails, this.#level);
         }
 
         // Add items
